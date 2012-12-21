@@ -11,15 +11,14 @@
 
 @implementation RKPromise
 
-#pragma mark Cancelling
+#pragma mark - Cancelling
 
 - (IBAction)cancel:(id)sender
 {
 	self.cancelled = YES;
 }
 
-#pragma mark -
-#pragma mark Execution
+#pragma mark - Execution
 
 - (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess
 				   failureBlock:(RKPromiseFailureBlock)onFailure
@@ -30,93 +29,12 @@
 
 @end
 
-#pragma mark -
-
-@implementation RKBlockPromise
-
-#pragma mark Shared Queue
-
-+ (dispatch_queue_t)sharedRealizationQueue
-{
-	static dispatch_queue_t realizationQueue;
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		realizationQueue = dispatch_queue_create("com.roundabout.RKPromise.realizationQueue", DISPATCH_QUEUE_CONCURRENT);
-	});
-	
-	return realizationQueue;
-}
-
-#pragma mark -
-#pragma mark Initialization
-
-- (id)initWithWorker:(RKBlockPromiseWorker)worker
-{
-	NSParameterAssert(worker);
-	
-	if((self = [super init]))
-	{
-		mWorker = [worker copy];
-	}
-	
-	return self;
-}
-
-#pragma mark -
-#pragma mark Blocks
-
-@synthesize worker = mWorker;
-
-#pragma mark -
-#pragma mark Execution
-
-- (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess
-				   failureBlock:(RKPromiseFailureBlock)onFailure
-				  callbackQueue:(dispatch_queue_t)callbackQueue
-{
-	NSParameterAssert(onSuccess);
-	NSParameterAssert(onFailure);
-	NSParameterAssert(callbackQueue);
-	
-	NSAssert(!mHasBeenRealized, @"Attempting to realize an already-realized promise.");
-	
-	if(self.cancelled)
-	{
-		mHasBeenRealized = YES;
-		return;
-	}
-	
-	onSuccess = [onSuccess copy];
-	onFailure = [onFailure copy];
-	
-	dispatch_async([RKBlockPromise sharedRealizationQueue], ^{
-		mWorker(self, ^(id result) {
-			dispatch_async(callbackQueue, ^{ onSuccess(result); });
-		}, ^(NSError *error) {
-			dispatch_async(callbackQueue, ^{ onFailure(error); });
-		});
-	});
-	
-	mHasBeenRealized = YES;
-}
-
-@end
-
-#pragma mark -
-#pragma mark Public
-
-RKBlockPromise *RKPromiseCreate(RKBlockPromiseWorker worker)
-{
-	return [[RKBlockPromise alloc] initWithWorker:worker];
-}
-
-#pragma mark -
-#pragma mark Singular Realization
+#pragma mark - Singular Realization
 
 RK_OVERLOADABLE void RKRealize(RKPromise *promise, 
 							   RKPromiseSuccessBlock success,
 							   RKPromiseFailureBlock failure,
-							   dispatch_queue_t callbackQueue)
+							   NSOperationQueue *callbackQueue)
 {
 	if(!promise)
 		return;
@@ -128,52 +46,19 @@ RK_OVERLOADABLE void RKRealize(RKPromise *promise,
 							   RKPromiseSuccessBlock success,
 							   RKPromiseFailureBlock failure)
 {
-	RKRealize(promise, success, failure, dispatch_get_current_queue());
+	RKRealize(promise, success, failure, [NSOperationQueue currentQueue]);
 }
-
-#pragma mark -
-#pragma mark Plural Realization
-
-@implementation RKPossibility
-
-- (id)initWithValue:(id)value
-{
-	if((self = [super init]))
-	{
-		mValue = value;
-	}
-	
-	return self;
-}
-
-- (id)initWithError:(NSError *)error
-{
-	if((self = [super init]))
-	{
-		mError = error;
-	}
-	
-	return self;
-}
-
-#pragma mark -
-#pragma mark Properties
-
-@synthesize value = mValue;
-@synthesize error = mError;
-
-@end
 
 #pragma mark -
 
 RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 									   void(^callback)(NSArray *possibilities))
 {
-	RKRealizePromises(promises, callback, dispatch_get_current_queue());
+	RKRealizePromises(promises, callback, [NSOperationQueue currentQueue]);
 }
 RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 									   void(^callback)(NSArray *possibilities),
-									   dispatch_queue_t callbackQueue)
+									   NSOperationQueue *callbackQueue)
 {
 	NSCParameterAssert(promises);
 	NSCParameterAssert(callback);
@@ -190,9 +75,9 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 				[completedPromises addObject:possibility];
 				if([completedPromises count] == numberOfPromises)
 				{
-					dispatch_async(callbackQueue, ^{
+					[callbackQueue addOperationWithBlock:^{
 						if(callback) callback(completedPromises);
-					});
+					}];
 				}
 			}
 		}, ^(NSError *error) {
@@ -202,11 +87,83 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 				[completedPromises addObject:possibility];
 				if([completedPromises count] == numberOfPromises)
 				{
-					dispatch_async(callbackQueue, ^{
+					[callbackQueue addOperationWithBlock:^{
 						if(callback) callback(completedPromises);
-					});
+					}];
 				}
 			}
 		}, callbackQueue);
 	}
 }
+
+#pragma mark -
+
+@implementation RKBlockPromise
+
+#pragma mark Shared Queue
+
++ (NSOperationQueue *)defaultBlockPromiseQueue
+{
+	static NSOperationQueue *sharedRealizationQueue = nil;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		sharedRealizationQueue = [NSOperationQueue new];
+        [sharedRealizationQueue setName:@"com.roundabout.pinna.RKBlockPromise.sharedRealizationQueue"];
+	});
+	
+	return sharedRealizationQueue;
+}
+
+#pragma mark - Initialization
+
+- (id)initWithWorker:(RKBlockPromiseWorker)worker
+{
+	NSParameterAssert(worker);
+	
+	if((self = [super init]))
+	{
+		mWorker = [worker copy];
+        
+        self.operationQueue = [[self class] defaultBlockPromiseQueue];
+	}
+	
+	return self;
+}
+
+#pragma mark - Blocks
+
+@synthesize worker = mWorker;
+
+#pragma mark - Execution
+
+- (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess
+				   failureBlock:(RKPromiseFailureBlock)onFailure
+				  callbackQueue:(NSOperationQueue *)callbackQueue
+{
+	NSParameterAssert(onSuccess);
+	NSParameterAssert(onFailure);
+	NSParameterAssert(callbackQueue);
+	
+	NSAssert(!mHasBeenRealized, @"Attempting to realize an already-realized promise.");
+	
+	if(self.cancelled)
+	{
+		mHasBeenRealized = YES;
+		return;
+	}
+	
+	onSuccess = [onSuccess copy];
+	onFailure = [onFailure copy];
+	
+    [self.operationQueue addOperationWithBlock:^{
+        mWorker(self, ^(id result) {
+            [callbackQueue addOperationWithBlock:^{ onSuccess(result); }];
+		}, ^(NSError *error) {
+			[callbackQueue addOperationWithBlock:^{ onFailure(error); }];
+		});
+    }];
+	
+	mHasBeenRealized = YES;
+}
+
+@end

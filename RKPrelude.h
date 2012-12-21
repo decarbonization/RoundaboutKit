@@ -11,25 +11,54 @@
 
 #import <Foundation/Foundation.h>
 
-#pragma mark Goop
+#define RoundaboutKit_Version       1L
+
+#pragma mark - Linkage Goop
 
 #if __cplusplus
-#	define RK_EXTERN extern "C"
-#	define RK_OVERLOADABLE	
+
+///Indicates external linkage for a function that uses the C ABI.
+#	define RK_EXTERN                extern "C"
+
+///Indicates external link for a function that is overloadable and uses said ABI.
+#   define RK_EXTERN_OVERLOADABLE   extern
+
+///Indicates that a function is overloadable.
+///
+///This attribute changes the ABI of whatever function it is applied to.
+///This define should only be used in implementation files.
+///
+/// \seealso(RK_EXTERN_OVERLOADABLE)
+#	define RK_OVERLOADABLE
+
 #else
-#	define RK_EXTERN extern
-#	define RK_OVERLOADABLE	__attribute__((overloadable))
+
+///Indicates external linkage for a function that uses the C ABI.
+#	define RK_EXTERN                extern
+
+///Indicates external link for a function that is overloadable and uses said ABI.
+#   define RK_EXTERN_OVERLOADABLE   extern __attribute__((overloadable))
+
+///Indicates that a function is overloadable.
+///
+///This attribute changes the ABI of whatever function it is applied to.
+///This define should only be used in implementation files.
+///
+/// \seealso(RK_EXTERN_OVERLOADABLE)
+#	define RK_OVERLOADABLE          __attribute__((overloadable))
+
 #endif /* __cplusplus */
 
-#define RK_INLINE static inline
+#define RK_INLINE                   static inline
+
+#pragma mark - Tools
 
 ///Whether or not a flag is set on a bitfield.
 ///	\param	field	The field to check for the flag on.
 ///	\param	flag	The flag.
 #define RK_FLAG_IS_SET(field, flag) ((flag & field) == flag)
 
-#pragma mark -
-#pragma mark Time Constants
+#pragma mark - Time Tools
 
 ///The number of seconds in a minute.
 #define RK_TIME_MINUTE	(60.0)
@@ -44,14 +73,16 @@
 #define RK_TIME_WEEK	(RK_TIME_DAY * 7.0)
 
 #pragma mark -
-#pragma mark Collection Shorthand
 
-#define NSARRAY(...) [NSArray arrayWithObjects:__VA_ARGS__, nil]
-#define NSSET(...) [NSSet setWithObjects:__VA_ARGS__, nil]
-#define NSDICT(...) [NSDictionary dictionaryWithObjectsAndKeys:__VA_ARGS__, nil]
+///An infinitely large time interval.
+RK_EXTERN NSTimeInterval const kRKTimeIntervalInfinite;
 
-#pragma mark -
-#pragma mark Collection Operations
+///Returns a human readable time stamp for a given time interval.
+///
+///If the time interval is negative, this function returns `@"Continuous"`.
+RK_EXTERN NSString *RKMakeStringFromTimeInterval(NSTimeInterval total);
+
+#pragma mark - Collection Operations
 
 ///A Predicate is a block that takes an object and applies a test to it, returning the result.
 typedef BOOL(^RKPredicateBlock)(id value);
@@ -59,8 +90,7 @@ typedef BOOL(^RKPredicateBlock)(id value);
 ///A Mapper is a block that takes an object and performs an operation on it, returning the result.
 typedef id(^RKMapperBlock)(id value);
 
-#pragma mark -
-#pragma mark • Mapping
+#pragma mark - • Mapping
 
 ///Returns a collection mapped to an array.
 RK_EXTERN NSArray *RKCollectionMapToArray(id input, RKMapperBlock mapper);
@@ -71,14 +101,12 @@ RK_EXTERN NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapp
 ///Returns a dictionary mapped.
 RK_EXTERN NSDictionary *RKDictionaryMap(NSDictionary *input, RKMapperBlock mapper);
 
-#pragma mark -
-#pragma mark • Filtering
+#pragma mark - • Filtering
 
 ///Returns a given collection filtered into an array.
 RK_EXTERN NSArray *RKCollectionFilterToArray(id input, RKPredicateBlock predicate);
 
-#pragma mark -
-#pragma mark • Matching
+#pragma mark - • Matching
 
 ///Returns YES if any value in a given collection passes a specified predicate; NO otherwise.
 RK_EXTERN BOOL RKCollectionDoesAnyValueMatch(id input, RKPredicateBlock predicate);
@@ -89,34 +117,18 @@ RK_EXTERN BOOL RKCollectionDoAllValuesMatch(id input, RKPredicateBlock predicate
 ///Returns the first object matching a given predicate in a given collection.
 RK_EXTERN id RKCollectionFindFirstMatch(id input, RKPredicateBlock predicate);
 
-#pragma mark -
-#pragma mark Time Intervals
+#pragma mark - Safe Casting
 
-///Returns a human readable time stamp for a given time interval.
-///
-///If the time interval is negative, this function returns `@"Continuous"`.
-RK_EXTERN NSString *RKMakeStringFromTimeInterval(NSTimeInterval total);
+///Perform a cast with a runtime check.
+#define RK_CAST(ClassType, ...) ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) [NSException raise:@"RKDynamicCastTypeMismatchException" format:@"%@ is not a %s", $value, #ClassType]; (ClassType *)$value; })
 
-#pragma mark -
-#pragma mark Utilities
+///Perform a cast with a runtime check, yielding nil if there is a type mismatch.
+#define RK_TRY_CAST(ClassType, ...) ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) $value = nil; (ClassType *)$value; })
+
+#pragma mark - Utilities
 
 ///Returns an NSString sans 'the' at the beginning.
 RK_EXTERN NSString *RKSanitizeStringForSorting(NSString *string);
-
-///Generates a unique identifier through CFUUID.
-RK_INLINE NSString *RKMakeUUIDString()
-{
-#if __has_feature(objc_arc)
-	CFUUIDRef uniqueIdentifier = CFUUIDCreate(kCFAllocatorDefault);
-	NSString *uniqueIdentifierString = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uniqueIdentifier);
-	CFRelease(uniqueIdentifier);
-	return uniqueIdentifierString;
-#else
-	CFStringRef uuid = CFUUIDCreateString(kCFAllocatorDefault, 
-										  (CFUUIDRef)NSMakeCollectable(CFUUIDCreate(kCFAllocatorDefault)));
-	return [NSString stringWithString:NSMakeCollectable(uuid)];
-#endif
-}
 
 ///Returns `nil` if `value` is NSNull, `value` otherwise.
 RK_INLINE id RKFilterOutNSNull(id value)
@@ -126,24 +138,5 @@ RK_INLINE id RKFilterOutNSNull(id value)
 	
 	return value;
 }
-
-#pragma mark -
-
-///Enumerates all of the files in a given directory location.
-RK_EXTERN void RKEnumerateFilesInLocation(NSURL *folderLocation, void(^callback)(NSURL *location));
-
-#pragma mark -
-#pragma mark Song IDs
-
-///Returns a newly generated song ID for a specified name, artist,
-///and album taken from a song.
-///
-///This function will always produce the same output given the same
-///(or sufficiently similar) input. The output of this function is
-///intended to provide a unique key.
-///
-///At least one of the parameters of this function must be non-nil.
-///If any parameter is omitted, the resulting ID is marked as broken.
-RK_EXTERN NSString *RKGenerateSongID(NSString *name, NSString *artist, NSString *album);
 
 #endif /* RKPrelude_h */

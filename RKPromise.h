@@ -10,6 +10,7 @@
 #define RKPromise_h 1
 
 #import <Foundation/Foundation.h>
+#import "RKPossibility.h"
 
 ///A block to invoke upon successful realization of a promise.
 typedef void(^RKPromiseSuccessBlock)(id result);
@@ -21,10 +22,8 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 
 ///The abstract base class upon which all other promise types derive.
 @interface RKPromise : NSObject
-{
-}
 
-#pragma mark Canceling
+#pragma mark - Canceling
 
 ///Whether or not the abstract promise is cancelled.
 ///
@@ -34,14 +33,12 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 ///Cancel the receiver.
 - (IBAction)cancel:(id)sender;
 
-#pragma mark -
-#pragma mark Grouping
+#pragma mark - Grouping
 
 ///The name of the group that the promise belongs to.
 @property (copy) NSString *groupName;
 
-#pragma mark -
-#pragma mark Execution
+#pragma mark - Execution
 
 ///Execute the work of the promise.
 ///
@@ -53,9 +50,44 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 ///The default implementation of this method does nothing.
 - (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess
 				   failureBlock:(RKPromiseFailureBlock)onFailure
-				  callbackQueue:(dispatch_queue_t)callbackQueue;
+				  callbackQueue:(NSOperationQueue *)callbackQueue;
 
 @end
+
+#pragma mark - Singular Realization
+
+///Realize a promise.
+///
+///	\param	promise			The promise to realize. Optional.
+///	\param	success			The block to invoke if the promise is successfully realized. Optional.
+///	\param	failure			The block to invoke if the promise cannot be realized. Optional.
+///	\param	callbackQueue	The queue to invoke the callback blocks on. This parameter may be ommitted.
+///
+///This function will asynchronously invoke the `promise`, and subsequently
+///invoke either the `success`, or `failure` on the queue that invoked this
+///function initially.
+///
+///If promise is nil, then this function does nothing.
+RK_EXTERN_OVERLOADABLE void RKRealize(RKPromise *promise,
+                                      RKPromiseSuccessBlock success,
+                                      RKPromiseFailureBlock failure);
+RK_EXTERN_OVERLOADABLE void RKRealize(RKPromise *promise,
+                                      RKPromiseSuccessBlock success,
+                                      RKPromiseFailureBlock failure,
+                                      NSOperationQueue *callbackQueue);
+#pragma mark - Plural Realization
+
+///Realize an array of promises.
+///
+///	\param	promises		An array of promise objects to realize. Required.
+///	\param	callback		A block accepting an array of RKPossibilities. Required.
+///	\param	callbackQueue	The queue to invoke the callback on. This parameter may be ommitted.
+///
+RK_EXTERN_OVERLOADABLE void RKRealizePromises(NSArray *promises,
+                                              void(^callback)(NSArray *possibilities));
+RK_EXTERN_OVERLOADABLE void RKRealizePromises(NSArray *promises,
+                                              void(^callback)(NSArray *possibilities),
+                                              NSOperationQueue *callbackQueue);
 
 #pragma mark -
 
@@ -81,87 +113,24 @@ typedef void(^RKBlockPromiseWorker)(RKBlockPromise *me, RKPromiseSuccessBlock on
 	BOOL mHasBeenRealized;
 }
 
+///Returns the default block promise operation queue, creating it if it does not exist.
+///
+///This is a parallel queue. The properties of this queue should not be modified.
++ (NSOperationQueue *)defaultBlockPromiseQueue;
+
 ///Initialize a block promise.
 ///
 ///All parameters required.
 - (id)initWithWorker:(RKBlockPromiseWorker)worker;
 
-#pragma mark -
-#pragma mark Properties
+#pragma mark - Properties
 
 ///The worker block of the promise.
 @property (readonly) RKBlockPromiseWorker worker;
 
-@end
-
-#pragma mark -
-
-///Create an RKBlockPromise with a specified block.
-///
-///	\param	implementation	The implementation of the promise. Required.
-RK_EXTERN RKBlockPromise *RKPromiseCreate(RKBlockPromiseWorker worker);
-
-#pragma mark -
-#pragma mark Singular Realization
-
-///Realize a promise.
-///
-///	\param	promise			The promise to realize. Optional.
-///	\param	success			The block to invoke if the promise is successfully realized. Optional.
-///	\param	failure			The block to invoke if the promise cannot be realized. Optional.
-///	\param	callbackQueue	The queue to invoke the callback blocks on. This parameter may be ommitted.
-///
-///This function will asynchronously invoke the `promise`, and subsequently
-///invoke either the `success`, or `failure` on the queue that invoked this
-///function initially.
-///
-///If promise is nil, then this function does nothing.
-RK_OVERLOADABLE RK_EXTERN void RKRealize(RKPromise *promise, 
-										 RKPromiseSuccessBlock success,
-										 RKPromiseFailureBlock failure);
-RK_OVERLOADABLE RK_EXTERN void RKRealize(RKPromise *promise, 
-										 RKPromiseSuccessBlock success,
-										 RKPromiseFailureBlock failure,
-										 dispatch_queue_t callbackQueue);
-#pragma mark -
-#pragma mark Plural Realization
-
-///The RKPossibility class represents the two possible outcomes of a given promise.
-@interface RKPossibility : NSObject
-{
-	id mValue;
-	NSError *mError;
-}
-
-///Initialize the receiver with a specified value.
-- (id)initWithValue:(id)value;
-
-///Initialize the receiver with a specified error.
-- (id)initWithError:(NSError *)error;
-
-#pragma mark -
-#pragma mark Properties
-
-///The possible value.
-@property (readonly) id value;
-
-///The possible error.
-@property (readonly) NSError *error;
+///The queue to execute this block promise on.
+@property NSOperationQueue *operationQueue;
 
 @end
-
-#pragma mark -
-
-///Realize an array of promises.
-///
-///	\param	promises		An array of promise objects to realize. Required.
-///	\param	callback		A block accepting an array of RKPossibilities. Required.
-///	\param	callbackQueue	The queue to invoke the callback on. This parameter may be ommitted.
-///
-RK_OVERLOADABLE RK_EXTERN void RKRealizePromises(NSArray *promises,
-												 void(^callback)(NSArray *possibilities));
-RK_OVERLOADABLE RK_EXTERN void RKRealizePromises(NSArray *promises,
-												 void(^callback)(NSArray *possibilities),
-												 dispatch_queue_t callbackQueue);
 
 #endif /* RKPromise_h */
