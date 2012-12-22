@@ -1,6 +1,6 @@
 //
 //  RKPromise.h
-//  Pinna
+//  RoundaboutKit
 //
 //  Created by Kevin MacWhinnie on 5/19/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.

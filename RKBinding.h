@@ -1,12 +1,13 @@
 //
 //  RKBinding.h
-//  Pinna
+//  RoundaboutKit
 //
 //  Created by Kevin MacWhinnie on 12/18/12.
 //  Copyright (c) 2012 Roundabout Software, LLC. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
+#import "RKPromise.h"
 
 ///The RKBinding object encapsulates a connection between the key path
 ///of a source object, and the key path of a destination object.
@@ -30,7 +31,7 @@
 
 ///Connects this binding to a specified key path in a specified object.
 ///
-/// \param  object  The object to bind to. Required.
+/// \param  object  The object to bind to. Non-retained. Required.
 /// \param  keyPath The key path of the object to bind to. Required.
 ///
 /// \result self
@@ -44,6 +45,27 @@
 ///
 ///This method does nothing if the receiver isn't connected.
 - (RKBinding *)disconnect;
+
+#pragma mark - Options
+
+///The value to substitute when the key path on the connected-to-object yields nil.
+@property id defaultValue;
+
+///The value transformer to use.
+@property NSValueTransformer *valueTransformer;
+
+#pragma mark - Promise Support
+
+///Whether or not promises should be realized.
+///
+///Default value is YES.
+///
+///When a promise is encountered by a binding, the default value is set
+///on the target object while the promise is realized.
+@property BOOL realizePromises;
+
+///The block to invoke when realizing a promise fails.
+@property (copy) RKPromiseFailureBlock promiseFailureBlock;
 
 @end
 
@@ -65,8 +87,15 @@
 #pragma mark - Tracking Bindings
 
 ///The bindings owned by the object.
-///
-///This property is thread-specific.
 @property (readonly) NSMutableArray *bindings;
+
+@end
+
+#pragma mark -
+
+@interface NSArray (RKBinding)
+
+///Returns an array of new binding objects for a specified key path that are owned by the objects in the array.
+- (NSArray *)bindingsFor:(NSString *)keyPath;
 
 @end

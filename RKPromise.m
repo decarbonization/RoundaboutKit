@@ -1,6 +1,6 @@
 //
 //  RKPromise.m
-//  Pinna
+//  RoundaboutKit
 //
 //  Created by Kevin MacWhinnie on 5/19/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -108,7 +108,7 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
 		sharedRealizationQueue = [NSOperationQueue new];
-        [sharedRealizationQueue setName:@"com.roundabout.pinna.RKBlockPromise.sharedRealizationQueue"];
+        [sharedRealizationQueue setName:@"com.roundabout.RoundaboutKit.RKBlockPromise.sharedRealizationQueue"];
 	});
 	
 	return sharedRealizationQueue;

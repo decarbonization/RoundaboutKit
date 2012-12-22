@@ -1,6 +1,6 @@
 //
 //  RKPossibility.m
-//  Pinna
+//  RoundaboutKit
 //
 //  Created by Kevin MacWhinnie on 12/20/12.
 //  Copyright (c) 2012 Roundabout Software, LLC. All rights reserved.
@@ -12,9 +12,9 @@
 
 - (id)initWithValue:(id)value
 {
-	if((self = [super init]))
-	{
+	if((self = [super init])) {
 		mValue = value;
+        mContents = kRKPossibiltyContentsValue;
 	}
 	
 	return self;
@@ -22,12 +22,21 @@
 
 - (id)initWithError:(NSError *)error
 {
-	if((self = [super init]))
-	{
+	if((self = [super init])) {
 		mError = error;
+        mContents = kRKPossibiltyContentsError;
 	}
 	
 	return self;
+}
+
+- (id)initEmpty
+{
+    if((self = [super init])) {
+        mContents = kRKPossibiltyContentsEmpty;
+    }
+    
+    return self;
 }
 
 #pragma mark - Properties
@@ -47,12 +56,10 @@ RK_OVERLOADABLE RKPossibility *RKRefinePossibility(RKPossibility *possibility,
     if(!valueRefiner) valueRefiner = ^(id value) { return value; };
     if(!errorRefiner) errorRefiner = ^(NSError *error) { return error; };
     
-    if(possibility.value)
-    {
+    if(possibility.contents == kRKPossibiltyContentsValue ||
+       possibility.contents == kRKPossibiltyContentsEmpty) {
         return [[RKPossibility alloc] initWithValue:valueRefiner(possibility.value)];
-    }
-    else if(possibility.error)
-    {
+    } else if(possibility.contents == kRKPossibiltyContentsError) {
         return [[RKPossibility alloc] initWithError:errorRefiner(possibility.error)];
     }
     
@@ -68,13 +75,11 @@ RK_OVERLOADABLE void RKMatchPossibility(RKPossibility *possibility,
     if(!possibility)
         return;
     
-    if(possibility.value)
-    {
+    if(possibility.contents == kRKPossibiltyContentsValue ||
+       possibility.contents == kRKPossibiltyContentsEmpty) {
         if(value)
             value(possibility.value);
-    }
-    else if(possibility.error)
-    {
+    } else if(possibility.contents == kRKPossibiltyContentsError) {
         if(error)
             error(possibility.error);
     }

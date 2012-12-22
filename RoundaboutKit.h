@@ -29,3 +29,5 @@
 #import "RKPromise.h"
 #import "RKPossibility.h"
 #import "RKDefaults.h"
+#import "RKBinding.h"
+#import "RKBlockBasedValueTransformer.h"

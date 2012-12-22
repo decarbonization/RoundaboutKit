@@ -1,6 +1,6 @@
 //
 //  RKPossibility.h
-//  Pinna
+//  RoundaboutKit
 //
 //  Created by Kevin MacWhinnie on 12/20/12.
 //  Copyright (c) 2012 Roundabout Software, LLC. All rights reserved.
@@ -10,12 +10,28 @@
 #define RKPossibility_h 1
 
 #import <Foundation/Foundation.h>
+#import "RKPrelude.h"
+
+///The different types of contents an RKPossibility can contain.
+typedef enum RKPossibiltyContents : NSUInteger {
+    
+    ///The possibility contains nothing.
+    kRKPossibiltyContentsEmpty = 0,
+    
+    ///The possibility contains a value.
+    kRKPossibiltyContentsValue = 1,
+    
+    ///The possibility contains an error.
+    kRKPossibiltyContentsError = 2,
+    
+} RKPossibiltyContents;
 
 ///The RKPossibility class represents the two possible outcomes of a given promise.
 @interface RKPossibility : NSObject
 {
 	id mValue;
 	NSError *mError;
+    RKPossibiltyContents mContents;
 }
 
 ///Initialize the receiver with a specified value.
@@ -24,6 +40,9 @@
 ///Initialize the receiver with a specified error.
 - (id)initWithError:(NSError *)error;
 
+///Initialize the receiver with nothing.
+- (id)initEmpty;
+
 #pragma mark - Properties
 
 ///The possible value.
@@ -31,6 +50,8 @@
 
 ///The possible error.
 @property (readonly) NSError *error;
+
+@property (readonly) RKPossibiltyContents contents;
 
 @end
 
