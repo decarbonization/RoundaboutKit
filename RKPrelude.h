@@ -84,11 +84,19 @@ RK_EXTERN NSString *RKMakeStringFromTimeInterval(NSTimeInterval total);
 
 #pragma mark - Collection Operations
 
+///A Generator is a block that takes an index and returns an object.
+typedef id(^RKGeneratorBlock)(NSUInteger index);
+
 ///A Predicate is a block that takes an object and applies a test to it, returning the result.
 typedef BOOL(^RKPredicateBlock)(id value);
 
 ///A Mapper is a block that takes an object and performs an operation on it, returning the result.
 typedef id(^RKMapperBlock)(id value);
+
+#pragma mark - • Generation
+
+///Returns a newly generated array of a given length.
+RK_EXTERN NSArray *RKCollectionGenerateArray(NSUInteger length, RKGeneratorBlock generator);
 
 #pragma mark - • Mapping
 

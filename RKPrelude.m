@@ -10,7 +10,24 @@
 
 #pragma mark Collection Operations
 
-#pragma mark • Mapping
+#pragma mark - • Generation
+
+NSArray *RKCollectionGenerateArray(NSUInteger length, RKGeneratorBlock generator)
+{
+    NSCParameterAssert(generator);
+    
+    NSMutableArray *result = [NSMutableArray array];
+    
+    for (NSUInteger index = 0; index < length; index++) {
+        id object = generator(index);
+        if(object)
+            [result addObject:object];
+    }
+    
+    return result;
+}
+
+#pragma mark - • Mapping
 
 NSArray *RKCollectionMapToArray(id input, RKMapperBlock mapper)
 {
@@ -18,8 +35,7 @@ NSArray *RKCollectionMapToArray(id input, RKMapperBlock mapper)
 	
 	NSMutableArray *result = [NSMutableArray array];
 	
-	for (id object in input)
-	{
+	for (id object in input) {
 		id mappedObject = mapper(object);
 		if(mappedObject)
 			[result addObject:mappedObject];
@@ -34,8 +50,7 @@ NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapper)
 	
 	NSMutableOrderedSet *result = [NSMutableOrderedSet orderedSet];
 	
-	for (id object in input)
-	{
+	for (id object in input) {
 		id mappedObject = mapper(object);
 		if(mappedObject)
 			[result addObject:mappedObject];
@@ -66,8 +81,7 @@ NSArray *RKCollectionFilterToArray(id input, RKPredicateBlock predicate)
 	
 	NSMutableArray *result = [NSMutableArray array];
 	
-	for (id object in input)
-	{
+	for (id object in input) {
 		if(predicate(object))
 			[result addObject:object];
 	}
@@ -81,8 +95,7 @@ BOOL RKCollectionDoesAnyValueMatch(id input, RKPredicateBlock predicate)
 {
 	NSCParameterAssert(predicate);
 	
-	for (id object in input)
-	{
+	for (id object in input) {
 		if(predicate(object))
 			return YES;
 	}
@@ -94,8 +107,7 @@ BOOL RKCollectionDoAllValuesMatch(id input, RKPredicateBlock predicate)
 {
 	NSCParameterAssert(predicate);
 	
-	for (id object in input)
-	{
+	for (id object in input) {
 		if(!predicate(object))
 			return NO;
 	}
@@ -107,8 +119,7 @@ id RKCollectionFindFirstMatch(id input, RKPredicateBlock predicate)
 {
 	NSCParameterAssert(predicate);
 	
-	for (id object in input)
-	{
+	for (id object in input) {
 		if(predicate(object))
 			return object;
 	}
