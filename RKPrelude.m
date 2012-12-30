@@ -3,7 +3,7 @@
 //  NewBrowser
 //
 //  Created by Kevin MacWhinnie on 2/8/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Roundabout Software, LLC. All rights reserved.
 //
 
 #import "RKPrelude.h"

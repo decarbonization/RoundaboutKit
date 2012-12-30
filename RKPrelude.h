@@ -3,7 +3,7 @@
 //  NewBrowser
 //
 //  Created by Kevin MacWhinnie on 2/8/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Roundabout Software, LLC. All rights reserved.
 //
 
 #ifndef RKPrelude_h
@@ -50,6 +50,26 @@
 #endif /* __cplusplus */
 
 #define RK_INLINE                   static inline
+
+#pragma mark - Thread-Safety Goop
+
+#if TARGET_OS_IPHONE
+
+///Indicates a property is atomic on non-iOS platforms only.
+#   define RK_NONATOMIC_IOSONLY         nonatomic
+
+///Indicates that a section of code is only synchronized on the Mac platform.
+#   define RK_SYNCHRONIZED_MACONLY(...)
+
+#else
+
+///Indicates a property is atomic on non-iOS platforms only.
+#   define RK_NONATOMIC_IOSONLY
+
+///Indicates that a section of code is only synchronized on the Mac platform.
+#   define RK_SYNCHRONIZED_MACONLY(...) @synchronized(__VA_ARGS__)
+
+#endif /* TARGET_OS_IPHONE */
 
 #pragma mark - Tools
 
