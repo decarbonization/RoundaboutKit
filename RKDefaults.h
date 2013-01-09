@@ -3,7 +3,7 @@
 //  RoundaboutKit
 //
 //  Created by Kevin MacWhinnie on 6/6/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 Roundabout Software, LLC. All rights reserved.
 //
 
 #ifndef RKDefaults_h

@@ -11,34 +11,76 @@
 
 #import <objc/runtime.h>
 
+#pragma mark - Warnings
+
+void RKBindingEmitReconnectionWarning()
+{
+#if RoundaboutKit_EmitWarnings
+    NSLog(@"*** Warning, binding told to connect when it already had a connection. Existing connection was broken. Add a breakpoint to RKBindingEmitReconnectionWarning to debug.");
+#endif /* RoundaboutKit_EmitWarnings */
+}
+
+void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
+{
+#if RoundaboutKit_EmitWarnings
+    NSLog(@"*** Warning, unhandled error from binding-based promise realization. Existing connection was broken. Add a breakpoint to RKBindingEmitUnhandledRealizationErrorWarning to debug. Error: %@", error);
+#endif /* RoundaboutKit_EmitWarnings */
+}
+
+#pragma mark - Continuations
+
+@interface NSObject (RKBinding_Continued)
+
+@property (readonly, nonatomic) NSMutableArray *bindingsTrackedForLifecycle;
+@property (readonly, nonatomic) NSMutableDictionary *bindingsLookupTable;
+
+@end
+
+#pragma mark -
+
 @interface RKBinding ()
+
+///Initialize the receiver with a specified target and key path.
+///
+/// \param  target  The object this binding will be to. Required.
+/// \param  keyPath The key path of the object that will be bound to another object. Required.
+///
+/// \result A fully initialized RKBinding object.
+///
+- (id)initWithTarget:(__weak NSObject *)target keyPath:(NSString *)keyPath;
 
 #pragma mark - Properties
 
 ///The target of the binding.
-@property (weak) NSObject *target;
+@property (weak, RK_NONATOMIC_IOSONLY) NSObject *target;
 
 ///The target key path of the binding.
-@property (copy) NSString *targetKeyPath;
+@property (copy, RK_NONATOMIC_IOSONLY) NSString *targetKeyPath;
 
 ///Whether or not the target key path is multi-level.
-@property BOOL isTargetKeyPathMultiLevel;
+@property (RK_NONATOMIC_IOSONLY) BOOL isTargetKeyPathMultiLevel;
 
 #pragma mark -
 
 ///The source of the binding.
-@property (assign) __unsafe_unretained NSObject *objectConnectedTo;
+@property (assign, RK_NONATOMIC_IOSONLY) __unsafe_unretained NSObject *objectConnectedTo;
 
 ///The key path of the source of the binding.
-@property (copy) NSString *keyPathConnectedTo;
+@property (copy, RK_NONATOMIC_IOSONLY) NSString *keyPathConnectedTo;
 
 ///Whether or not the source key path is multi-level.
-@property BOOL isKeyPathConnectedToMultiLevel;
+@property (RK_NONATOMIC_IOSONLY) BOOL isKeyPathConnectedToMultiLevel;
+
+///The promise currently being realized.
+@property RKPromise *currentPromise;
 
 #pragma mark - Readwrite
 
 ///Readwrite.
-@property (readwrite) BOOL isConnected;
+@property (readwrite, RK_NONATOMIC_IOSONLY) BOOL isConnected;
+
+///Readwrite
+@property (readwrite, RK_NONATOMIC_IOSONLY) RKBindingConnectionType connectionType;
 
 @end
 
@@ -84,6 +126,32 @@
     NSParameterAssert(object);
     NSParameterAssert(keyPath);
     
+    if(self.isConnected) {
+        RKBindingEmitReconnectionWarning();
+        [self disconnect];
+    }
+    
+    self.objectConnectedTo = object;
+    self.keyPathConnectedTo = keyPath;
+    self.isKeyPathConnectedToMultiLevel = ([self.keyPathConnectedTo rangeOfString:@"."].location != NSNotFound);
+    
+    [self.objectConnectedTo addObserver:self forKeyPath:self.keyPathConnectedTo options:0 context:NULL];
+    [self.objectConnectedTo.bindingsTrackedForLifecycle addObject:self];
+    
+    [self setValue:[self valueForKeyPathFromConnectedToObject:self.keyPathConnectedTo] forKeyPathOnTarget:self.targetKeyPath];
+    
+    self.isConnected = YES;
+    
+    self.connectionType = kRKBindingConnectionTypeOneWayBinding;
+    
+    return self;
+}
+
+- (RKBinding *)becomeAffectedBy:(NSObject *)object keyPath:(NSString *)keyPath
+{
+    NSParameterAssert(object);
+    NSParameterAssert(keyPath);
+    
     NSAssert(!self.isConnected, @"Cannot connect binding more than once.");
     
     self.objectConnectedTo = object;
@@ -91,11 +159,11 @@
     self.isKeyPathConnectedToMultiLevel = ([self.keyPathConnectedTo rangeOfString:@"."].location != NSNotFound);
     
     [self.objectConnectedTo addObserver:self forKeyPath:self.keyPathConnectedTo options:0 context:NULL];
-    [self.objectConnectedTo.bindings addObject:self];
-    
-    [self setValue:[self valueForKeyPathFromConnectedToObject:self.keyPathConnectedTo] forKeyPathOnTarget:self.targetKeyPath];
+    [self.objectConnectedTo.bindingsTrackedForLifecycle addObject:self];
     
     self.isConnected = YES;
+    
+    self.connectionType = kRKBindingConnectionTypeChangePropagation;
     
     return self;
 }
@@ -106,7 +174,7 @@
         return self;
     
     [self.objectConnectedTo removeObserver:self forKeyPath:self.keyPathConnectedTo];
-    [self.objectConnectedTo.bindings removeObject:self];
+    [self.objectConnectedTo.bindingsTrackedForLifecycle removeObject:self];
     
     self.objectConnectedTo = nil;
     self.keyPathConnectedTo = nil;
@@ -135,14 +203,47 @@
         value = [self.objectConnectedTo valueForKey:keyPath] ?: self.defaultValue;
     
     if(self.realizePromises && [value isKindOfClass:[RKPromise class]]) {
-        RKRealize(value, ^(id value) {
-            [self setValue:(value && self.valueTransformer? [self.valueTransformer transformedValue:value] : value) forKeyPathOnTarget:self.targetKeyPath];
-        }, ^(NSError *error) {
-            if(self.promiseFailureBlock)
-                self.promiseFailureBlock(error);
-            else
-                NSLog(@"***Unhandled error from binding-based promise realization: %@", error);
-        });
+        self.currentPromise = value;
+        
+        if([value isKindOfClass:[RKMultiPartPromise class]]) {
+            RKRealizeMultiPart(value, ^(id data, RKMultiPartPromisePart fromPart) {
+                if(value == self.currentPromise)
+                    self.currentPromise = nil;
+                else
+                    return;
+                
+                [self setValue:(value && self.valueTransformer? [self.valueTransformer transformedValue:value] : value) forKeyPathOnTarget:self.targetKeyPath];
+            }, ^(NSError *error, RKMultiPartPromisePart fromPart) {
+                if(value == self.currentPromise)
+                    self.currentPromise = nil;
+                else
+                    return;
+                
+                if(self.promiseFailureBlock)
+                    self.promiseFailureBlock(error);
+                else
+                    RKBindingEmitUnhandledRealizationErrorWarning(error);
+            });
+        } else {
+            RKRealize(value, ^(id value) {
+                if(value == self.currentPromise)
+                    self.currentPromise = nil;
+                else
+                    return;
+                
+                [self setValue:(value && self.valueTransformer? [self.valueTransformer transformedValue:value] : value) forKeyPathOnTarget:self.targetKeyPath];
+            }, ^(NSError *error) {
+                if(value == self.currentPromise)
+                    self.currentPromise = nil;
+                else
+                    return;
+                
+                if(self.promiseFailureBlock)
+                    self.promiseFailureBlock(error);
+                else
+                    RKBindingEmitUnhandledRealizationErrorWarning(error);
+            });
+        }
         return self.defaultValue;
     }
     
@@ -152,7 +253,18 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
     if(object == self.objectConnectedTo && [keyPath isEqualToString:self.keyPathConnectedTo]) {
-        [self setValue:[self valueForKeyPathFromConnectedToObject:keyPath] forKeyPathOnTarget:self.targetKeyPath];
+        switch (self.connectionType) {
+            case kRKBindingConnectionTypeOneWayBinding: {
+                [self setValue:[self valueForKeyPathFromConnectedToObject:keyPath] forKeyPathOnTarget:self.targetKeyPath];
+                break;
+            }
+                
+            case kRKBindingConnectionTypeChangePropagation: {
+                [self.target willChangeValueForKey:self.targetKeyPath];
+                [self.target didChangeValueForKey:self.targetKeyPath];
+                break;
+            }
+        }
     } else {
         [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
@@ -181,7 +293,8 @@
 
 #pragma mark -
 
-static CFStringRef const RKBindingsAssociatedObjectKey = CFSTR("RKBindingsAssociatedObjectKey");
+static CFStringRef const RKBindingsTrackedForLifecycleAssociatedObjectKey = CFSTR("RKBindingsTrackedForLifecycleAssociatedObjectKey");
+static CFStringRef const RKBindingsLookupTableAssociatedObjectKey = CFSTR("RKBindingsLookupTableAssociatedObjectKey");
 
 @implementation NSObject (RKBinding)
 
@@ -195,8 +308,8 @@ static CFStringRef const RKBindingsAssociatedObjectKey = CFSTR("RKBindingsAssoci
 
 - (void)RKBinding_dealloc
 {
-    if(objc_getAssociatedObject(self, RKBindingsAssociatedObjectKey) != nil) {
-        NSMutableArray *bindings = self.bindings;
+    if(objc_getAssociatedObject(self, RKBindingsTrackedForLifecycleAssociatedObjectKey) != nil) {
+        NSMutableArray *bindings = self.bindingsTrackedForLifecycle;
         while (bindings.count > 0) {
             RKBinding *binding = [bindings lastObject];
             [bindings removeLastObject];
@@ -209,33 +322,50 @@ static CFStringRef const RKBindingsAssociatedObjectKey = CFSTR("RKBindingsAssoci
 
 #pragma mark - Public Interface
 
-- (RKBinding *)untrackedBindingFor:(NSString *)keyPath
-{
-    NSParameterAssert(keyPath);
-    
-    return [[RKBinding alloc] initWithTarget:self keyPath:keyPath];
-}
-
 - (RKBinding *)bindingFor:(NSString *)keyPath
 {
     NSParameterAssert(keyPath);
     
-    RKBinding *binding = [self untrackedBindingFor:keyPath];
-    [self.bindings addObject:binding];
+    NSMutableDictionary *existentBindings = self.bindingsLookupTable;
+    
+    RKBinding *binding = existentBindings[keyPath];
+    if(!binding) {
+        binding = [[RKBinding alloc] initWithTarget:self keyPath:keyPath];
+        existentBindings[keyPath] = binding;
+    }
+    [self.bindingsTrackedForLifecycle addObject:binding];
     return binding;
 }
 
 #pragma mark - Tracking Bindings
 
-- (NSMutableArray *)bindings
+///The mutable array returned by this method is used to track the
+///lifecycle of bindings for both target and connected-to objects.
+///
+///The return value of this method is to be considered an implementation
+///detail, and this method should never be publicly exposed.
+- (NSMutableArray *)bindingsTrackedForLifecycle
 {
-    NSMutableArray *trackedBindings = objc_getAssociatedObject(self, RKBindingsAssociatedObjectKey);
+    NSMutableArray *trackedBindings = objc_getAssociatedObject(self, RKBindingsTrackedForLifecycleAssociatedObjectKey);
     if(!trackedBindings) {
         trackedBindings = [NSMutableArray new];
-        objc_setAssociatedObject(self, RKBindingsAssociatedObjectKey, trackedBindings, OBJC_ASSOCIATION_RETAIN);
+        objc_setAssociatedObject(self, RKBindingsTrackedForLifecycleAssociatedObjectKey, trackedBindings, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     
     return trackedBindings;
+}
+
+///The mutable dictionary returned by this method is
+///used to track bindings by key path for an object.
+- (NSMutableDictionary *)bindingsLookupTable
+{
+    NSMutableDictionary *bindingsLookupTable = objc_getAssociatedObject(self, RKBindingsLookupTableAssociatedObjectKey);
+    if(!bindingsLookupTable) {
+        bindingsLookupTable = [NSMutableDictionary new];
+        objc_setAssociatedObject(self, RKBindingsLookupTableAssociatedObjectKey, bindingsLookupTable, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    
+    return bindingsLookupTable;
 }
 
 @end

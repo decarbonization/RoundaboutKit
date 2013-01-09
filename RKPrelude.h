@@ -11,7 +11,15 @@
 
 #import <Foundation/Foundation.h>
 
-#define RoundaboutKit_Version       1L
+///The version of the RoundaboutKit being embedded.
+#define RoundaboutKit_Version       2L
+
+///Whether or not the embedded version of RoundaboutKit is considered stable.
+#define RoundaboutKit_Stable        0
+
+///Whether or not the RoundaboutKit should emit warnings
+///for questionable but presently valid behaviour.
+#define RoundaboutKit_EmitWarnings  1
 
 #pragma mark - Linkage Goop
 
@@ -126,8 +134,10 @@ RK_EXTERN NSArray *RKCollectionMapToArray(id input, RKMapperBlock mapper);
 ///Returns a collection mapped to an ordered set.
 RK_EXTERN NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapper);
 
+///This method is deprecated and should not be used in new code.
+///
 ///Returns a dictionary mapped.
-RK_EXTERN NSDictionary *RKDictionaryMap(NSDictionary *input, RKMapperBlock mapper);
+DEPRECATED_ATTRIBUTE RK_EXTERN NSDictionary *RKDictionaryMap(NSDictionary *input, RKMapperBlock mapper);
 
 #pragma mark - • Filtering
 

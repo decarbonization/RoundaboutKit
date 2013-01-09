@@ -8,6 +8,13 @@
 
 #import "RKSongID.h"
 
+void RKGenerateSongIDEmitDeprecatedWarning()
+{
+#if RoundaboutKit_EmitWarnings
+    NSLog(@"*** Warning, RKGenerateSongID is deprecated. Add a breakpoint to RKGenerateSongIDEmitDeprecatedWarning to debug.");
+#endif /* RoundaboutKit_EmitWarnings */
+}
+
 static NSString *RemoveBlacklistedCharactersForSongID(NSString *string)
 {
 	//A song ID cannot contain whitespace, punctuation, or symbols.
@@ -37,6 +44,8 @@ static NSString *RemoveBlacklistedCharactersForSongID(NSString *string)
 
 NSString *RKGenerateSongID(NSString *name, NSString *artist, NSString *album)
 {
+    RKGenerateSongIDEmitDeprecatedWarning();
+    
 	//We require at least one parameter to
 	//generate a song ID. All must be specified
 	//in order for the ID to be non-broken.

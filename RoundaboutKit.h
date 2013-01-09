@@ -31,3 +31,6 @@
 #import "RKDefaults.h"
 #import "RKBinding.h"
 #import "RKBlockBasedValueTransformer.h"
+#import "RKReachability.h"
+#import "RKURLRequestPromise.h"
+#import "RKURLRequestPromiseCacheManager.h"

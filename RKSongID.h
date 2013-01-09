@@ -10,7 +10,10 @@
 #define RKSongIdentifiers_h 1
 
 #import <Foundation/Foundation.h>
+#import "RKPrelude.h"
 
+///This function is deprecated and should not be used in new code.
+///
 ///Returns a newly generated song ID for a specified name, artist,
 ///and album taken from a song.
 ///
@@ -20,6 +23,6 @@
 ///
 ///At least one of the parameters of this function must be non-nil.
 ///If any parameter is omitted, the resulting ID is marked as broken.
-RK_EXTERN NSString *RKGenerateSongID(NSString *name, NSString *artist, NSString *album);
+DEPRECATED_ATTRIBUTE RK_EXTERN NSString *RKGenerateSongID(NSString *name, NSString *artist, NSString *album);
 
 #endif /* RKSongIdentifiers_h */
