@@ -143,7 +143,6 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     _loadedData = [NSMutableData new];
     
     _isInOfflineMode = ![RKReachability defaultInternetConnectionReachability].isConnected;
-    
     [self loadCache];
     
     if(!_isInOfflineMode) {
@@ -178,7 +177,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
             } else {
                 [self invokeFirstSuccessCallbackWithData:data];
             }
-        } else {
+        } else if(_isInOfflineMode) {
             NSDictionary *userInfo = @{
                 NSUnderlyingErrorKey: error,
                 NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
@@ -187,11 +186,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
             NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
                                                           code:kRKURLRequestPromiseErrorCannotLoadCache
                                                       userInfo:userInfo];
-            if(_isInOfflineMode) {
-                [self invokeFailureCallbackWithError:highLevelError fromPart:kRKMultiPartPromisePartSecond];
-            } else {
-                [self invokeFailureCallbackWithError:highLevelError fromPart:kRKMultiPartPromisePartFirst];
-            }
+            [self invokeFailureCallbackWithError:highLevelError fromPart:kRKMultiPartPromisePartSecond];
         }
     }];
 }
@@ -304,6 +299,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     
     [self invokeSecondSuccessCallbackWithData:_loadedData];
     
+    _connection = nil;
     _loadedData = nil;
 }
 

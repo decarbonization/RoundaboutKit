@@ -13,13 +13,6 @@
 
 #pragma mark - Warnings
 
-void RKBindingEmitReconnectionWarning()
-{
-#if RoundaboutKit_EmitWarnings
-    NSLog(@"*** Warning, binding told to connect when it already had a connection. Existing connection was broken. Add a breakpoint to RKBindingEmitReconnectionWarning to debug.");
-#endif /* RoundaboutKit_EmitWarnings */
-}
-
 void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
 {
 #if RoundaboutKit_EmitWarnings
@@ -127,7 +120,6 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
     NSParameterAssert(keyPath);
     
     if(self.isConnected) {
-        RKBindingEmitReconnectionWarning();
         [self disconnect];
     }
     
@@ -203,18 +195,21 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
         value = [self.objectConnectedTo valueForKey:keyPath] ?: self.defaultValue;
     
     if(self.realizePromises && [value isKindOfClass:[RKPromise class]]) {
-        self.currentPromise = value;
+        RKPromise *promise = value;
         
-        if([value isKindOfClass:[RKMultiPartPromise class]]) {
-            RKRealizeMultiPart(value, ^(id data, RKMultiPartPromisePart fromPart) {
-                if(value == self.currentPromise)
+        [self.currentPromise cancel:nil];
+        self.currentPromise = promise;
+        
+        if([promise isKindOfClass:[RKMultiPartPromise class]]) {
+            RKRealizeMultiPart((RKMultiPartPromise *)promise, ^(id realizedValue, RKMultiPartPromisePart fromPart) {
+                if(promise == self.currentPromise)
                     self.currentPromise = nil;
                 else
                     return;
                 
-                [self setValue:(value && self.valueTransformer? [self.valueTransformer transformedValue:value] : value) forKeyPathOnTarget:self.targetKeyPath];
+                [self setValue:(realizedValue && self.valueTransformer? [self.valueTransformer transformedValue:realizedValue] : realizedValue) forKeyPathOnTarget:self.targetKeyPath];
             }, ^(NSError *error, RKMultiPartPromisePart fromPart) {
-                if(value == self.currentPromise)
+                if(promise == self.currentPromise)
                     self.currentPromise = nil;
                 else
                     return;
@@ -225,15 +220,15 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
                     RKBindingEmitUnhandledRealizationErrorWarning(error);
             });
         } else {
-            RKRealize(value, ^(id value) {
-                if(value == self.currentPromise)
+            RKRealize(promise, ^(id realizedValue) {
+                if(promise == self.currentPromise)
                     self.currentPromise = nil;
                 else
                     return;
                 
-                [self setValue:(value && self.valueTransformer? [self.valueTransformer transformedValue:value] : value) forKeyPathOnTarget:self.targetKeyPath];
+                [self setValue:(realizedValue && self.valueTransformer? [self.valueTransformer transformedValue:realizedValue] : realizedValue) forKeyPathOnTarget:self.targetKeyPath];
             }, ^(NSError *error) {
-                if(value == self.currentPromise)
+                if(promise == self.currentPromise)
                     self.currentPromise = nil;
                 else
                     return;

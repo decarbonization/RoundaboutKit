@@ -48,8 +48,8 @@ typedef enum RKBindingConnectionType {
 ///
 /// \result self
 ///
-///This method emits a warning if the receiver is already connected.
-///This may be a hard error in the future.
+///If the receiver is already connected, it will be disconnected,
+///and then connected to the new object-keypath.
 - (RKBinding *)connectTo:(NSObject *)object keyPath:(NSString *)keyPath;
 
 ///Creates an observation connection wherein the target key path of the binding has

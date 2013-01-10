@@ -143,7 +143,7 @@ static void NetworkReachabilityChanged(SCNetworkReachabilityRef target, SCNetwor
     RKReachabilityStatus status = self.connectionStatus;
     
     if(RK_FLAG_IS_SET(status, kRKReachabilityStatusConnectionRequired) ||
-       RK_FLAG_IS_SET(status, kRKReachabilityStatusTransientConnection))
+       (RK_FLAG_IS_SET(status, kRKReachabilityStatusTransientConnection) && !RK_FLAG_IS_SET(status, kRKReachabilityStatusIsLocalAddress)))
         return NO;
     
     if(!RK_FLAG_IS_SET(status, kRKReachabilityStatusConnectionOnTraffic) &&
