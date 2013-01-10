@@ -230,6 +230,9 @@ typedef void(^RKBlockPromiseWorker)(RKBlockPromise *me, RKPromiseSuccessBlock on
 ///All parameters required.
 - (id)initWithWorker:(RKBlockPromiseWorker)worker;
 
+///Initialize a block promise.
+- (id)initWithWorker:(RKBlockPromiseWorker)worker operationQueue:(NSOperationQueue *)operationQueue;
+
 #pragma mark - Properties
 
 ///The worker block of the promise.

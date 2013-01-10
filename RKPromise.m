@@ -202,17 +202,22 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 
 #pragma mark - Initialization
 
-- (id)initWithWorker:(RKBlockPromiseWorker)worker
+- (id)initWithWorker:(RKBlockPromiseWorker)worker operationQueue:(NSOperationQueue *)operationQueue
 {
 	NSParameterAssert(worker);
+    NSParameterAssert(operationQueue);
 	
 	if((self = [super init])) {
 		mWorker = [worker copy];
-        
-        self.operationQueue = [[self class] defaultBlockPromiseQueue];
+        self.operationQueue = operationQueue;
 	}
 	
 	return self;
+}
+
+- (id)initWithWorker:(RKBlockPromiseWorker)worker
+{
+    return [self initWithWorker:worker operationQueue:[[self class] defaultBlockPromiseQueue]];
 }
 
 #pragma mark - Blocks
