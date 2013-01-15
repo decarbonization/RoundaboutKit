@@ -97,11 +97,12 @@
         _bucketLocation = [[self class] locationForBucket:bucketName];
         if(![_bucketLocation checkResourceIsReachableAndReturnError:nil]) {
             NSError *error = nil;
-            NSAssert([[NSFileManager defaultManager] createDirectoryAtURL:_bucketLocation
-                                              withIntermediateDirectories:YES
-                                                               attributes:nil
-                                                                    error:&error],
-                     @"Could not create bucket location %@. %@", _bucketLocation, error);
+            if(![[NSFileManager defaultManager] createDirectoryAtURL:_bucketLocation
+                                         withIntermediateDirectories:YES
+                                                          attributes:nil
+                                                               error:&error]) {
+                [NSException raise:NSInternalInconsistencyException format:@"Could not create bucket location %@. %@", _bucketLocation, error];
+            }
         }
         
         _metadataLocation = [[self class] locationForMetadataInBucket:bucketName];

@@ -107,11 +107,13 @@ static void NetworkReachabilityChanged(SCNetworkReachabilityRef target, SCNetwor
             .release = &CFRelease,
             .copyDescription = &CFCopyDescription,
         };
-        NSAssert(SCNetworkReachabilitySetCallback(_networkReachability, &NetworkReachabilityChanged, &context),
-                 @"Could not set reachability callback.");
+        if(!SCNetworkReachabilitySetCallback(_networkReachability, &NetworkReachabilityChanged, &context)) {
+            [NSException raise:NSInternalInconsistencyException format:@"Could not set reachability callback."];
+        }
         
-        NSAssert(SCNetworkReachabilityScheduleWithRunLoop(_networkReachability, CFRunLoopGetMain(), kCFRunLoopCommonModes),
-                 @"Could not schedule reachability into main run loop.");
+        if(!SCNetworkReachabilityScheduleWithRunLoop(_networkReachability, CFRunLoopGetMain(), kCFRunLoopCommonModes)) {
+            [NSException raise:NSInternalInconsistencyException format:@"Could not schedule reachability into main run loop."];
+        }
         
         _callbackBlocks = [NSMutableArray new];
     }
