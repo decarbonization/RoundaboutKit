@@ -132,7 +132,7 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 ///The queue that the request will be executed on.
 ///
 ///This queue should be concurrent.
-@property (readonly, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
+@property (RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
 
 ///The post processor to invoke on the URL request promise.
 ///

@@ -77,9 +77,6 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 ///Readwrite
 @property (readwrite, RK_NONATOMIC_IOSONLY) BOOL useCacheWhenOffline;
 
-///Readwrite
-@property (readwrite, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
-
 @end
 
 #pragma mark -
