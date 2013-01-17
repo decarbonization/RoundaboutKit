@@ -8,6 +8,7 @@
 
 #import "RKURLRequestPromise.h"
 #import "RKReachability.h"
+#import "RKActivityManager.h"
 
 NSString *const RKURLRequestPromiseErrorDomain = @"RKURLRequestPromiseErrorDomain";
 NSString *const RKURLRequestPromiseCacheIdentifierErrorUserInfoKey = @"RKURLRequestPromiseCacheIdentifierErrorUserInfoKey";
@@ -140,9 +141,12 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     _loadedData = [NSMutableData new];
     
     _isInOfflineMode = ![RKReachability defaultInternetConnectionReachability].isConnected;
+    [[RKActivityManager sharedActivityManager] incrementActivityCount];
     [self loadCache];
     
     if(!_isInOfflineMode) {
+        [[RKActivityManager sharedActivityManager] incrementActivityCount];
+        
         self.connection = [[NSURLConnection alloc] initWithRequest:self.request
                                                           delegate:self
                                                   startImmediately:NO];
@@ -158,12 +162,21 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     
     [self.connection cancel];
     _loadedData = nil;
+    
+    [[RKActivityManager sharedActivityManager] decrementActivityCount];
 }
 
 - (void)loadCache
 {
-    if(!self.cacheManager || self.cancelled || self.cacheIdentifier == nil)
+    if(!self.cacheManager || self.cacheIdentifier == nil)
         return;
+    
+    if(self.cancelled) {
+        if(!_isInOfflineMode)
+            [[RKActivityManager sharedActivityManager] decrementActivityCount];
+        
+        return;
+    }
     
     [self.requestQueue addOperationWithBlock:^{
         NSError *error = nil;
@@ -195,6 +208,8 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     if(self.cancelled)
         return;
     
+    [[RKActivityManager sharedActivityManager] decrementActivityCount];
+    
     [self.callbackQueue addOperationWithBlock:^{
         if(self.postProcessor) {
             RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data]);
@@ -214,6 +229,8 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     if(self.cancelled)
         return;
     
+    [[RKActivityManager sharedActivityManager] decrementActivityCount];
+    
     [self.callbackQueue addOperationWithBlock:^{
         if(self.postProcessor) {
             RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data]);
@@ -232,6 +249,8 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 {
     if(self.cancelled)
         return;
+    
+    [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
     [self.callbackQueue addOperationWithBlock:^{
         self.onFailure(error, part);
@@ -258,6 +277,8 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         [self.connection cancel];
         _loadedData = nil;
     }
+    
+    [[RKActivityManager sharedActivityManager] decrementActivityCount];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data

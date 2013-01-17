@@ -34,3 +34,4 @@
 #import "RKReachability.h"
 #import "RKURLRequestPromise.h"
 #import "RKURLRequestPromiseCacheManager.h"
+#import "RKActivityManager.h"
