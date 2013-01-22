@@ -11,7 +11,7 @@
 void RKGenerateSongIDEmitDeprecatedWarning()
 {
 #if RoundaboutKit_EmitWarnings
-    NSLog(@"*** Warning, RKGenerateSongID is deprecated. Add a breakpoint to RKGenerateSongIDEmitDeprecatedWarning to debug.");
+    NSLog(@"*** Warning, RKGenerateSongID is deprecated and will be obsoleted in the next major version of RoundaboutKit. Add a breakpoint to RKGenerateSongIDEmitDeprecatedWarning to debug.");
 #endif /* RoundaboutKit_EmitWarnings */
 }
 

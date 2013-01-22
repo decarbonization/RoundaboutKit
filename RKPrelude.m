@@ -166,3 +166,41 @@ NSString *RKSanitizeStringForSorting(NSString *string)
 	
 	return string;
 }
+
+NSString *RKGenerateIdentifierForStrings(NSArray *strings)
+{
+    NSCParameterAssert(strings);
+    
+    NSString *(^sanitize)(NSString *) = ^(NSString *string)
+    {
+        //An identifier cannot contain whitespace, punctuation, or symbols.
+        //We create an all encompassing character set to test for these.
+        static NSMutableCharacterSet *charactersToRemove = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            charactersToRemove = [NSMutableCharacterSet new];
+            [charactersToRemove formUnionWithCharacterSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            [charactersToRemove formUnionWithCharacterSet:[NSCharacterSet symbolCharacterSet]];
+            [charactersToRemove formUnionWithCharacterSet:[NSCharacterSet punctuationCharacterSet]];
+        });
+        
+        NSMutableString *resultString = [[string lowercaseString] mutableCopy];
+        for (NSUInteger index = 0; index < [resultString length]; index++)
+        {
+            unichar character = [resultString characterAtIndex:index];
+            if([charactersToRemove characterIsMember:character])
+            {
+                [resultString deleteCharactersInRange:NSMakeRange(index, 1)];
+                index--;
+            }
+        }
+        
+        return resultString;
+    };
+    
+    NSArray *sanitizedStrings = RKCollectionMapToArray(strings, ^(NSString *string) {
+        return sanitize(string);
+    });
+    NSArray *sortedStrings = [sanitizedStrings sortedArrayUsingSelector:@selector(compare:)];
+    return [sortedStrings componentsJoinedByString:@""];
+}

@@ -13,6 +13,8 @@
 #import "RKPrelude.h"
 
 ///This function is deprecated and should not be used in new code.
+///New code should use `RKGenerateIdentifierForStrings`. This function
+///will be obsoleted in the next major clean up of RoundaboutKit.
 ///
 ///Returns a newly generated song ID for a specified name, artist,
 ///and album taken from a song.

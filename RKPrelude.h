@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version       2L
+#define RoundaboutKit_Version       3L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
 #define RoundaboutKit_Stable        0
@@ -167,6 +167,19 @@ RK_EXTERN id RKCollectionFindFirstMatch(id input, RKPredicateBlock predicate);
 
 ///Returns an NSString sans 'the' at the beginning.
 RK_EXTERN NSString *RKSanitizeStringForSorting(NSString *string);
+
+///Combines an array of NSString objects into a string suitable for use
+///as a universal identifier or is an inexpensive comparator.
+///
+/// \param  strings     The strings to combine into the identifier. Required.
+///
+/// \result The `strings` combined and sanitized.
+///
+///The result of this method is safe to use as a file system name.
+///
+///This function should be considered the functional replacement for
+///the deprecated (and soon to be obsoleted) `RKGenerateSongID` function.
+RK_EXTERN NSString *RKGenerateIdentifierForStrings(NSArray *strings);
 
 ///Returns `nil` if `value` is NSNull, `value` otherwise.
 RK_INLINE id RKFilterOutNSNull(id value)
