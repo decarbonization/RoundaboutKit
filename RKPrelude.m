@@ -46,7 +46,7 @@ NSMutableArray *RKCollectionMapToMutableArray(id input, RKMapperBlock mapper)
 			[result addObject:mappedObject];
 	}
 	
-	return [result copyWithZone:[input zone]];
+	return result;
 }
 
 NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapper)
