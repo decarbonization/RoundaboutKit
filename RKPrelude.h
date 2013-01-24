@@ -131,6 +131,9 @@ RK_EXTERN NSArray *RKCollectionGenerateArray(NSUInteger length, RKGeneratorBlock
 ///Returns a collection mapped to an array.
 RK_EXTERN NSArray *RKCollectionMapToArray(id input, RKMapperBlock mapper);
 
+///Returns a collection mapped to a mutable array.
+RK_EXTERN NSMutableArray *RKCollectionMapToMutableArray(id input, RKMapperBlock mapper);
+
 ///Returns a collection mapped to an ordered set.
 RK_EXTERN NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapper);
 

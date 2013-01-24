@@ -31,7 +31,12 @@ NSArray *RKCollectionGenerateArray(NSUInteger length, RKGeneratorBlock generator
 
 NSArray *RKCollectionMapToArray(id input, RKMapperBlock mapper)
 {
-	NSCParameterAssert(mapper);
+	return [RKCollectionMapToMutableArray(input, mapper) copyWithZone:[input zone]];
+}
+
+NSMutableArray *RKCollectionMapToMutableArray(id input, RKMapperBlock mapper)
+{
+    NSCParameterAssert(mapper);
 	
 	NSMutableArray *result = [NSMutableArray array];
 	
