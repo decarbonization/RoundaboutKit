@@ -6,6 +6,9 @@
 //  Copyright (c) 2012 Roundabout Software, LLC. All rights reserved.
 //
 
+#ifndef RKBinding_h
+#define RKBinding_h 1
+
 #import <Foundation/Foundation.h>
 #import "RKPromise.h"
 
@@ -14,9 +17,6 @@ typedef enum RKBindingConnectionType {
     
     ///The default binding connection type.
     kRKBindingConnectionTypeOneWayBinding = 0,
-    
-    ///The observation propagation connection type.
-    kRKBindingConnectionTypeChangePropagation = 1,
     
 } RKBindingConnectionType;
 
@@ -51,18 +51,6 @@ typedef enum RKBindingConnectionType {
 ///If the receiver is already connected, it will be disconnected,
 ///and then connected to the new object-keypath.
 - (RKBinding *)connectTo:(NSObject *)object keyPath:(NSString *)keyPath;
-
-///Creates an observation connection wherein the target key path of the binding has
-///change notifications propagated to it based on the connected-to object's key path.
-///
-/// \param  object  The object to quasi bind to. Non-retained. Requried.
-/// \param  keyPath The key path of the object to quasi-bind to. Required.
-///
-/// \result self
-///
-///This method emits a warning if the receiver is already connected.
-///This may be a hard error in the future.
-- (RKBinding *)becomeAffectedBy:(NSObject *)object keyPath:(NSString *)keyPath;
 
 ///Disconnects this binding.
 ///
@@ -133,3 +121,16 @@ typedef enum RKBindingConnectionType {
 - (NSArray *)bindingsFor:(NSString *)keyPath;
 
 @end
+
+#pragma mark - One-Off Observations
+
+///Creates and returns a one-time key-value change observer object.
+///
+/// \param  target      The object to observe for changes. Required.
+/// \param  keyPath     The key path to observe for changes on `target`. Required.
+/// \param  callback    The block to invoke when the change happens. Required.
+///
+/// \result An opaque object responsible for propagating changes from `target.keyPath` to `callback`.
+RK_EXTERN_OVERLOADABLE id RKObserveOnce(id target, NSString *keyPath, void(^callback)(id value));
+
+#endif /* RKBinding_h */

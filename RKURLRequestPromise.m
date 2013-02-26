@@ -48,14 +48,11 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 
 #pragma mark - Internal Properties
 
-///The first on success callback block.
-@property (copy, RK_NONATOMIC_IOSONLY) RKMultiPartPromiseFirstSuccessBlock onFirstSuccess;
-
-///The second on success callback block.
-@property (copy, RK_NONATOMIC_IOSONLY) RKMultiPartPromiseSecondSuccessBlock onSecondSuccess;
+///The on success callback block.
+@property (copy, RK_NONATOMIC_IOSONLY) RKPromiseSuccessBlock onSuccess;
 
 ///The on failure callback block.
-@property (copy, RK_NONATOMIC_IOSONLY) RKMultiPartPromiseFailureBlock onFailure;
+@property (copy, RK_NONATOMIC_IOSONLY) RKPromiseFailureBlock onFailure;
 
 ///The queue to invoke the callback blocks on.
 @property (RK_NONATOMIC_IOSONLY) NSOperationQueue *callbackQueue;
@@ -66,6 +63,9 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 
 ///The underlying connection.
 @property NSURLConnection *connection;
+
+///Whether or not the cache has been successfully loaded.
+@property BOOL isCacheLoaded;
 
 #pragma mark - Readwrite Properties
 
@@ -120,21 +120,18 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 
 #pragma mark - Realization
 
-- (void)executeWithFirstSuccessBlock:(RKMultiPartPromiseFirstSuccessBlock)onFirstSuccess
-                  secondSuccessBlock:(RKMultiPartPromiseSecondSuccessBlock)onSecondSuccess
-                        failureBlock:(RKMultiPartPromiseFailureBlock)onFailure
-                       callbackQueue:(NSOperationQueue *)callbackQueue
+- (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess
+                   failureBlock:(RKPromiseFailureBlock)onFailure
+                  callbackQueue:(NSOperationQueue *)callbackQueue
 {
-    NSParameterAssert(onFirstSuccess);
-    NSParameterAssert(onSecondSuccess);
+    NSParameterAssert(onSuccess);
     NSParameterAssert(onFailure);
     NSParameterAssert(callbackQueue);
     
     NSAssert((self.connection == nil),
              @"Cannot realize a %@ more than once.", NSStringFromClass([self class]));
     
-    self.onFirstSuccess = onFirstSuccess;
-    self.onSecondSuccess = onSecondSuccess;
+    self.onSuccess = onSuccess;
     self.onFailure = onFailure;
     self.callbackQueue = callbackQueue;
     
@@ -142,11 +139,10 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     
     _isInOfflineMode = ![RKReachability defaultInternetConnectionReachability].isConnected;
     [[RKActivityManager sharedActivityManager] incrementActivityCount];
-    [self loadCache];
     
-    if(!_isInOfflineMode) {
-        [[RKActivityManager sharedActivityManager] incrementActivityCount];
+    if(_isInOfflineMode) {
         
+    } else {
         self.connection = [[NSURLConnection alloc] initWithRequest:self.request
                                                           delegate:self
                                                   startImmediately:NO];
@@ -154,17 +150,29 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         [self.connection setDelegateQueue:self.requestQueue];
         [self.connection start];
     }
+    
+#if RKURLRequestPromise_Option_LogRequests
+    NSLog(@"[DEBUG] Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+#endif /* RKURLRequestPromise_Option_LogRequests */
 }
 
 - (void)cancel:(id)sender
 {
-    [super cancel:nil];
-    
-    [self.connection cancel];
-    _loadedData = nil;
-    
-    [[RKActivityManager sharedActivityManager] decrementActivityCount];
+    if(!self.cancelled) {
+        [self.connection cancel];
+        _loadedData = nil;
+        
+#if RKURLRequestPromise_Option_LogRequests
+        NSLog(@"[DEBUG] Outgoing request to <%@> cancelled", self.request.URL);
+#endif /* RKURLRequestPromise_Option_LogRequests */
+        
+        [[RKActivityManager sharedActivityManager] decrementActivityCount];
+        
+        self.cancelled = YES;
+    }
 }
+
+#pragma mark - Cache Support
 
 - (void)loadCache
 {
@@ -182,11 +190,9 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         NSError *error = nil;
         NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
         if(data) {
-            if(_isInOfflineMode) {
-                [self invokeSecondSuccessCallbackWithData:data];
-            } else {
-                [self invokeFirstSuccessCallbackWithData:data];
-            }
+            self.isCacheLoaded = YES;
+            
+            [self invokeSuccessCallbackWithData:data];
         } else if(_isInOfflineMode) {
             NSDictionary *userInfo = @{
                 NSUnderlyingErrorKey: error,
@@ -196,64 +202,89 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
             NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
                                                           code:kRKURLRequestPromiseErrorCannotLoadCache
                                                       userInfo:userInfo];
-            [self invokeFailureCallbackWithError:highLevelError fromPart:kRKMultiPartPromisePartSecond];
+            [self invokeFailureCallbackWithError:highLevelError];
+        }
+    }];
+}
+
+- (void)loadCachedDataWithCallbackQueue:(NSOperationQueue *)callbackQueue block:(RKURLRequestPromiseCacheLoadingBlock)block
+{
+    NSParameterAssert(callbackQueue);
+    NSParameterAssert(block);
+    
+    if(!self.cacheManager || self.cacheIdentifier == nil)
+        return;
+    
+    [self.requestQueue addOperationWithBlock:^{
+        NSError *error = nil;
+        NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
+        if(data) {
+            RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data]);
+            [callbackQueue addOperationWithBlock:^{
+                block(maybeValue);
+            }];
+        } else if(error) {
+            NSDictionary *userInfo = @{
+                NSUnderlyingErrorKey: error,
+                NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
+                RKURLRequestPromiseCacheIdentifierErrorUserInfoKey: self.cacheIdentifier,
+            };
+            NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
+                                                          code:kRKURLRequestPromiseErrorCannotLoadCache
+                                                      userInfo:userInfo];
+            [callbackQueue addOperationWithBlock:^{
+                block([[RKPossibility alloc] initWithError:highLevelError]);
+            }];
+        } else {
+            [callbackQueue addOperationWithBlock:^{
+                block([[RKPossibility alloc] initEmpty]);
+            }];
         }
     }];
 }
 
 #pragma mark - Invoking Callbacks
 
-- (void)invokeFirstSuccessCallbackWithData:(NSData *)data
+- (void)invokeSuccessCallbackWithData:(NSData *)data
 {
     if(self.cancelled)
         return;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
+#if RKURLRequestPromise_Option_LogResponses
+    NSLog(@"[DEBUG] %@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+#endif /* RKURLRequestPromise_Option_LogResponses */
+    
     [self.callbackQueue addOperationWithBlock:^{
+        self.isFinished = YES;
+        
         if(self.postProcessor) {
             RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data]);
             if(maybeValue.state == kRKPossibilityStateError) {
-                self.onFailure(maybeValue.error, kRKMultiPartPromisePartFirst);
+                self.onFailure(maybeValue.error);
             } else {
-                self.onFirstSuccess(maybeValue.value, YES);
+                self.onSuccess(maybeValue.value);
             }
         } else {
-            self.onFirstSuccess(data, YES);
+            self.onSuccess(data);
         }
     }];
 }
 
-- (void)invokeSecondSuccessCallbackWithData:(NSData *)data
+- (void)invokeFailureCallbackWithError:(NSError *)error
 {
     if(self.cancelled)
         return;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
-    [self.callbackQueue addOperationWithBlock:^{
-        if(self.postProcessor) {
-            RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data]);
-            if(maybeValue.state == kRKPossibilityStateError) {
-                self.onFailure(maybeValue.error, kRKMultiPartPromisePartSecond);
-            } else {
-                self.onSecondSuccess(maybeValue.value);
-            }
-        } else {
-            self.onSecondSuccess(data);
-        }
-    }];
-}
-
-- (void)invokeFailureCallbackWithError:(NSError *)error fromPart:(RKMultiPartPromisePart)part
-{
-    if(self.cancelled)
-        return;
-    
-    [[RKActivityManager sharedActivityManager] decrementActivityCount];
+#if RKURLRequestPromise_Option_LogErrors
+    NSLog(@"[DEBUG] Error for request to <%@>: %@", self.request.URL, error);
+#endif /* RKURLRequestPromise_Option_LogErrors */
     
     [self.callbackQueue addOperationWithBlock:^{
-        self.onFailure(error, part);
+        self.onFailure(error);
     }];
 }
 
@@ -261,7 +292,33 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
-    [self invokeFailureCallbackWithError:error fromPart:kRKMultiPartPromisePartSecond];
+    switch (error.code) {
+        case NSURLErrorCannotFindHost:
+        case NSURLErrorCannotConnectToHost:
+        case NSURLErrorNetworkConnectionLost:
+        case NSURLErrorDNSLookupFailed:
+        case NSURLErrorNotConnectedToInternet:
+        case NSURLErrorRedirectToNonExistentLocation:
+        case NSURLErrorBadServerResponse: {
+            if(self.isCacheLoaded) {
+                [self.callbackQueue addOperationWithBlock:^{
+                    if(!self.isFinished)
+                        self.isFinished = YES;
+                }];
+                
+                //Return early, for we have loaded our cache.
+                return;
+            }
+            
+            break;
+        }
+            
+        default: {
+            break;
+        }
+    }
+    
+    [self invokeFailureCallbackWithError:error];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response
@@ -276,9 +333,18 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     if(etag && cachedEtag && [etag caseInsensitiveCompare:cachedEtag] == NSOrderedSame) {
         [self.connection cancel];
         _loadedData = nil;
+        
+        if(self.cancelWhenRemoteDataUnchanged) {
+            [[RKActivityManager sharedActivityManager] decrementActivityCount];
+            
+            [self.callbackQueue addOperationWithBlock:^{
+                if(!self.isFinished)
+                    self.isFinished = YES;
+            }];
+        } else {
+            [self loadCache];
+        }
     }
-    
-    [[RKActivityManager sharedActivityManager] decrementActivityCount];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -310,15 +376,27 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
                 NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
                                                               code:kRKURLRequestPromiseErrorCannotWriteCache
                                                           userInfo:userInfo];
-                [self invokeFailureCallbackWithError:highLevelError fromPart:kRKMultiPartPromisePartFirst];
+                [self invokeFailureCallbackWithError:highLevelError];
             }
         }
     }
     
-    [self invokeSecondSuccessCallbackWithData:_loadedData];
+    [self invokeSuccessCallbackWithData:_loadedData];
     
     _connection = nil;
     _loadedData = nil;
+}
+
+#pragma mark -
+
+- (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
+{
+    return [self.authenticationHandler request:self canHandlerAuthenticateProtectionSpace:protectionSpace];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    [self.authenticationHandler request:self handleAuthenticationChallenge:challenge];
 }
 
 @end

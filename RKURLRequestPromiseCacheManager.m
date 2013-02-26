@@ -177,13 +177,24 @@
     return YES;
 }
 
-- (NSData *)cachedDataForIdentifier:(NSString *)identifier error:(NSError **)error
+- (NSData *)cachedDataForIdentifier:(NSString *)identifier error:(NSError **)outError
 {
     NSParameterAssert(identifier);
     
+    NSError *error = nil;
     NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
     NSURL *dataLocation = [_bucketLocation URLByAppendingPathComponent:sanitizedIdentifier];
-    return [NSData dataWithContentsOfURL:dataLocation options:0 error:error];
+    NSData *data = [NSData dataWithContentsOfURL:dataLocation options:0 error:&error];
+    if(data) {
+        return data;
+    } else {
+        if(error.code == NSFileNoSuchFileError) {
+            return nil;
+        } else {
+            if(outError) *outError = error;
+            return nil;
+        }
+    }
 }
 
 @end

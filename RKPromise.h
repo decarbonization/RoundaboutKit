@@ -24,6 +24,10 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 @interface RKPromise : NSObject
 
 ///Returns whether or not the promise is multi-part.
+///
+///A multi-part promise is one who may call its `success` and `failure` blocks multiple times.
+///
+///Most built-in promise processing functions do not support multi-part promises.
 - (BOOL)isMultiPart;
 
 #pragma mark - Canceling
@@ -35,6 +39,14 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 
 ///Cancel the receiver.
 - (IBAction)cancel:(id)sender;
+
+#pragma mark - Finished Status
+
+///Whether or not the promise is finished.
+///
+///This property should be set to YES on the `callbackQueue`
+///passed into the execute promise method.
+@property BOOL isFinished;
 
 #pragma mark - Grouping
 
@@ -54,72 +66,6 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 - (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess
 				   failureBlock:(RKPromiseFailureBlock)onFailure
 				  callbackQueue:(NSOperationQueue *)callbackQueue;
-
-@end
-
-#pragma mark - Multi-Part Promises
-
-///The different parts of a multi-part promise.
-typedef enum RKMultiPartPromisePart : NSUInteger {
-    
-    ///The first part of the promise.
-    kRKMultiPartPromisePartFirst = 1,
-    
-    ///The second part of the promise.
-    kRKMultiPartPromisePartSecond = 2,
-    
-} RKMultiPartPromisePart;
-
-///A block to invoke upon successful completion of the first segment of a multi-part promise.
-///
-/// \param  data            The data given.
-/// \param  willContinue    Whether or not the next part of the promise will be invoked.
-///
-/// \seealso(kRKMultiPartPromisePartFirst)
-typedef void(^RKMultiPartPromiseFirstSuccessBlock)(id data, BOOL willContinue);
-
-///A block to invoke upon successful completion of the second segment of a multi-part promise.
-///
-/// \param  data    The data given.
-///
-/// \seealso(kRKMultiPartPromisePartSecond)
-typedef void(^RKMultiPartPromiseSecondSuccessBlock)(id data);
-
-///A block to invoke upon successful completion of both segments of a multi-part promise.
-///
-/// \param  data        The data given.
-/// \param  fromPart    The part of the promise that has been completed.
-///
-/// \seealso(RKMultiPartPromisePart)
-typedef void(^RKMultiPartPromiseCombinedSuccessBlock)(id data, RKMultiPartPromisePart fromPart);
-
-///A block to invoke upon non-successful realization of a multi-part promise.
-///
-/// \param  error       The error that occurred
-/// \param  fromPart    The part of the realization process this error came from.
-///
-/// \seealso(RKMultiPartPromisePart)
-typedef void(^RKMultiPartPromiseFailureBlock)(NSError *error, RKMultiPartPromisePart fromPart);
-
-///The RKMultiPartPromise class is an abstract subclass of RKPromise that adds support for
-///promises that complete in multiple parts.
-@interface RKMultiPartPromise : RKPromise
-
-#pragma mark - Execution
-
-///Execute the work of the promise.
-///
-/// \param  onFirstSuccess  The block to invoke upon successful execution of the first part of the promise. Required.
-/// \param  onSecondSuccess The block to invoke upon successful execution of the final part of the promise. Required.
-/// \param  onFailure       The block t invoke upon non-successful execution of the promise. Required.
-/// \param  callbackQueue   The queue to invoke the blocks on. Required.
-///
-///It is up to subclasses to implement a strategy for executing promises asynchronously.
-///The default implementation of this method does nothing.
-- (void)executeWithFirstSuccessBlock:(RKMultiPartPromiseFirstSuccessBlock)onFirstSuccess
-                  secondSuccessBlock:(RKMultiPartPromiseSecondSuccessBlock)onSecondSuccess
-                        failureBlock:(RKMultiPartPromiseFailureBlock)onFailure
-                       callbackQueue:(NSOperationQueue *)callbackQueue;
 
 @end
 
@@ -145,42 +91,7 @@ RK_EXTERN_OVERLOADABLE void RKRealize(RKPromise *promise,
                                       RKPromiseFailureBlock failure,
                                       NSOperationQueue *callbackQueue);
 
-#pragma mark -
-
-///Realize a multi-part promise.
-///
-///Two forms of this function exist for convenience.
-///
-///Form 1:
-/// \param  onFirstSuccess  The block to invoke upon successful execution of the first part of the promise. Required.
-/// \param  onSecondSuccess The block to invoke upon successful execution of the final part of the promise. Required.
-/// \param  onFailure       The block t invoke upon non-successful execution of the promise. Required.
-/// \param  callbackQueue   The queue to invoke the blocks on. May be ommitted at call site. May not be nil otherwise.
-///
-///
-///Form 2:
-/// \param  onSuccess  The block to invoke (multiple times) upon successful execution of both parts of the promise. Required.
-/// \param  onFailure       The block t invoke upon non-successful execution of the promise. Required.
-///
-///This function will asynchronously invoke the `promise`, and subsequently
-///invoke either the first and success blocks, or the failure block on
-///the queue that invoked this function initially.
-///
-///If promise is nil, then this function does nothing.
-RK_EXTERN_OVERLOADABLE void RKRealizeMultiPart(RKMultiPartPromise *promise,
-                                               RKMultiPartPromiseCombinedSuccessBlock onSuccess,
-                                               RKMultiPartPromiseFailureBlock onFailure);
-RK_EXTERN_OVERLOADABLE void RKRealizeMultiPart(RKMultiPartPromise *promise,
-                                               RKMultiPartPromiseFirstSuccessBlock onFirstSuccess,
-                                               RKMultiPartPromiseSecondSuccessBlock onSecondSuccess,
-                                               RKMultiPartPromiseFailureBlock onFailure);
-RK_EXTERN_OVERLOADABLE void RKRealizeMultiPart(RKMultiPartPromise *promise,
-                                               RKMultiPartPromiseFirstSuccessBlock onFirstSuccess,
-                                               RKMultiPartPromiseSecondSuccessBlock onSecondSuccess,
-                                               RKMultiPartPromiseFailureBlock onFailure,
-                                               NSOperationQueue *callbackQueue);
-
-#pragma mark - Plural Realization (Deprecated)
+#pragma mark - Plural Realization
 
 ///Realize an array of promises.
 ///
@@ -188,13 +99,12 @@ RK_EXTERN_OVERLOADABLE void RKRealizeMultiPart(RKMultiPartPromise *promise,
 ///	\param	callback		A block accepting an array of RKPossibilities. Required.
 ///	\param	callbackQueue	The queue to invoke the callback on. This parameter may be ommitted.
 ///
-///This form of RKRealizePromises is deprecated due to issues with incorporating
-///multi-part promises with a serial realization system of this nature.
+///RKRealizePromises may not be used with a multi-part promise and will raise an exception if passed one.
 RK_EXTERN_OVERLOADABLE void RKRealizePromises(NSArray *promises,
-                                              void(^callback)(NSArray *possibilities)) DEPRECATED_ATTRIBUTE;
+                                              void(^callback)(NSArray *possibilities));
 RK_EXTERN_OVERLOADABLE void RKRealizePromises(NSArray *promises,
                                               void(^callback)(NSArray *possibilities),
-                                              NSOperationQueue *callbackQueue) DEPRECATED_ATTRIBUTE;
+                                              NSOperationQueue *callbackQueue);
 
 #pragma mark -
 

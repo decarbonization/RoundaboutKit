@@ -25,6 +25,14 @@ enum {
     kRKURLRequestPromiseErrorCannotWriteCache = 'nwch',
 };
 
+
+///The callback block type expected in `-[RKURLRequestPromise loadCachedData:]`.
+///
+/// \param  maybeData   The cached data. The state of the possibility corresponds to the state of the cache.
+///
+typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
+
+
 ///The RKURLRequestPromiseCacheManager protocol outlines the methods and behaviours
 ///necessary for an object to be used as a cache manager for the RKURLRequestPromise class.
 ///
@@ -64,7 +72,27 @@ enum {
 /// \result An NSData object or nil.
 ///
 ///This method will be called from multiple threads, and may safely block.
+///
+///This method should return nil and leave the `out error`
+///empty to indicate there is no available value.
 - (NSData *)cachedDataForIdentifier:(NSString *)identifier error:(NSError **)error;
+
+@end
+
+#pragma mark -
+
+@class RKURLRequestPromise;
+
+///The RKURLRequestAuthenticationHandler protocol encapsulates the methods
+///required for an object to be an authentication handler for instances of
+///the RKURLRequestPromise class.
+@protocol RKURLRequestAuthenticationHandler <NSObject>
+
+///Sent to determine whether the handler is able to respond to a protection space's form of authentication.
+- (BOOL)request:(RKURLRequestPromise *)sender canHandlerAuthenticateProtectionSpace:(NSURLProtectionSpace *)protectionSpace;
+
+///Sent when a request must authenticate a challenge in order to download its data.
+- (void)request:(RKURLRequestPromise *)sender handleAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge;
 
 @end
 
@@ -89,6 +117,17 @@ RK_EXTERN_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProc
 ///A post-processor block that takes an NSData object and yields JSON.
 RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 
+#pragma mark - Compile Time Options
+
+///Set to 1 to have all requests logged.
+#define RKURLRequestPromise_Option_LogRequests  0
+
+///Set to 1 to have all request-responses logged.
+#define RKURLRequestPromise_Option_LogResponses 0
+
+///Set to 1 to have RKURLRequestPromise errors logged.
+#define RKURLRequestPromise_Option_LogErrors    0
+
 #pragma mark -
 
 ///The RKURLRequestPromise class encapsulates a network request.
@@ -104,7 +143,7 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 /// -   If NO, then the cache is completely ignored. This is typically
 ///     the intended behaviour of servers.
 ///
-@interface RKURLRequestPromise : RKMultiPartPromise
+@interface RKURLRequestPromise : RKPromise
 
 ///Initialize the receiver with a given request.
 ///
@@ -141,6 +180,9 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 ///No assumptions should be made about environment in a post processor block.
 @property (copy) RKPostProcessorBlock postProcessor;
 
+///The authentication handler of the request promise.
+@property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
+
 #pragma mark - Cache
 
 ///The cache identifier to use.
@@ -151,6 +193,8 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 ///The cache manager of the request.
 @property (readonly, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
 
+#pragma mark -
+
 ///Whether or not the request can use the cache when the internet connection is offline.
 ///
 ///If `.useCacheWhenOffline` is YES, and the internet connection is inactive, then the
@@ -158,6 +202,23 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 ///
 ///This property is ignored if `.cacheManager` is nil.
 @property (readonly, RK_NONATOMIC_IOSONLY) BOOL useCacheWhenOffline;
+
+///Whether or not the request should cancel itself if it finds
+///its cache is unchanged from the newly loaded remote data.
+@property (RK_NONATOMIC_IOSONLY) BOOL cancelWhenRemoteDataUnchanged;
+
+#pragma mark -
+
+///Loads any data cached under the identifier assigned to
+///the receiver using the receiver's cache manager object.
+///
+/// \param  block   The block to invoke when the loading operation has been completed. Required.
+///
+///This method does nothing when the receiver has either no cacheIdentifier and/or cacheManager.
+///
+///The cached data will be passed through the receiver's post-processor, and may be
+///consumed in exactly the same manner as the `success` value from realizing the receiver.
+- (void)loadCachedDataWithCallbackQueue:(NSOperationQueue *)callbackQueue block:(RKURLRequestPromiseCacheLoadingBlock)block;
 
 @end
 

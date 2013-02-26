@@ -139,27 +139,6 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
     return self;
 }
 
-- (RKBinding *)becomeAffectedBy:(NSObject *)object keyPath:(NSString *)keyPath
-{
-    NSParameterAssert(object);
-    NSParameterAssert(keyPath);
-    
-    NSAssert(!self.isConnected, @"Cannot connect binding more than once.");
-    
-    self.objectConnectedTo = object;
-    self.keyPathConnectedTo = keyPath;
-    self.isKeyPathConnectedToMultiLevel = ([self.keyPathConnectedTo rangeOfString:@"."].location != NSNotFound);
-    
-    [self.objectConnectedTo addObserver:self forKeyPath:self.keyPathConnectedTo options:0 context:NULL];
-    [self.objectConnectedTo.bindingsTrackedForLifecycle addObject:self];
-    
-    self.isConnected = YES;
-    
-    self.connectionType = kRKBindingConnectionTypeChangePropagation;
-    
-    return self;
-}
-
 - (RKBinding *)disconnect
 {
     if(!self.isConnected)
@@ -200,15 +179,15 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
         [self.currentPromise cancel:nil];
         self.currentPromise = promise;
         
-        if([promise isKindOfClass:[RKMultiPartPromise class]]) {
-            RKRealizeMultiPart((RKMultiPartPromise *)promise, ^(id realizedValue, RKMultiPartPromisePart fromPart) {
+        if([promise isKindOfClass:[RKPromise class]]) {
+            RKRealize((RKPromise *)promise, ^(id realizedValue) {
                 if(promise == self.currentPromise)
                     self.currentPromise = nil;
                 else
                     return;
                 
                 [self setValue:(realizedValue && self.valueTransformer? [self.valueTransformer transformedValue:realizedValue] : realizedValue) forKeyPathOnTarget:self.targetKeyPath];
-            }, ^(NSError *error, RKMultiPartPromisePart fromPart) {
+            }, ^(NSError *error) {
                 if(promise == self.currentPromise)
                     self.currentPromise = nil;
                 else
@@ -251,12 +230,6 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
         switch (self.connectionType) {
             case kRKBindingConnectionTypeOneWayBinding: {
                 [self setValue:[self valueForKeyPathFromConnectedToObject:keyPath] forKeyPathOnTarget:self.targetKeyPath];
-                break;
-            }
-                
-            case kRKBindingConnectionTypeChangePropagation: {
-                [self.target willChangeValueForKey:self.targetKeyPath];
-                [self.target didChangeValueForKey:self.targetKeyPath];
                 break;
             }
         }
@@ -377,3 +350,76 @@ static CFStringRef const RKBindingsLookupTableAssociatedObjectKey = CFSTR("RKBin
 }
 
 @end
+
+#pragma mark - One-Off Observations
+
+///The RKOneTimeObserver encapsulates a one-time observation.
+@interface RKOneTimeObserver : NSObject
+
+///Initialize the receiver with a given target, key path, and callback block.
+///
+/// \param  target      Required.
+/// \param  keyPath     Required.
+/// \param  callback    Required.
+///
+/// \result A fully initialized one time observer.
+///
+- (id)initWithTarget:(id)target keyPath:(NSString *)keyPath callback:(void(^)(id value))callback;
+
+#pragma mark - Properties
+
+@property id target;
+@property (copy) NSString *keyPath;
+@property (copy) void(^callback)(id value);
+
+@end
+
+@implementation RKOneTimeObserver
+
+- (void)dealloc
+{
+    [self.target removeObserver:self forKeyPath:self.keyPath];
+}
+
+- (id)initWithTarget:(id)target keyPath:(NSString *)keyPath callback:(void(^)(id value))callback
+{
+    NSParameterAssert(target);
+    NSParameterAssert(keyPath);
+    NSParameterAssert(callback);
+    
+    if((self = [super init])) {
+        self.target = target;
+        self.keyPath = keyPath;
+        self.callback = callback;
+        
+        [self.target addObserver:self forKeyPath:self.keyPath options:0 context:NULL];
+    }
+    
+    return self;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if(object == self.target && [keyPath isEqualToString:self.keyPath]) {
+        [self.target removeObserver:self forKeyPath:self.keyPath];
+        
+        self.callback(object);
+    } else {
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+    }
+}
+
+@end
+
+#pragma mark -
+
+RK_OVERLOADABLE id RKObserveOnce(id target, NSString *keyPath, void(^callback)(id value))
+{
+    NSCParameterAssert(target);
+    NSCParameterAssert(keyPath);
+    NSCParameterAssert(callback);
+    
+    return [[RKOneTimeObserver alloc] initWithTarget:target
+                                             keyPath:keyPath
+                                            callback:callback];
+}

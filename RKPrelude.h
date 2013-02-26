@@ -12,10 +12,10 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version       3L
+#define RoundaboutKit_Version       4L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
-#define RoundaboutKit_Stable        0
+#define RoundaboutKit_Stable        1
 
 ///Whether or not the RoundaboutKit should emit warnings
 ///for questionable but presently valid behaviour.
@@ -191,6 +191,41 @@ RK_INLINE id RKFilterOutNSNull(id value)
 		return nil;
 	
 	return value;
+}
+
+#pragma mark -
+
+///Retains a given object implementing the `<NSObject>` protocol.
+///
+///This function should be considered unsafe.
+RK_INLINE id RKObjectRetain(id <NSObject> object)
+{
+    //So we don't have to include the objc runtime headers.
+    extern id objc_msgSend(id, SEL, ...);
+    
+    return objc_msgSend(object, NSSelectorFromString(@"retain"));
+}
+
+///Autoreleases a given object implementing the `<NSObject>` protocol.
+///
+///This function should be considered unsafe.
+RK_INLINE id RKObjectAutorelease(id <NSObject> object)
+{
+    //So we don't have to include the objc runtime headers.
+    extern id objc_msgSend(id, SEL, ...);
+    
+    return objc_msgSend(object, NSSelectorFromString(@"autorelease"));
+}
+
+///Releases a given object implementing the `<NSObject>` protocol.
+///
+///This function should be considered unsafe.
+RK_INLINE void RKObjectRelease(id <NSObject> object)
+{
+    //So we don't have to include the objc runtime headers.
+    extern id objc_msgSend(id, SEL, ...);
+    
+    ((void(*)(id, SEL))objc_msgSend)(object, NSSelectorFromString(@"release"));
 }
 
 #endif /* RKPrelude_h */

@@ -27,59 +27,14 @@
 
 - (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess
 				   failureBlock:(RKPromiseFailureBlock)onFailure
-				  callbackQueue:(dispatch_queue_t)callbackQueue
+				  callbackQueue:(NSOperationQueue *)callbackQueue
 {
 	//Do nothing
 }
 
 @end
 
-#pragma mark - 
-
-@implementation RKMultiPartPromise
-
-- (BOOL)isMultiPart
-{
-    return YES;
-}
-
-#pragma mark - Execution
-
-- (void)executeWithSuccessBlock:(RKPromiseSuccessBlock)onSuccess failureBlock:(RKPromiseFailureBlock)onFailure callbackQueue:(NSOperationQueue *)callbackQueue
-{
-    NSParameterAssert(onSuccess);
-    NSParameterAssert(onFailure);
-    
-    [self executeWithFirstSuccessBlock:^(id data, BOOL willContinue) {
-        onSuccess(data);
-    } secondSuccessBlock:^(id data) {
-        onSuccess(data);
-    } failureBlock:^(NSError *error, RKMultiPartPromisePart fromPart) {
-        onFailure(error);
-    } callbackQueue:callbackQueue];
-}
-
-- (void)executeWithFirstSuccessBlock:(RKMultiPartPromiseFirstSuccessBlock)onFirstSuccess
-                  secondSuccessBlock:(RKMultiPartPromiseSecondSuccessBlock)onSecondSuccess
-                        failureBlock:(RKMultiPartPromiseFailureBlock)onFailure
-                       callbackQueue:(NSOperationQueue *)callbackQueue
-{
-    //Do nothing
-}
-
-@end
-
 #pragma mark - Singular Realization
-
-///Emits a warning that a multi-part promise was realized using the single part function.
-///
-///This function primarily exists to provide a simple debug point.
-void RKRealizeMultiPartMisuseWarning()
-{
-#if RoundaboutKit_EmitWarnings
-    NSLog(@"*** Warning, realizing a multi-part promise using single part realization function. Add a breakpoint to `RKRealizeMultiPartMisuseWarning` to debug.");
-#endif /* RoundaboutKit_EmitWarnings */
-}
 
 RK_OVERLOADABLE void RKRealize(RKPromise *promise,
 							   RKPromiseSuccessBlock success,
@@ -89,9 +44,6 @@ RK_OVERLOADABLE void RKRealize(RKPromise *promise,
 	if(!promise)
 		return;
 	
-    if([promise isMultiPart])
-        RKRealizeMultiPartMisuseWarning();
-    
 	[promise executeWithSuccessBlock:success failureBlock:failure callbackQueue:callbackQueue];
 }
 
@@ -102,44 +54,8 @@ RK_OVERLOADABLE void RKRealize(RKPromise *promise,
 	RKRealize(promise, success, failure, [NSOperationQueue currentQueue]);
 }
 
-#pragma mark -
-
-RK_OVERLOADABLE void RKRealizeMultiPart(RKMultiPartPromise *promise,
-                                        RKMultiPartPromiseFirstSuccessBlock onFirstSuccess,
-                                        RKMultiPartPromiseSecondSuccessBlock onSecondSuccess,
-                                        RKMultiPartPromiseFailureBlock onFailure,
-                                        NSOperationQueue *callbackQueue)
-{
-    if(!promise)
-		return;
-	
-    if(![promise isMultiPart])
-        [NSException raise:NSInternalInconsistencyException
-                    format:@"Cannot realize a non-multi-part promise using regular realization method."];
-    
-	[promise executeWithFirstSuccessBlock:onFirstSuccess secondSuccessBlock:onSecondSuccess failureBlock:onFailure callbackQueue:callbackQueue];
-}
-
-RK_OVERLOADABLE void RKRealizeMultiPart(RKMultiPartPromise *promise,
-                                        RKMultiPartPromiseFirstSuccessBlock onFirstSuccess,
-                                        RKMultiPartPromiseSecondSuccessBlock onSecondSuccess,
-                                        RKMultiPartPromiseFailureBlock onFailure)
-{
-    RKRealizeMultiPart(promise, onFirstSuccess, onSecondSuccess, onFailure, [NSOperationQueue currentQueue]);
-}
-
 #pragma mark - Plural Realization
 
-RK_OVERLOADABLE void RKRealizeMultiPart(RKMultiPartPromise *promise,
-                                        RKMultiPartPromiseCombinedSuccessBlock onSuccess,
-                                        RKMultiPartPromiseFailureBlock onFailure)
-{
-    RKRealizeMultiPart(promise, ^(id data, BOOL willContinue) {
-        onSuccess(data, kRKMultiPartPromisePartFirst);
-    }, ^(id data) {
-        onSuccess(data, kRKMultiPartPromisePartSecond);
-    }, onFailure);
-}
 RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 									   void(^callback)(NSArray *possibilities))
 {
@@ -153,11 +69,15 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 	NSCParameterAssert(callback);
 	NSCParameterAssert(callbackQueue);
 	
-    NSLog(@"*** Warning RKRealizePromises is deprecated and will result in undefined behaviour when used with an RKMultiPartPromise.");
-    
 	NSUInteger numberOfPromises = [promises count];
 	NSMutableArray *completedPromises = [NSMutableArray array];
 	for (RKPromise *promise in [promises copy]) {
+        //We do not support multi-part promises. Period.
+        if(promise.isMultiPart) {
+            [NSException raise:NSInternalInconsistencyException
+                        format:@"RKRealizePromises cannot be used with a multi-part promise."];
+        }
+        
 		RKRealize(promise, ^(id result) {
 			RKPossibility *possibility = [[RKPossibility alloc] initWithValue:result];
 			@synchronized(completedPromises) {
@@ -247,9 +167,15 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 	
     [self.operationQueue addOperationWithBlock:^{
         mWorker(self, ^(id result) {
-            [callbackQueue addOperationWithBlock:^{ onSuccess(result); }];
+            [callbackQueue addOperationWithBlock:^{
+                self.isFinished = YES;
+                onSuccess(result);
+            }];
 		}, ^(NSError *error) {
-			[callbackQueue addOperationWithBlock:^{ onFailure(error); }];
+			[callbackQueue addOperationWithBlock:^{
+                self.isFinished = YES;
+                onFailure(error);
+            }];
 		});
     }];
 	

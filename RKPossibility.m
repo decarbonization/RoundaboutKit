@@ -98,7 +98,7 @@ RK_OVERLOADABLE void RKMatchPossibility(RKPossibility *possibility,
     } else if(possibility.state == kRKPossibilityStateError) {
         if(error)
             error(possibility.error);
+    } else {
+        NSCAssert(0, @"RKPossibility is in an undefined state.");
     }
-    
-    NSCAssert(0, @"RKPossibility is in an undefined state.");
 }
