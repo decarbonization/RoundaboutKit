@@ -209,3 +209,18 @@ NSString *RKGenerateIdentifierForStrings(NSArray *strings)
     NSArray *sortedStrings = [sanitizedStrings sortedArrayUsingSelector:@selector(compare:)];
     return [sortedStrings componentsJoinedByString:@""];
 }
+
+id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPath)
+{
+    NSCParameterAssert(keyPath);
+    if(!RKFilterOutNSNull(dictionary))
+        return nil;
+    
+    NSArray *keys = [keyPath componentsSeparatedByString:@"."];
+    id value = dictionary;
+    for (NSString *key in keys) {
+        value = RKFilterOutNSNull([value valueForKey:key]);
+    }
+    
+    return value;
+}

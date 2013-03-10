@@ -56,6 +56,30 @@ typedef enum RKPossibilityState : NSUInteger {
 
 @end
 
+#pragma mark - Default Matchers/Refiners
+
+///The default value possibility refiner.
+#define kRKPossibilityDefaultValueRefiner nil
+
+///The default empty possibility refiner.
+#define kRKPossibilityDefaultEmptyRefiner nil
+
+///The default error possibility refiner.
+#define kRKPossibilityDefaultErrorRefiner nil
+
+#pragma mark -
+
+///The default value possibility matcher.
+#define kRKPossibilityDefaultValueMatcher nil
+
+///The default empty possibility matcher.
+#define kRKPossibilityDefaultEmptyMatcher nil
+
+///The default error possibility matcher.
+#define kRKPossibilityDefaultErrorMatcher nil
+
+#pragma mark - Refining and Matching
+
 ///Refine a possibility by passing its contents through a refiner block.
 ///
 /// \param  possibility     The possibility to refine. Optional.

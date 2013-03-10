@@ -193,6 +193,17 @@ RK_INLINE id RKFilterOutNSNull(id value)
 	return value;
 }
 
+///Safely indexes a JSON dictionary given a limited keyPath.
+///
+/// \param  dictionary  The dictionary to index. Optional.
+/// \param  keyPath     The key path to search for in the dictionary.
+///                     This key path may not contain collection operators. Required.
+///
+/// \result The value for the key assoicated with the `keyPath`.
+///
+///This function filters out NSNull values.
+RK_EXTERN id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPath);
+
 #pragma mark -
 
 ///Retains a given object implementing the `<NSObject>` protocol.
