@@ -26,7 +26,7 @@ enum {
 };
 
 
-///The callback block type expected in `-[RKURLRequestPromise loadCachedData:]`.
+///The callback block type expected in `-[RKURLRequestPromise loadCachedDataWithCallbackQueue:block:]`.
 ///
 /// \param  maybeData   The cached data. The state of the possibility corresponds to the state of the cache.
 ///
@@ -117,6 +117,11 @@ RK_EXTERN_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProc
 ///A post-processor block that takes an NSData object and yields JSON.
 RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 
+///The RKURLRequestPreflightBlock functor encapsulates a series of actions that must be
+///executed before a RKURLRequestPromise may be executed. This functor will be called
+///on the request promise's operation queue.
+typedef BOOL(^RKURLRequestPreflightBlock)(NSError **outError);
+
 #pragma mark - Compile Time Options
 
 ///Set to 1 to have all requests logged.
@@ -161,7 +166,7 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 - (id)initWithRequest:(NSURLRequest *)request
          cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
   useCacheWhenOffline:(BOOL)useCacheWhenOffline
-         requestQueue:(NSOperationQueue *)requestQueue;
+         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
 
 #pragma mark - Properties
 
@@ -172,6 +177,13 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 ///
 ///This queue should be concurrent.
 @property (RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
+
+#pragma mark -
+
+///The block to execute before the operation is started.
+@property (copy, RK_NONATOMIC_IOSONLY) RKURLRequestPreflightBlock preflight;
+
+#pragma mark -
 
 ///The post processor to invoke on the URL request promise.
 ///

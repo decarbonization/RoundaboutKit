@@ -50,6 +50,12 @@ RK_EXTERN NSString *RKReachabilityStatusGetDescription(RKReachabilityStatus stat
 ///A reachability statuc changed block.
 typedef void(^RKReachabilityStatusChangedBlock)(RKReachabilityStatus connectionStatus);
 
+///The name of the notification posted when RKReachability detects a change in connection status.
+///
+///The object of the notification is the RKReachability that posted the notificiation.
+///There is no associated userInfo dictionary.
+RK_EXTERN NSString *const RKReachabilityStatusChangedNotification;
+
 ///The RKReachability class encapsulates internet connectivity state tracking.
 ///
 ///This object requires there be an active run loop to function.
@@ -78,9 +84,13 @@ typedef void(^RKReachabilityStatusChangedBlock)(RKReachabilityStatus connectionS
 #pragma mark - Registering Callbacks
 
 ///Register a status changed block.
+///
+/// \seealso(RKReachabilityStatusChangedNotification)
 - (void)registerStatusChangedBlock:(RKReachabilityStatusChangedBlock)statusChangedBlock;
 
 ///Unregister a status changed block.
+///
+/// \seealso(RKReachabilityStatusChangedNotification)
 - (void)unregisterStatusChangedBlock:(RKReachabilityStatusChangedBlock)statusChangedBlock;
 
 @end

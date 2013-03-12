@@ -20,7 +20,7 @@
     NSURL *_bucketLocation;
     NSURL *_metadataLocation;
     
-    dispatch_queue_t _metadataAccessQueue;
+    dispatch_queue_t _accessQueue;
     NSMutableDictionary *_metadata;
 }
 
@@ -94,23 +94,24 @@
     NSParameterAssert(bucketName);
     
     if((self = [super init])) {
-        _bucketLocation = [[self class] locationForBucket:bucketName];
-        if(![_bucketLocation checkResourceIsReachableAndReturnError:nil]) {
-            NSError *error = nil;
-            if(![[NSFileManager defaultManager] createDirectoryAtURL:_bucketLocation
-                                         withIntermediateDirectories:YES
-                                                          attributes:nil
-                                                               error:&error]) {
-                [NSException raise:NSInternalInconsistencyException format:@"Could not create bucket location %@. %@", _bucketLocation, error];
+        _accessQueue = dispatch_queue_create("com.roundabout.RoundaboutKit.RKURLRequestPromiseCacheManager.accessQueue", 0);
+        dispatch_barrier_async(_accessQueue, ^{
+            _bucketLocation = [[self class] locationForBucket:bucketName];
+            if(![_bucketLocation checkResourceIsReachableAndReturnError:nil]) {
+                NSError *error = nil;
+                if(![[NSFileManager defaultManager] createDirectoryAtURL:_bucketLocation
+                                             withIntermediateDirectories:YES
+                                                              attributes:nil
+                                                                   error:&error]) {
+                    [NSException raise:NSInternalInconsistencyException format:@"Could not create bucket location %@. %@", _bucketLocation, error];
+                }
             }
-        }
-        
-        _metadataLocation = [[self class] locationForMetadataInBucket:bucketName];
-        _metadata = [NSMutableDictionary dictionaryWithContentsOfURL:_metadataLocation] ?: [NSMutableDictionary dictionary];
-        
-        self.bucketName = bucketName;
-        
-        _metadataAccessQueue = dispatch_queue_create("com.roundabout.RoundaboutKit.RKURLRequestPromiseCacheManager.metadataAccessQueue", 0);
+            
+            _metadataLocation = [[self class] locationForMetadataInBucket:bucketName];
+            _metadata = [NSMutableDictionary dictionaryWithContentsOfURL:_metadataLocation] ?: [NSMutableDictionary dictionary];
+            
+            self.bucketName = bucketName;
+        });
     }
     
     return self;
@@ -150,10 +151,11 @@
     NSParameterAssert(identifier);
     
     __block NSString *revision = nil;
-    dispatch_sync(_metadataAccessQueue, ^{
+    dispatch_sync(_accessQueue, ^{
         NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
         revision = _metadata[sanitizedIdentifier][@"revision"];
     });
+    
     return revision;
 }
 
@@ -162,29 +164,34 @@
     NSParameterAssert(identifier);
     NSParameterAssert(revision);
     
-    NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
-    NSURL *dataLocation = [_bucketLocation URLByAppendingPathComponent:sanitizedIdentifier];
-    
-    if(![data writeToURL:dataLocation options:NSAtomicWrite error:error]) {
-        return NO;
-    }
-    
-    dispatch_barrier_async(_metadataAccessQueue, ^{
+    __block BOOL success = YES;
+    dispatch_barrier_sync(_accessQueue, ^{
+        NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
+        NSURL *dataLocation = [_bucketLocation URLByAppendingPathComponent:sanitizedIdentifier];
+        
+        if(![data writeToURL:dataLocation options:NSAtomicWrite error:error]) {
+            success = NO;
+        }
+        
         _metadata[sanitizedIdentifier] = @{@"revision": revision};
         [self synchronizeMetadata];
     });
     
-    return YES;
+    return success;
 }
 
 - (NSData *)cachedDataForIdentifier:(NSString *)identifier error:(NSError **)outError
 {
     NSParameterAssert(identifier);
     
-    NSError *error = nil;
-    NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
-    NSURL *dataLocation = [_bucketLocation URLByAppendingPathComponent:sanitizedIdentifier];
-    NSData *data = [NSData dataWithContentsOfURL:dataLocation options:0 error:&error];
+    __block NSError *error = nil;
+    __block NSData *data = nil;
+    dispatch_sync(_accessQueue, ^{
+        NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
+        NSURL *dataLocation = [_bucketLocation URLByAppendingPathComponent:sanitizedIdentifier];
+        data = [NSData dataWithContentsOfURL:dataLocation options:0 error:&error];
+    });
+    
     if(data) {
         return data;
     } else {

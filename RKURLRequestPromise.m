@@ -131,29 +131,39 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     NSAssert((self.connection == nil),
              @"Cannot realize a %@ more than once.", NSStringFromClass([self class]));
     
-    self.onSuccess = onSuccess;
-    self.onFailure = onFailure;
-    self.callbackQueue = callbackQueue;
-    
-    _loadedData = [NSMutableData new];
-    
-    _isInOfflineMode = ![RKReachability defaultInternetConnectionReachability].isConnected;
-    [[RKActivityManager sharedActivityManager] incrementActivityCount];
-    
-    if(_isInOfflineMode) {
+    [_requestQueue addOperationWithBlock:^{
+        self.onSuccess = onSuccess;
+        self.onFailure = onFailure;
+        self.callbackQueue = callbackQueue;
         
-    } else {
-        self.connection = [[NSURLConnection alloc] initWithRequest:self.request
-                                                          delegate:self
-                                                  startImmediately:NO];
+        _loadedData = [NSMutableData new];
         
-        [self.connection setDelegateQueue:self.requestQueue];
-        [self.connection start];
-    }
-    
+        _isInOfflineMode = ![RKReachability defaultInternetConnectionReachability].isConnected;
+        [[RKActivityManager sharedActivityManager] incrementActivityCount];
+        
+        if(_preflight) {
+            NSError *preflightError = nil;
+            if(!_preflight(&preflightError)) {
+                [self invokeFailureCallbackWithError:preflightError];
+                return;
+            }
+        }
+        
+        if(_isInOfflineMode) {
+            [self loadCache];
+        } else {
+            self.connection = [[NSURLConnection alloc] initWithRequest:self.request
+                                                              delegate:self
+                                                      startImmediately:NO];
+            
+            [self.connection setDelegateQueue:self.requestQueue];
+            [self.connection start];
+        }
+        
 #if RKURLRequestPromise_Option_LogRequests
-    NSLog(@"[DEBUG] Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+        NSLog(@"[DEBUG] Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
 #endif /* RKURLRequestPromise_Option_LogRequests */
+    }];
 }
 
 - (void)cancel:(id)sender

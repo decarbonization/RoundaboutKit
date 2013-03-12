@@ -138,10 +138,10 @@ typedef void(^RKBlockPromiseWorker)(RKBlockPromise *me, RKPromiseSuccessBlock on
 ///Initialize a block promise.
 ///
 ///All parameters required.
-- (id)initWithWorker:(RKBlockPromiseWorker)worker;
+- (id)initWithWorker:(RKBlockPromiseWorker)worker RK_REQUIRE_RESULT_USED;
 
 ///Initialize a block promise.
-- (id)initWithWorker:(RKBlockPromiseWorker)worker operationQueue:(NSOperationQueue *)operationQueue;
+- (id)initWithWorker:(RKBlockPromiseWorker)worker operationQueue:(NSOperationQueue *)operationQueue RK_REQUIRE_RESULT_USED;
 
 #pragma mark - Properties
 

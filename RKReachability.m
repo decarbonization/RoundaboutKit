@@ -38,6 +38,8 @@ NSString *RKReachabilityStatusGetDescription(RKReachabilityStatus status)
     return [description copy];
 }
 
+NSString *const RKReachabilityStatusChangedNotification = @"RKReachabilityStatusChangedNotification";
+
 @implementation RKReachability {
     NSMutableArray *_callbackBlocks;
     SCNetworkReachabilityRef _networkReachability;
@@ -51,6 +53,8 @@ static void NetworkReachabilityChanged(SCNetworkReachabilityRef target, SCNetwor
     
     [self willChangeValueForKey:@"connectionStatus"];
     [self didChangeValueForKey:@"connectionStatus"];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:RKReachabilityStatusChangedNotification object:self];
     
     RK_SYNCHRONIZED_MACONLY(self->_callbackBlocks) {
         for (RKReachabilityStatusChangedBlock statusChangedBlock in self->_callbackBlocks) {

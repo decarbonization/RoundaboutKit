@@ -59,6 +59,9 @@
 
 #define RK_INLINE                   static inline
 
+///Causes any function or method decorated to emit a warning when its return result is not used.
+#define RK_REQUIRE_RESULT_USED      __attribute__((warn_unused_result))
+
 #pragma mark - Thread-Safety Goop
 
 #if TARGET_OS_IPHONE

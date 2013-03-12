@@ -86,7 +86,6 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
 
 - (void)dealloc
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     if(_isConnected)
         [_objectConnectedTo removeObserver:self forKeyPath:_keyPathConnectedTo];
 }
