@@ -48,10 +48,10 @@ RK_OVERLOADABLE id RKAwait(RKPromise *promise)
 {
     NSError *error = nil;
     id value = RKAwait(promise, &error);
-    if(!value && error) {
+    if(!value) {
         @throw [NSException exceptionWithName:[error domain]
                                        reason:[error localizedDescription]
-                                     userInfo:[error userInfo]];
+                                     userInfo:@{NSUnderlyingErrorKey: error}];
     }
     
     return value;
