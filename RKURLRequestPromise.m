@@ -143,7 +143,10 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         
         if(_preflight) {
             NSError *preflightError = nil;
-            if(!_preflight(&preflightError)) {
+            NSURLRequest *newRequest = nil;
+            if((newRequest = _preflight(self.request, &preflightError))) {
+                self.request = newRequest;
+            } else {
                 [self invokeFailureCallbackWithError:preflightError];
                 return;
             }

@@ -120,7 +120,12 @@ RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 ///The RKURLRequestPreflightBlock functor encapsulates a series of actions that must be
 ///executed before a RKURLRequestPromise may be executed. This functor will be called
 ///on the request promise's operation queue.
-typedef BOOL(^RKURLRequestPreflightBlock)(NSError **outError);
+///
+/// \param  request     The current request of the promise.
+/// \param  outError    On return, should contain an error describing any problems.
+///
+/// \result A NSURLRequest instance to use for the request-promise, or nil if an error occurs.
+typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSError **outError);
 
 #pragma mark - Compile Time Options
 
