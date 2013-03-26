@@ -245,15 +245,20 @@ void RKBindingEmitUnhandledRealizationErrorWarning(NSError *error)
 
 static CFStringRef const RKBindingsTrackedForLifecycleAssociatedObjectKey = CFSTR("RKBindingsTrackedForLifecycleAssociatedObjectKey");
 
+RK_INLINE void InstallRKBindingDealloc()
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Class NSObjectClass = [NSObject class];
+        
+        method_exchangeImplementations(class_getInstanceMethod(NSObjectClass, sel_registerName("dealloc")),
+                                       class_getInstanceMethod(NSObjectClass, sel_registerName("RKBinding_dealloc")));
+    });
+}
+
 @implementation NSObject (RKBinding)
 
 #pragma mark - Automatic Unobservation
-
-+ (void)load
-{
-    method_exchangeImplementations(class_getInstanceMethod(self, sel_registerName("dealloc")),
-                                   class_getInstanceMethod(self, sel_registerName("RKBinding_dealloc")));
-}
 
 - (void)RKBinding_dealloc
 {
@@ -296,6 +301,8 @@ static CFStringRef const RKBindingsTrackedForLifecycleAssociatedObjectKey = CFST
 ///detail, and this method should never be publicly exposed.
 - (NSMutableArray *)bindingsTrackedForLifecycle
 {
+    InstallRKBindingDealloc();
+    
     NSMutableArray *trackedBindings = objc_getAssociatedObject(self, RKBindingsTrackedForLifecycleAssociatedObjectKey);
     if(!trackedBindings) {
         trackedBindings = [NSMutableArray new];
