@@ -69,37 +69,46 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 	NSCParameterAssert(callback);
 	NSCParameterAssert(callbackQueue);
 	
-	NSUInteger numberOfPromises = [promises count];
-	NSMutableArray *completedPromises = [NSMutableArray array];
-	for (RKPromise *promise in [promises copy]) {
-        //We do not support multi-part promises. Period.
-        if(promise.isMultiPart) {
-            [NSException raise:NSInternalInconsistencyException
-                        format:@"RKRealizePromises cannot be used with a multi-part promise."];
+    NSOperationQueue *realizationQueue = [RKBlockPromise defaultBlockPromiseQueue];
+    [realizationQueue addOperationWithBlock:^{
+        NSMutableArray *results = [promises mutableCopy];
+        __block NSUInteger numberOfRealizedPromises = 0;
+        for (NSUInteger index = 0, count = promises.count; index < count; index++) {
+            RKPromise *promise = promises[index];
+            
+            //We do not support multi-part promises. Period.
+            if(promise.isMultiPart) {
+                NSError *error = [NSError errorWithDomain:@"RKPromiseErrorDomain"
+                                                     code:'+prt'
+                                                 userInfo:@{NSLocalizedDescriptionKey: @"RKRealizePromises cannot be used with a multi-part promise."}];
+                [results replaceObjectAtIndex:index withObject:[[RKPossibility alloc] initWithError:error]];
+                
+                continue;
+            }
+            
+            RKRealize(promise, ^(id result) {
+                RKPossibility *possibility = [[RKPossibility alloc] initWithValue:result];
+                [results replaceObjectAtIndex:index withObject:possibility];
+                
+                numberOfRealizedPromises++;
+                if(numberOfRealizedPromises == count) {
+                    [callbackQueue addOperationWithBlock:^{
+                        if(callback) callback(results);
+                    }];
+                }
+            }, ^(NSError *error) {
+                RKPossibility *possibility = [[RKPossibility alloc] initWithError:error];
+                [results replaceObjectAtIndex:index withObject:possibility];
+                
+                numberOfRealizedPromises++;
+                if(numberOfRealizedPromises == count) {
+                    [callbackQueue addOperationWithBlock:^{
+                        if(callback) callback(results);
+                    }];
+                }
+            }, realizationQueue);
         }
-        
-		RKRealize(promise, ^(id result) {
-			RKPossibility *possibility = [[RKPossibility alloc] initWithValue:result];
-			@synchronized(completedPromises) {
-				[completedPromises addObject:possibility];
-				if([completedPromises count] == numberOfPromises) {
-					[callbackQueue addOperationWithBlock:^{
-						if(callback) callback(completedPromises);
-					}];
-				}
-			}
-		}, ^(NSError *error) {
-			RKPossibility *possibility = [[RKPossibility alloc] initWithError:error];
-			@synchronized(completedPromises) {
-				[completedPromises addObject:possibility];
-				if([completedPromises count] == numberOfPromises) {
-					[callbackQueue addOperationWithBlock:^{
-						if(callback) callback(completedPromises);
-					}];
-				}
-			}
-		}, callbackQueue);
-	}
+    }];
 }
 
 #pragma mark -
@@ -180,6 +189,16 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
     }];
 	
 	mHasBeenRealized = YES;
+}
+
+#pragma mark -
+
+RK_OVERLOADABLE void RKDoAsync(dispatch_block_t actions)
+{
+    if(!actions)
+        return;
+    
+    [[RKBlockPromise defaultBlockPromiseQueue] addOperationWithBlock:actions];
 }
 
 @end

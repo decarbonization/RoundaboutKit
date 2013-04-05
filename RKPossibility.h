@@ -116,4 +116,20 @@ RK_EXTERN_OVERLOADABLE void RKMatchPossibility(RKPossibility *possibility,
                                                void(^empty)(),
                                                void(^error)(NSError *error));
 
+#pragma mark - Collection Tools
+
+///Enumerates an array of possibilities, invoking a callback for every possibility that has a value.
+///
+/// \param  possibilities   An array of RKPossibility instances.
+/// \param  callback        The callback. Required.
+///
+RK_EXTERN_OVERLOADABLE void RKPossibilitiesIterateValues(NSArray *possibilities, void(^callback)(id value, NSUInteger index, BOOL *stop));
+
+///Enumerates an array of possibilities, invoking a callback for every possibility that has an error.
+///
+/// \param  possibilities   An array of RKPossibility instances.
+/// \param  callback        The callback. Required.
+///
+RK_EXTERN_OVERLOADABLE void RKPossibilitiesIterateErrors(NSArray *possibilities, void(^callback)(NSError *error, NSUInteger index, BOOL *stop));
+
 #endif /* RKPossibility_h */

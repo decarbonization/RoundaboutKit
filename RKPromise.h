@@ -100,6 +100,9 @@ RK_EXTERN_OVERLOADABLE void RKRealize(RKPromise *promise,
 ///	\param	callbackQueue	The queue to invoke the callback on. This parameter may be ommitted.
 ///
 ///RKRealizePromises may not be used with a multi-part promise and will raise an exception if passed one.
+///
+///Starting in RoundaboutKit version 5, the order of the promises is preserved
+///between the array passed in and the array of resultant possibilities given.
 RK_EXTERN_OVERLOADABLE void RKRealizePromises(NSArray *promises,
                                               void(^callback)(NSArray *possibilities));
 RK_EXTERN_OVERLOADABLE void RKRealizePromises(NSArray *promises,
@@ -152,5 +155,14 @@ typedef void(^RKBlockPromiseWorker)(RKBlockPromise *me, RKPromiseSuccessBlock on
 @property NSOperationQueue *operationQueue;
 
 @end
+
+#pragma mark -
+
+///Executes a given block in the background.
+///
+///This function is mainly provided as a convenient way to push
+///long running operations to a background thread in a way that
+///is compatible with the RKPromise internal implementation.
+RK_EXTERN_OVERLOADABLE void RKDoAsync(dispatch_block_t actions);
 
 #endif /* RKPromise_h */

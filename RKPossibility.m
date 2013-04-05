@@ -102,3 +102,29 @@ RK_OVERLOADABLE void RKMatchPossibility(RKPossibility *possibility,
         NSCAssert(0, @"RKPossibility is in an undefined state.");
     }
 }
+
+#pragma mark - Collection Tools
+
+RK_OVERLOADABLE void RKPossibilitiesIterateValues(NSArray *possibilities, void(^callback)(id value, NSUInteger index, BOOL *stop))
+{
+    NSCParameterAssert(callback);
+    
+    [possibilities enumerateObjectsUsingBlock:^(RKPossibility *possibility, NSUInteger index, BOOL *stop) {
+        if(possibility.state != kRKPossibilityStateValue)
+            return;
+        
+        callback(possibility.value, index, stop);
+    }];
+}
+
+RK_OVERLOADABLE void RKPossibilitiesIterateErrors(NSArray *possibilities, void(^callback)(NSError *error, NSUInteger index, BOOL *stop))
+{
+    NSCParameterAssert(callback);
+    
+    [possibilities enumerateObjectsUsingBlock:^(RKPossibility *possibility, NSUInteger index, BOOL *stop) {
+        if(possibility.state != kRKPossibilityStateError)
+            return;
+        
+        callback(possibility.error, index, stop);
+    }];
+}
