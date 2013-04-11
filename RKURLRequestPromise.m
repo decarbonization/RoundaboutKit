@@ -136,7 +136,9 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         self.onFailure = onFailure;
         self.callbackQueue = callbackQueue;
         
-        _loadedData = [NSMutableData new];
+        @synchronized(self) {
+            _loadedData = [NSMutableData new];
+        }
         
         _isInOfflineMode = ![RKReachability defaultInternetConnectionReachability].isConnected;
         [[RKActivityManager sharedActivityManager] incrementActivityCount];
@@ -173,7 +175,9 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 {
     if(!self.cancelled) {
         [self.connection cancel];
-        _loadedData = nil;
+        @synchronized(self) {
+             _loadedData = nil;
+        }
         
 #if RKURLRequestPromise_Option_LogRequests
         NSLog(@"[DEBUG] Outgoing request to <%@> cancelled", self.request.URL);
@@ -345,7 +349,9 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     NSString *cachedEtag = [self.cacheManager revisionForIdentifier:self.cacheIdentifier];
     if(etag && cachedEtag && [etag caseInsensitiveCompare:cachedEtag] == NSOrderedSame) {
         [self.connection cancel];
-        _loadedData = nil;
+        @synchronized(self) {
+            _loadedData = nil;
+        }
         
         if(self.cancelWhenRemoteDataUnchanged) {
             [[RKActivityManager sharedActivityManager] decrementActivityCount];
@@ -362,13 +368,20 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    [_loadedData appendData:data];
+    @synchronized(self) {
+        [_loadedData appendData:data];
+    }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     if(self.cancelled)
         return;
+    
+    __block NSData *loadedData = nil;
+    @synchronized(self) {
+        loadedData = _loadedData;
+    }
     
     if(self.cacheManager) {
         NSString *etag = self.responseHeaderFields[kETagHeaderKey];
@@ -377,7 +390,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         
         if(etag) {
             NSError *error = nil;
-            if(![self.cacheManager cacheData:_loadedData
+            if(![self.cacheManager cacheData:loadedData
                                forIdentifier:self.cacheIdentifier
                                 withRevision:etag
                                        error:&error]) {
@@ -394,10 +407,12 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         }
     }
     
-    [self invokeSuccessCallbackWithData:_loadedData];
+    [self invokeSuccessCallbackWithData:loadedData];
     
     _connection = nil;
-    _loadedData = nil;
+    @synchronized(self) {
+        _loadedData = nil;
+    }
 }
 
 #pragma mark -
