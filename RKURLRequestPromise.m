@@ -273,11 +273,15 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     NSLog(@"[DEBUG] %@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 #endif /* RKURLRequestPromise_Option_LogResponses */
     
+    RKPossibility *maybeValue = nil;
+    if(_postProcessor) {
+        maybeValue = _postProcessor([[RKPossibility alloc] initWithValue:data]);
+    }
+    
     [self.callbackQueue addOperationWithBlock:^{
         self.isFinished = YES;
         
-        if(self.postProcessor) {
-            RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data]);
+        if(maybeValue) {
             if(maybeValue.state == kRKPossibilityStateError) {
                 self.onFailure(maybeValue.error);
             } else {
