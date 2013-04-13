@@ -25,6 +25,7 @@
 		8B25A4441718E32500472842 /* RKPreludeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4431718E32500472842 /* RKPreludeTests.m */; };
 		8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4461718E97F00472842 /* RKActivityManagerTests.m */; };
 		8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4491718EA6900472842 /* RKDefaultsTests.m */; };
+		8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -64,6 +65,8 @@
 		8B25A4461718E97F00472842 /* RKActivityManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKActivityManagerTests.m; sourceTree = "<group>"; };
 		8B25A4481718EA6900472842 /* RKDefaultsTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKDefaultsTests.h; sourceTree = "<group>"; };
 		8B25A4491718EA6900472842 /* RKDefaultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKDefaultsTests.m; sourceTree = "<group>"; };
+		8B73FAF51718EBFF0004C984 /* RKPossibilityTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPossibilityTests.h; sourceTree = "<group>"; };
+		8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPossibilityTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +121,8 @@
 				8B25A4461718E97F00472842 /* RKActivityManagerTests.m */,
 				8B25A4481718EA6900472842 /* RKDefaultsTests.h */,
 				8B25A4491718EA6900472842 /* RKDefaultsTests.m */,
+				8B73FAF51718EBFF0004C984 /* RKPossibilityTests.h */,
+				8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */,
 			);
 			path = RoundaboutKitTests;
 			sourceTree = "<group>";
@@ -137,18 +142,18 @@
 			children = (
 				8B25A41A1718E2AC00472842 /* RKActivityManager.h */,
 				8B25A41B1718E2AC00472842 /* RKActivityManager.m */,
+				8B25A4221718E2AC00472842 /* RKDefaults.h */,
+				8B25A4231718E2AC00472842 /* RKDefaults.m */,
+				8B25A4271718E2AC00472842 /* RKPrelude.m */,
+				8B25A4261718E2AC00472842 /* RKPrelude.h */,
 				8B25A41C1718E2AC00472842 /* RKAwait.h */,
 				8B25A41D1718E2AC00472842 /* RKAwait.m */,
 				8B25A41E1718E2AC00472842 /* RKBinding.h */,
 				8B25A41F1718E2AC00472842 /* RKBinding.m */,
 				8B25A4201718E2AC00472842 /* RKBlockBasedValueTransformer.h */,
 				8B25A4211718E2AC00472842 /* RKBlockBasedValueTransformer.m */,
-				8B25A4221718E2AC00472842 /* RKDefaults.h */,
-				8B25A4231718E2AC00472842 /* RKDefaults.m */,
 				8B25A4241718E2AC00472842 /* RKPossibility.h */,
 				8B25A4251718E2AC00472842 /* RKPossibility.m */,
-				8B25A4261718E2AC00472842 /* RKPrelude.h */,
-				8B25A4271718E2AC00472842 /* RKPrelude.m */,
 				8B25A4281718E2AC00472842 /* RKPromise.h */,
 				8B25A4291718E2AC00472842 /* RKPromise.m */,
 				8B25A42A1718E2AC00472842 /* RKReachability.h */,
@@ -254,6 +259,7 @@
 				8B25A4441718E32500472842 /* RKPreludeTests.m in Sources */,
 				8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */,
 				8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */,
+				8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,6 +381,7 @@
 				8B25A4181718E26600472842 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
