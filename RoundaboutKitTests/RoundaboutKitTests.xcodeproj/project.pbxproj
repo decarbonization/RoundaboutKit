@@ -24,6 +24,7 @@
 		8B25A4411718E2F300472842 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B25A4401718E2F300472842 /* Cocoa.framework */; };
 		8B25A4441718E32500472842 /* RKPreludeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4431718E32500472842 /* RKPreludeTests.m */; };
 		8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4461718E97F00472842 /* RKActivityManagerTests.m */; };
+		8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4491718EA6900472842 /* RKDefaultsTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -61,6 +62,8 @@
 		8B25A4431718E32500472842 /* RKPreludeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeTests.m; sourceTree = "<group>"; };
 		8B25A4451718E97E00472842 /* RKActivityManagerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKActivityManagerTests.h; sourceTree = "<group>"; };
 		8B25A4461718E97F00472842 /* RKActivityManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKActivityManagerTests.m; sourceTree = "<group>"; };
+		8B25A4481718EA6900472842 /* RKDefaultsTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKDefaultsTests.h; sourceTree = "<group>"; };
+		8B25A4491718EA6900472842 /* RKDefaultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKDefaultsTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +116,8 @@
 				8B25A4431718E32500472842 /* RKPreludeTests.m */,
 				8B25A4451718E97E00472842 /* RKActivityManagerTests.h */,
 				8B25A4461718E97F00472842 /* RKActivityManagerTests.m */,
+				8B25A4481718EA6900472842 /* RKDefaultsTests.h */,
+				8B25A4491718EA6900472842 /* RKDefaultsTests.m */,
 			);
 			path = RoundaboutKitTests;
 			sourceTree = "<group>";
@@ -248,6 +253,7 @@
 				8B25A43B1718E2AC00472842 /* RKURLRequestPromiseCacheManager.m in Sources */,
 				8B25A4441718E32500472842 /* RKPreludeTests.m in Sources */,
 				8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */,
+				8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
