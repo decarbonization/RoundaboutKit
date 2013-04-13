@@ -110,7 +110,7 @@ RK_EXTERN NSTimeInterval const kRKTimeIntervalInfinite;
 
 ///Returns a human readable time stamp for a given time interval.
 ///
-///If the time interval is negative, this function returns `@"Continuous"`.
+///If the time interval is negative, this function returns `@"-:--"`.
 RK_EXTERN NSString *RKMakeStringFromTimeInterval(NSTimeInterval total);
 
 #pragma mark - Collection Operations
