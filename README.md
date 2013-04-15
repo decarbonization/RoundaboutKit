@@ -3,6 +3,11 @@ RoundaboutKit
 
 The core tools from RoundaboutKit
 
+Tests
+=====
+
+The tests for RoundaboutKit live in an Xcode project in the repo called `RoundaboutKitTests`. To run, launch Xcode and press `command+u`.
+
 License
 =======
 
