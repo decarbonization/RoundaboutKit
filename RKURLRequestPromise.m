@@ -42,6 +42,147 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     }, nil /* ignore empty */, nil /* ignore error */);
 };
 
+RKPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData) {
+    return RKRefinePossibility(maybeData, ^RKPossibility *(NSData *data) {
+#if TARGET_OS_IPHONE
+        UIImage *image = [[UIImage alloc] initWithData:data];
+#else
+        NSImage *image = [[NSImage alloc] initWithData:data];
+#endif /* TARGET_OS_IPHONE */
+        if(image) {
+            return [[RKPossibility alloc] initWithValue:image];
+        } else {
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:RKURLRequestPromiseErrorDomain
+                                                                            code:'!img'
+                                                                        userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}]];
+        }
+    }, nil /* ignore empty */, nil /* ignore error */);
+};
+
+#if RKURLRequestPromise_Option_TrackActiveRequests
+#pragma mark - Tracking Active Requests
+
+#warning RKURLRequestPromise_Option_TrackActiveRequests = 1
+
+static CFMutableArrayRef GetSharedActiveRequestArray()
+{
+    static CFMutableArrayRef _ActiveRequests = NULL;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        CFArrayCallBacks callbacks = {
+            .version = 0,
+            .retain = NULL,
+            .release = NULL,
+            .copyDescription = &CFCopyDescription,
+            .equal = &CFEqual,
+        };
+        _ActiveRequests = CFArrayCreateMutable(kCFAllocatorDefault, 0, &callbacks);
+    });
+    
+    return _ActiveRequests;
+}
+
+static void AddRequestToActiveRequestArray(RKURLRequestPromise *request)
+{
+    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
+    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
+        CFArrayAppendValue(sharedActiveRequestArray, (__bridge const void *)request);
+    }
+}
+
+static void RemoveRequestFromActiveRequestArray(RKURLRequestPromise *request)
+{
+    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
+    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
+        CFIndex indexOfRequest = CFArrayGetFirstIndexOfValue(sharedActiveRequestArray,
+                                                             CFRangeMake(0, CFArrayGetCount(sharedActiveRequestArray)),
+                                                             (__bridge const void *)request);
+        if(indexOfRequest == kCFNotFound)
+            return;
+        
+        CFArrayRemoveValueAtIndex(sharedActiveRequestArray, indexOfRequest);
+    }
+}
+
+static CFIndex ActiveRequestArrayGetInstanteousCount()
+{
+    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
+    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
+        return CFArrayGetCount(sharedActiveRequestArray);
+    }
+}
+
+static NSArray *ActiveRequestArrayGetInstanteousCopy()
+{
+    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
+    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
+        return [(__bridge NSMutableArray *)sharedActiveRequestArray copy];
+    }
+}
+
+#pragma mark -
+
+RK_INLINE void RequestDidIsBecomingActive(RKURLRequestPromise *request)
+{
+    AddRequestToActiveRequestArray(request);
+}
+
+RK_INLINE void RequestDidFail(RKURLRequestPromise *request)
+{
+    RemoveRequestFromActiveRequestArray(request);
+}
+
+RK_INLINE void RequestDidSucceed(RKURLRequestPromise *request)
+{
+    RemoveRequestFromActiveRequestArray(request);
+}
+
+RK_INLINE void RequestCancelled(RKURLRequestPromise *request)
+{
+    RemoveRequestFromActiveRequestArray(request);
+}
+
+RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
+{
+    RemoveRequestFromActiveRequestArray(request);
+}
+
+#else
+
+static CFIndex ActiveRequestArrayGetInstanteousCount()
+{
+    NSLog(@"*** Warning: Attempting to get number of active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
+    return 0;
+}
+
+static NSArray *ActiveRequestArrayGetInstanteousCopy()
+{
+    NSLog(@"*** Warning: Attempting to get active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
+    return nil;
+}
+
+RK_INLINE void RequestDidIsBecomingActive(RKURLRequestPromise *request)
+{
+}
+
+RK_INLINE void RequestDidFail(RKURLRequestPromise *request)
+{
+}
+
+RK_INLINE void RequestDidSucceed(RKURLRequestPromise *request)
+{
+}
+
+RK_INLINE void RequestCancelled(RKURLRequestPromise *request)
+{
+}
+
+RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
+{
+}
+
+#endif /* RKURLRequestPromise_Option_TrackActiveRequests */
+
 #pragma mark -
 
 @interface RKURLRequestPromise () <NSURLConnectionDelegate>
@@ -87,8 +228,47 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     NSMutableData *_loadedData;
 }
 
+#pragma mark - Tracking Requests
+
++ (NSUInteger)numberOfActiveRequests
+{
+    return ActiveRequestArrayGetInstanteousCount();
+}
+
++ (NSArray *)activeRequests
+{
+    return ActiveRequestArrayGetInstanteousCopy();
+}
+
++ (void)prettyPrintActiveRequests
+{
+    NSArray *activeRequests = [self activeRequests];
+    puts([[NSString stringWithFormat:@"-- begin %d active requests --", activeRequests.count] UTF8String]);
+    putc('\n', stdout);
+    
+    for (RKURLRequestPromise *activeRequest in activeRequests) {
+        NSString *method = activeRequest.request.HTTPMethod;
+        NSURL *url = activeRequest.request.URL;
+        puts([[NSString stringWithFormat:@"%@ %@", method, url] UTF8String]);
+        
+        NSString *cacheIdentiifer = activeRequest.cacheIdentifier;
+        id <RKURLRequestPromiseCacheManager> cacheManager = activeRequest.cacheManager;
+        puts([[NSString stringWithFormat:@"\twith cache id \"%@\" in manager %@", cacheIdentiifer, cacheManager] UTF8String]);
+        
+        NSString *requestQueueName = activeRequest.requestQueue.name ?: [activeRequest.requestQueue description];
+        puts([[NSString stringWithFormat:@"\ton request queue %@", requestQueueName] UTF8String]);
+        
+        putc('\n', stdout);
+    }
+    
+    puts([[NSString stringWithFormat:@"-- end %d active requests --", activeRequests.count] UTF8String]);
+}
+
+#pragma mark - Lifecycle
+
 - (void)dealloc
 {
+    RequestIsDeallocating(self);
     [self cancel:nil];
 }
 
@@ -116,6 +296,13 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     }
     
     return self;
+}
+
+#pragma mark - Identity
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@:%p %@ to %@>", NSStringFromClass([self class]), self, self.request.HTTPMethod, self.request.URL];
 }
 
 #pragma mark - Realization
@@ -154,6 +341,8 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
             }
         }
         
+        RequestDidIsBecomingActive(self);
+        
         if(_isInOfflineMode) {
             [self loadCache];
         } else {
@@ -173,7 +362,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 
 - (void)cancel:(id)sender
 {
-    if(!self.cancelled) {
+    if(!self.cancelled && _connection) {
         [self.connection cancel];
         @synchronized(self) {
              _loadedData = nil;
@@ -186,6 +375,8 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
         self.cancelled = YES;
+        
+        RequestCancelled(self);
     }
 }
 
@@ -278,6 +469,12 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         maybeValue = _postProcessor([[RKPossibility alloc] initWithValue:data]);
     }
     
+    //Post-processors can be long running.
+    if(self.cancelled)
+        return;
+    
+    RequestDidSucceed(self);
+    
     [self.callbackQueue addOperationWithBlock:^{
         self.isFinished = YES;
         
@@ -303,6 +500,8 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
 #if RKURLRequestPromise_Option_LogErrors
     NSLog(@"[DEBUG] Error for request to <%@>: %@", self.request.URL, error);
 #endif /* RKURLRequestPromise_Option_LogErrors */
+    
+    RequestDidFail(self);
     
     [self.callbackQueue addOperationWithBlock:^{
         self.onFailure(error);
