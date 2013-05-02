@@ -102,7 +102,7 @@ typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 ///
 ///Top level RKPostProcessorBlocks will typically be given an NSData object.
 ///Blocks chained from this point will be given user-defined objects.
-typedef RKPossibility *(^RKPostProcessorBlock)(RKPossibility *maybeData);
+typedef RKPossibility *(^RKPostProcessorBlock)(RKPossibility *maybeData, RKURLRequestPromise *request);
 
 ///Returns a new block that will be given the result of an earlier block.
 ///
@@ -117,6 +117,9 @@ RK_EXTERN_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProc
 ///A post-processor block that takes an NSData object and yields JSON.
 RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 
+///A post-processor block that takes an NSData object and yields an NS/UIImage.
+RK_EXTERN RKPostProcessorBlock const kRKImagePostProcessorBlock;
+
 ///The RKURLRequestPreflightBlock functor encapsulates a series of actions that must be
 ///executed before a RKURLRequestPromise may be executed. This functor will be called
 ///on the request promise's operation queue.
@@ -130,13 +133,16 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 #pragma mark - Compile Time Options
 
 ///Set to 1 to have all requests logged.
-#define RKURLRequestPromise_Option_LogRequests  0
+#define RKURLRequestPromise_Option_LogRequests          0
 
 ///Set to 1 to have all request-responses logged.
-#define RKURLRequestPromise_Option_LogResponses 0
+#define RKURLRequestPromise_Option_LogResponses         0
 
 ///Set to 1 to have RKURLRequestPromise errors logged.
-#define RKURLRequestPromise_Option_LogErrors    0
+#define RKURLRequestPromise_Option_LogErrors            0
+
+///Set to 1 to have RKURLRequestPromise track all active requests.
+#define RKURLRequestPromise_Option_TrackActiveRequests  0
 
 #pragma mark -
 
@@ -154,6 +160,32 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 ///     the intended behaviour of servers.
 ///
 @interface RKURLRequestPromise : RKPromise
+
+#pragma mark - Tracking Requests
+
+///Returns an instanteous copy of number of active RKURLRequestPromise.
+///
+///This method returns 0 if `RKURLRequestPromise_Option_TrackActiveRequests` is not set to 1.
+///
+///This method is provided to aid in debugging and should not be used in a production environment.
++ (NSUInteger)numberOfActiveRequests;
+
+
+///Returns an instanteous copy of the currently active RKURLRequestPromises.
+///
+///This method returns 0 if `RKURLRequestPromise_Option_TrackActiveRequests` is not set to 1.
+///
+///This method is provided to aid in debugging and should not be used in a production environment.
++ (NSArray *)activeRequests;
+
+///Pretty prints all active requests to `stdout`.
+///
+///This method returns 0 if `RKURLRequestPromise_Option_TrackActiveRequests` is not set to 1.
+///
+///This method is provided to aid in debugging and should not be used in a production environment.
++ (void)prettyPrintActiveRequests;
+
+#pragma mark - Lifecycle
 
 ///Initialize the receiver with a given request.
 ///
@@ -177,6 +209,14 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 
 ///The URL request.
 @property (readonly, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
+
+///The HTTP response received when realizing the request.
+///
+///This property will be set for any request that is routed through a server.
+///This property is not guaranteed to be set when a post-processor is called
+///through `-[RKURLRequestPromise loadCachedDataWithCallbackQueue:block:]`.
+///Post-processors should take this into account.
+@property (copy, readonly) NSHTTPURLResponse *response;
 
 ///The queue that the request will be executed on.
 ///

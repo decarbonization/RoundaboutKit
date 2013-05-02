@@ -24,13 +24,13 @@ RK_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProcessorBl
     NSCParameterAssert(source);
     NSCParameterAssert(refiner);
     
-    return ^RKPossibility *(RKPossibility *maybeData) {
-        RKPossibility *refinedMaybeData = source(maybeData);
-        return refiner(refinedMaybeData);
+    return ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+        RKPossibility *refinedMaybeData = source(maybeData, request);
+        return refiner(refinedMaybeData, request);
     };
 }
 
-RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData) {
+RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return RKRefinePossibility(maybeData, ^RKPossibility *(NSData *data) {
         NSError *error = nil;
         id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -42,7 +42,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     }, nil /* ignore empty */, nil /* ignore error */);
 };
 
-RKPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData) {
+RKPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return RKRefinePossibility(maybeData, ^RKPossibility *(NSData *data) {
 #if TARGET_OS_IPHONE
         UIImage *image = [[UIImage alloc] initWithData:data];
@@ -200,8 +200,6 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
 
 #pragma mark -
 
-@property (copy, RK_NONATOMIC_IOSONLY) NSDictionary *responseHeaderFields;
-
 ///The underlying connection.
 @property NSURLConnection *connection;
 
@@ -212,6 +210,9 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
 
 ///Readwrite
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
+
+///Readwrite.
+@property (copy, readwrite) NSHTTPURLResponse *response;
 
 ///Readwrite
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
@@ -427,7 +428,7 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
         NSError *error = nil;
         NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
         if(data) {
-            RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data]);
+            RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data], self);
             [callbackQueue addOperationWithBlock:^{
                 block(maybeValue);
             }];
@@ -466,7 +467,7 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
     
     RKPossibility *maybeValue = nil;
     if(_postProcessor) {
-        maybeValue = _postProcessor([[RKPossibility alloc] initWithValue:data]);
+        maybeValue = _postProcessor([[RKPossibility alloc] initWithValue:data], self);
     }
     
     //Post-processors can be long running.
@@ -543,12 +544,12 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response
 {
+    self.response = response;
+    
     if(!self.cacheManager || self.cancelled || self.cacheIdentifier == nil)
         return;
     
-    self.responseHeaderFields = response.allHeaderFields;
-    
-    NSString *etag = self.responseHeaderFields[kETagHeaderKey];
+    NSString *etag = response.allHeaderFields[kETagHeaderKey];
     NSString *cachedEtag = [self.cacheManager revisionForIdentifier:self.cacheIdentifier];
     if(etag && cachedEtag && [etag caseInsensitiveCompare:cachedEtag] == NSOrderedSame) {
         [self.connection cancel];
@@ -587,7 +588,7 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
     }
     
     if(self.cacheManager) {
-        NSString *etag = self.responseHeaderFields[kETagHeaderKey];
+        NSString *etag = self.response.allHeaderFields[kETagHeaderKey];
         if(!etag && self.useCacheWhenOffline)
             etag = kDefaultETagKey;
         

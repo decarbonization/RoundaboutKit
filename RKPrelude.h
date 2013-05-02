@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version       5L
+#define RoundaboutKit_Version       6L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
 #define RoundaboutKit_Stable        1
@@ -110,7 +110,7 @@ RK_EXTERN NSTimeInterval const kRKTimeIntervalInfinite;
 
 ///Returns a human readable time stamp for a given time interval.
 ///
-///If the time interval is negative, this function returns `@"-:--"`.
+///If the time interval is negative, this function returns `@"Continuous"`.
 RK_EXTERN NSString *RKMakeStringFromTimeInterval(NSTimeInterval total);
 
 #pragma mark - Collection Operations
