@@ -37,7 +37,16 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 ///Subclasses of RKPromise should check this property periodically.
 @property BOOL cancelled;
 
+///Whether or not the promise can be cancelled. Default value is YES.
+///
+///This property can be overriden by subclasses to disable canceling.
+///
+/// \seealso(-[RKPromise cancel:])
+@property (readonly) BOOL canCancel;
+
 ///Cancel the receiver.
+///
+///This method will raise an exception if the receiver's `self.canCancel` is `NO`.
 - (IBAction)cancel:(id)sender;
 
 #pragma mark - Finished Status
@@ -130,6 +139,7 @@ typedef void(^RKBlockPromiseWorker)(RKBlockPromise *me, RKPromiseSuccessBlock on
 @interface RKBlockPromise : RKPromise
 {
 	RKBlockPromiseWorker mWorker;
+    BOOL mCanCancel;
 	BOOL mHasBeenRealized;
 }
 
@@ -153,6 +163,9 @@ typedef void(^RKBlockPromiseWorker)(RKBlockPromise *me, RKPromiseSuccessBlock on
 
 ///The queue to execute this block promise on.
 @property NSOperationQueue *operationQueue;
+
+///Makes `RKPromise.canCancel` readwrite.
+@property (readwrite) BOOL canCancel;
 
 @end
 

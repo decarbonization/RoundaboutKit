@@ -18,8 +18,16 @@
 
 #pragma mark - Cancelling
 
+- (BOOL)canCancel
+{
+    return YES;
+}
+
 - (IBAction)cancel:(id)sender
 {
+    if(!self.canCancel)
+        [NSException raise:NSInternalInconsistencyException format:@"cancel called on a promise that cannot be canceled. %@", self];
+    
 	self.cancelled = YES;
 }
 
@@ -138,6 +146,7 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 	
 	if((self = [super init])) {
 		mWorker = [worker copy];
+        mCanCancel = YES;
         self.operationQueue = operationQueue;
 	}
 	
@@ -149,8 +158,15 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
     return [self initWithWorker:worker operationQueue:[[self class] defaultBlockPromiseQueue]];
 }
 
+- (id)init
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
 #pragma mark - Blocks
 
+@synthesize canCancel = mCanCancel;
 @synthesize worker = mWorker;
 
 #pragma mark - Execution
@@ -165,8 +181,7 @@ RK_OVERLOADABLE void RKRealizePromises(NSArray *promises,
 	
 	NSAssert(!mHasBeenRealized, @"Attempting to realize an already-realized promise.");
 	
-	if(self.cancelled)
-	{
+	if(self.cancelled) {
 		mHasBeenRealized = YES;
 		return;
 	}

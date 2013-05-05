@@ -244,7 +244,7 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
 + (void)prettyPrintActiveRequests
 {
     NSArray *activeRequests = [self activeRequests];
-    puts([[NSString stringWithFormat:@"-- begin %d active requests --", activeRequests.count] UTF8String]);
+    puts([[NSString stringWithFormat:@"-- begin %ld active requests --", (unsigned long)activeRequests.count] UTF8String]);
     putc('\n', stdout);
     
     for (RKURLRequestPromise *activeRequest in activeRequests) {
@@ -262,7 +262,7 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
         putc('\n', stdout);
     }
     
-    puts([[NSString stringWithFormat:@"-- end %d active requests --", activeRequests.count] UTF8String]);
+    puts([[NSString stringWithFormat:@"-- end %ld active requests --", (unsigned long)activeRequests.count] UTF8String]);
 }
 
 #pragma mark - Lifecycle
