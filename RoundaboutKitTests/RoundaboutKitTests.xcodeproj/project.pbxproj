@@ -26,7 +26,8 @@
 		8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4461718E97F00472842 /* RKActivityManagerTests.m */; };
 		8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4491718EA6900472842 /* RKDefaultsTests.m */; };
 		8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */; };
-		8B73FAFA1718EE210004C984 /* RKPromiseAndAwaitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B73FAF91718EE210004C984 /* RKPromiseAndAwaitTests.m */; };
+		8BB69378173828F600B9B988 /* RKPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB69377173828F600B9B988 /* RKPromiseTests.m */; };
+		8BB6937B1738290400B9B988 /* RKMockPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB6937A1738290400B9B988 /* RKMockPromise.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,8 +69,10 @@
 		8B25A4491718EA6900472842 /* RKDefaultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKDefaultsTests.m; sourceTree = "<group>"; };
 		8B73FAF51718EBFF0004C984 /* RKPossibilityTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPossibilityTests.h; sourceTree = "<group>"; };
 		8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPossibilityTests.m; sourceTree = "<group>"; };
-		8B73FAF81718EE210004C984 /* RKPromiseAndAwaitTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPromiseAndAwaitTests.h; sourceTree = "<group>"; };
-		8B73FAF91718EE210004C984 /* RKPromiseAndAwaitTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPromiseAndAwaitTests.m; sourceTree = "<group>"; };
+		8BB69376173828F600B9B988 /* RKPromiseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPromiseTests.h; sourceTree = "<group>"; };
+		8BB69377173828F600B9B988 /* RKPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPromiseTests.m; sourceTree = "<group>"; };
+		8BB693791738290400B9B988 /* RKMockPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockPromise.h; sourceTree = "<group>"; };
+		8BB6937A1738290400B9B988 /* RKMockPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockPromise.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,8 +129,8 @@
 				8B25A4491718EA6900472842 /* RKDefaultsTests.m */,
 				8B73FAF51718EBFF0004C984 /* RKPossibilityTests.h */,
 				8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */,
-				8B73FAF81718EE210004C984 /* RKPromiseAndAwaitTests.h */,
-				8B73FAF91718EE210004C984 /* RKPromiseAndAwaitTests.m */,
+				8BB69376173828F600B9B988 /* RKPromiseTests.h */,
+				8BB69377173828F600B9B988 /* RKPromiseTests.m */,
 			);
 			path = RoundaboutKitTests;
 			sourceTree = "<group>";
@@ -138,6 +141,8 @@
 				8B25A40E1718E26600472842 /* RoundaboutKitTests-Info.plist */,
 				8B25A40F1718E26600472842 /* InfoPlist.strings */,
 				8B25A4151718E26600472842 /* RoundaboutKitTests-Prefix.pch */,
+				8BB693791738290400B9B988 /* RKMockPromise.h */,
+				8BB6937A1738290400B9B988 /* RKMockPromise.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -265,7 +270,8 @@
 				8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */,
 				8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */,
 				8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */,
-				8B73FAFA1718EE210004C984 /* RKPromiseAndAwaitTests.m in Sources */,
+				8BB69378173828F600B9B988 /* RKPromiseTests.m in Sources */,
+				8BB6937B1738290400B9B988 /* RKMockPromise.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
