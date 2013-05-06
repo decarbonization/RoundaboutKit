@@ -12,11 +12,6 @@
 #define DEFAULT_DURATION            0.3
 #define DEFAULT_TIMEOUT             0.8
 
-static void runloop_run_for(NSTimeInterval seconds)
-{
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:seconds]];
-}
-
 #pragma mark -
 
 @interface RKPromiseTests ()
@@ -65,7 +60,7 @@ static void runloop_run_for(NSTimeInterval seconds)
         succeeded = NO;
     });
     
-    runloop_run_for(DEFAULT_TIMEOUT);
+    [RunLoopHelper runFor:DEFAULT_TIMEOUT];
     
     STAssertTrue(finished, @"RKRealize timed out generating value.");
     STAssertTrue(succeeded, @"RKRealize failed to generate value.");
@@ -92,7 +87,7 @@ static void runloop_run_for(NSTimeInterval seconds)
         outError = error;
     });
     
-    runloop_run_for(DEFAULT_TIMEOUT);
+    [RunLoopHelper runFor:DEFAULT_TIMEOUT];
     
     STAssertTrue(finished, @"RKRealize timed out generating error.");
     STAssertTrue(failed, @"RKRealize failed to generate error.");
@@ -116,7 +111,7 @@ static void runloop_run_for(NSTimeInterval seconds)
     });
     [testPromise cancel:nil];
     
-    runloop_run_for(0.5);
+    [RunLoopHelper runFor:0.5];
     
     STAssertFalse(finished, @"RKRealize yielded after being canceled.");
 }
@@ -151,7 +146,7 @@ static void runloop_run_for(NSTimeInterval seconds)
         finished = YES;
     });
     
-    runloop_run_for(0.6);
+    [RunLoopHelper runFor:0.6];
     
     STAssertTrue(finished, @"RKRealize timed out");
     STAssertEquals(accumulator, kNumberOfSuccesses, @"Multi-part promise yielded less times than expected");
@@ -180,7 +175,7 @@ static void runloop_run_for(NSTimeInterval seconds)
         });
     });
     
-    runloop_run_for(0.7);
+    [RunLoopHelper runFor:0.7];
     
     STAssertTrue(finished, @"RKRealizePromises timed out");
     STAssertEqualObjects(results, (@[ @0, @1, @2, @3, @4 ]), @"RKRealizePromises yielded wrong value");

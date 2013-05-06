@@ -28,6 +28,8 @@
 		8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */; };
 		8BB69378173828F600B9B988 /* RKPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB69377173828F600B9B988 /* RKPromiseTests.m */; };
 		8BB6937B1738290400B9B988 /* RKMockPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB6937A1738290400B9B988 /* RKMockPromise.m */; };
+		8BB6937E173835FF00B9B988 /* RKAwaitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB6937D173835FF00B9B988 /* RKAwaitTests.m */; };
+		8BB693811738363A00B9B988 /* RunLoopHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB693801738363900B9B988 /* RunLoopHelper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +75,10 @@
 		8BB69377173828F600B9B988 /* RKPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPromiseTests.m; sourceTree = "<group>"; };
 		8BB693791738290400B9B988 /* RKMockPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockPromise.h; sourceTree = "<group>"; };
 		8BB6937A1738290400B9B988 /* RKMockPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockPromise.m; sourceTree = "<group>"; };
+		8BB6937C173835FF00B9B988 /* RKAwaitTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKAwaitTests.h; sourceTree = "<group>"; };
+		8BB6937D173835FF00B9B988 /* RKAwaitTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKAwaitTests.m; sourceTree = "<group>"; };
+		8BB6937F1738363900B9B988 /* RunLoopHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunLoopHelper.h; sourceTree = "<group>"; };
+		8BB693801738363900B9B988 /* RunLoopHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunLoopHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +137,8 @@
 				8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */,
 				8BB69376173828F600B9B988 /* RKPromiseTests.h */,
 				8BB69377173828F600B9B988 /* RKPromiseTests.m */,
+				8BB6937C173835FF00B9B988 /* RKAwaitTests.h */,
+				8BB6937D173835FF00B9B988 /* RKAwaitTests.m */,
 			);
 			path = RoundaboutKitTests;
 			sourceTree = "<group>";
@@ -143,6 +151,8 @@
 				8B25A4151718E26600472842 /* RoundaboutKitTests-Prefix.pch */,
 				8BB693791738290400B9B988 /* RKMockPromise.h */,
 				8BB6937A1738290400B9B988 /* RKMockPromise.m */,
+				8BB6937F1738363900B9B988 /* RunLoopHelper.h */,
+				8BB693801738363900B9B988 /* RunLoopHelper.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -272,6 +282,8 @@
 				8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */,
 				8BB69378173828F600B9B988 /* RKPromiseTests.m in Sources */,
 				8BB6937B1738290400B9B988 /* RKMockPromise.m in Sources */,
+				8BB6937E173835FF00B9B988 /* RKAwaitTests.m in Sources */,
+				8BB693811738363A00B9B988 /* RunLoopHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
