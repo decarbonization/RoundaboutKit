@@ -7,86 +7,87 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8B25A4111718E26600472842 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B25A40F1718E26600472842 /* InfoPlist.strings */; };
-		8B25A4311718E2AC00472842 /* RKActivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A41B1718E2AC00472842 /* RKActivityManager.m */; };
-		8B25A4321718E2AC00472842 /* RKAwait.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A41D1718E2AC00472842 /* RKAwait.m */; };
-		8B25A4331718E2AC00472842 /* RKBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A41F1718E2AC00472842 /* RKBinding.m */; };
-		8B25A4341718E2AC00472842 /* RKBlockBasedValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4211718E2AC00472842 /* RKBlockBasedValueTransformer.m */; };
-		8B25A4351718E2AC00472842 /* RKDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4231718E2AC00472842 /* RKDefaults.m */; };
-		8B25A4361718E2AC00472842 /* RKPossibility.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4251718E2AC00472842 /* RKPossibility.m */; };
-		8B25A4371718E2AC00472842 /* RKPrelude.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4271718E2AC00472842 /* RKPrelude.m */; };
-		8B25A4381718E2AC00472842 /* RKPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4291718E2AC00472842 /* RKPromise.m */; };
-		8B25A4391718E2AC00472842 /* RKReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A42B1718E2AC00472842 /* RKReachability.m */; };
-		8B25A43A1718E2AC00472842 /* RKURLRequestPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A42D1718E2AC00472842 /* RKURLRequestPromise.m */; };
-		8B25A43B1718E2AC00472842 /* RKURLRequestPromiseCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A42F1718E2AC00472842 /* RKURLRequestPromiseCacheManager.m */; };
+		8B1D6C7617385939004545C3 /* RKActivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6017385939004545C3 /* RKActivityManager.m */; };
+		8B1D6C7717385939004545C3 /* RKAwait.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6217385939004545C3 /* RKAwait.m */; };
+		8B1D6C7817385939004545C3 /* RKBinding.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6417385939004545C3 /* RKBinding.m */; };
+		8B1D6C7917385939004545C3 /* RKBlockBasedValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6617385939004545C3 /* RKBlockBasedValueTransformer.m */; };
+		8B1D6C7A17385939004545C3 /* RKDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6817385939004545C3 /* RKDefaults.m */; };
+		8B1D6C7B17385939004545C3 /* RKPossibility.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6A17385939004545C3 /* RKPossibility.m */; };
+		8B1D6C7C17385939004545C3 /* RKPrelude.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6C17385939004545C3 /* RKPrelude.m */; };
+		8B1D6C7D17385939004545C3 /* RKPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C6E17385939004545C3 /* RKPromise.m */; };
+		8B1D6C7E17385939004545C3 /* RKReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C7017385939004545C3 /* RKReachability.m */; };
+		8B1D6C7F17385939004545C3 /* RKURLRequestPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C7217385939004545C3 /* RKURLRequestPromise.m */; };
+		8B1D6C8017385939004545C3 /* RKURLRequestPromiseCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C7417385939004545C3 /* RKURLRequestPromiseCacheManager.m */; };
+		8B1D6C911738594D004545C3 /* RKActivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C821738594D004545C3 /* RKActivityManagerTests.m */; };
+		8B1D6C921738594D004545C3 /* RKAwaitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C841738594D004545C3 /* RKAwaitTests.m */; };
+		8B1D6C931738594D004545C3 /* RKCacheManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C861738594D004545C3 /* RKCacheManagerTests.m */; };
+		8B1D6C941738594D004545C3 /* RKDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C881738594D004545C3 /* RKDefaultsTests.m */; };
+		8B1D6C951738594D004545C3 /* RKPossibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C8A1738594D004545C3 /* RKPossibilityTests.m */; };
+		8B1D6C961738594D004545C3 /* RKPreludeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C8C1738594D004545C3 /* RKPreludeTests.m */; };
+		8B1D6C971738594D004545C3 /* RKPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C8E1738594D004545C3 /* RKPromiseTests.m */; };
+		8B1D6C981738594D004545C3 /* RKURLRequestPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C901738594D004545C3 /* RKURLRequestPromiseTests.m */; };
+		8B1D6C9F1738595A004545C3 /* RKMockPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C9A1738595A004545C3 /* RKMockPromise.m */; };
+		8B1D6CA01738595A004545C3 /* RKMockURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C9C1738595A004545C3 /* RKMockURLProtocol.m */; };
+		8B1D6CA11738595A004545C3 /* RunLoopHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C9E1738595A004545C3 /* RunLoopHelper.m */; };
+		8B1D6CA417385966004545C3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B1D6CA217385966004545C3 /* InfoPlist.strings */; };
 		8B25A43D1718E2D600472842 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B25A43C1718E2D600472842 /* SystemConfiguration.framework */; };
 		8B25A43F1718E2F000472842 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B25A43E1718E2F000472842 /* SenTestingKit.framework */; };
 		8B25A4411718E2F300472842 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B25A4401718E2F300472842 /* Cocoa.framework */; };
-		8B25A4441718E32500472842 /* RKPreludeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4431718E32500472842 /* RKPreludeTests.m */; };
-		8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4461718E97F00472842 /* RKActivityManagerTests.m */; };
-		8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25A4491718EA6900472842 /* RKDefaultsTests.m */; };
-		8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */; };
-		8BB69378173828F600B9B988 /* RKPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB69377173828F600B9B988 /* RKPromiseTests.m */; };
-		8BB6937B1738290400B9B988 /* RKMockPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB6937A1738290400B9B988 /* RKMockPromise.m */; };
-		8BB6937E173835FF00B9B988 /* RKAwaitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB6937D173835FF00B9B988 /* RKAwaitTests.m */; };
-		8BB693811738363A00B9B988 /* RunLoopHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB693801738363900B9B988 /* RunLoopHelper.m */; };
-		8BB693841738399800B9B988 /* RKMockURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB693831738399700B9B988 /* RKMockURLProtocol.m */; };
-		8BB6938717384A7500B9B988 /* RKURLRequestPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BB6938617384A7500B9B988 /* RKURLRequestPromiseTests.m */; };
-		8BB6938917384AFB00B9B988 /* PredeterminedResponses.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BB6938817384AFB00B9B988 /* PredeterminedResponses.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8B1D6C5F17385939004545C3 /* RKActivityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKActivityManager.h; path = ../RKActivityManager.h; sourceTree = "<group>"; };
+		8B1D6C6017385939004545C3 /* RKActivityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKActivityManager.m; path = ../RKActivityManager.m; sourceTree = "<group>"; };
+		8B1D6C6117385939004545C3 /* RKAwait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKAwait.h; path = ../RKAwait.h; sourceTree = "<group>"; };
+		8B1D6C6217385939004545C3 /* RKAwait.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKAwait.m; path = ../RKAwait.m; sourceTree = "<group>"; };
+		8B1D6C6317385939004545C3 /* RKBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKBinding.h; path = ../RKBinding.h; sourceTree = "<group>"; };
+		8B1D6C6417385939004545C3 /* RKBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKBinding.m; path = ../RKBinding.m; sourceTree = "<group>"; };
+		8B1D6C6517385939004545C3 /* RKBlockBasedValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKBlockBasedValueTransformer.h; path = ../RKBlockBasedValueTransformer.h; sourceTree = "<group>"; };
+		8B1D6C6617385939004545C3 /* RKBlockBasedValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKBlockBasedValueTransformer.m; path = ../RKBlockBasedValueTransformer.m; sourceTree = "<group>"; };
+		8B1D6C6717385939004545C3 /* RKDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKDefaults.h; path = ../RKDefaults.h; sourceTree = "<group>"; };
+		8B1D6C6817385939004545C3 /* RKDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKDefaults.m; path = ../RKDefaults.m; sourceTree = "<group>"; };
+		8B1D6C6917385939004545C3 /* RKPossibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPossibility.h; path = ../RKPossibility.h; sourceTree = "<group>"; };
+		8B1D6C6A17385939004545C3 /* RKPossibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPossibility.m; path = ../RKPossibility.m; sourceTree = "<group>"; };
+		8B1D6C6B17385939004545C3 /* RKPrelude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPrelude.h; path = ../RKPrelude.h; sourceTree = "<group>"; };
+		8B1D6C6C17385939004545C3 /* RKPrelude.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPrelude.m; path = ../RKPrelude.m; sourceTree = "<group>"; };
+		8B1D6C6D17385939004545C3 /* RKPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPromise.h; path = ../RKPromise.h; sourceTree = "<group>"; };
+		8B1D6C6E17385939004545C3 /* RKPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPromise.m; path = ../RKPromise.m; sourceTree = "<group>"; };
+		8B1D6C6F17385939004545C3 /* RKReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKReachability.h; path = ../RKReachability.h; sourceTree = "<group>"; };
+		8B1D6C7017385939004545C3 /* RKReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKReachability.m; path = ../RKReachability.m; sourceTree = "<group>"; };
+		8B1D6C7117385939004545C3 /* RKURLRequestPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKURLRequestPromise.h; path = ../RKURLRequestPromise.h; sourceTree = "<group>"; };
+		8B1D6C7217385939004545C3 /* RKURLRequestPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKURLRequestPromise.m; path = ../RKURLRequestPromise.m; sourceTree = "<group>"; };
+		8B1D6C7317385939004545C3 /* RKURLRequestPromiseCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKURLRequestPromiseCacheManager.h; path = ../RKURLRequestPromiseCacheManager.h; sourceTree = "<group>"; };
+		8B1D6C7417385939004545C3 /* RKURLRequestPromiseCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKURLRequestPromiseCacheManager.m; path = ../RKURLRequestPromiseCacheManager.m; sourceTree = "<group>"; };
+		8B1D6C7517385939004545C3 /* RoundaboutKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RoundaboutKit.h; path = ../RoundaboutKit.h; sourceTree = "<group>"; };
+		8B1D6C811738594D004545C3 /* RKActivityManagerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKActivityManagerTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C821738594D004545C3 /* RKActivityManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKActivityManagerTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C831738594D004545C3 /* RKAwaitTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKAwaitTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C841738594D004545C3 /* RKAwaitTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKAwaitTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C851738594D004545C3 /* RKCacheManagerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKCacheManagerTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C861738594D004545C3 /* RKCacheManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKCacheManagerTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C871738594D004545C3 /* RKDefaultsTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKDefaultsTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C881738594D004545C3 /* RKDefaultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKDefaultsTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C891738594D004545C3 /* RKPossibilityTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPossibilityTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C8A1738594D004545C3 /* RKPossibilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPossibilityTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C8B1738594D004545C3 /* RKPreludeTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPreludeTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C8C1738594D004545C3 /* RKPreludeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C8D1738594D004545C3 /* RKPromiseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPromiseTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C8E1738594D004545C3 /* RKPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPromiseTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C8F1738594D004545C3 /* RKURLRequestPromiseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKURLRequestPromiseTests.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C901738594D004545C3 /* RKURLRequestPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKURLRequestPromiseTests.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C991738595A004545C3 /* RKMockPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockPromise.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C9A1738595A004545C3 /* RKMockPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockPromise.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C9B1738595A004545C3 /* RKMockURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockURLProtocol.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C9C1738595A004545C3 /* RKMockURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockURLProtocol.m; sourceTree = SOURCE_ROOT; };
+		8B1D6C9D1738595A004545C3 /* RunLoopHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunLoopHelper.h; sourceTree = SOURCE_ROOT; };
+		8B1D6C9E1738595A004545C3 /* RunLoopHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunLoopHelper.m; sourceTree = SOURCE_ROOT; };
+		8B1D6CA317385966004545C3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
 		8B25A4091718E26600472842 /* RoundaboutKitTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoundaboutKitTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8B25A40E1718E26600472842 /* RoundaboutKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RoundaboutKitTests-Info.plist"; sourceTree = "<group>"; };
-		8B25A4101718E26600472842 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B25A4151718E26600472842 /* RoundaboutKitTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RoundaboutKitTests-Prefix.pch"; sourceTree = "<group>"; };
-		8B25A41A1718E2AC00472842 /* RKActivityManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKActivityManager.h; path = ../RKActivityManager.h; sourceTree = "<group>"; };
-		8B25A41B1718E2AC00472842 /* RKActivityManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKActivityManager.m; path = ../RKActivityManager.m; sourceTree = "<group>"; };
-		8B25A41C1718E2AC00472842 /* RKAwait.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKAwait.h; path = ../RKAwait.h; sourceTree = "<group>"; };
-		8B25A41D1718E2AC00472842 /* RKAwait.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKAwait.m; path = ../RKAwait.m; sourceTree = "<group>"; };
-		8B25A41E1718E2AC00472842 /* RKBinding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKBinding.h; path = ../RKBinding.h; sourceTree = "<group>"; };
-		8B25A41F1718E2AC00472842 /* RKBinding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKBinding.m; path = ../RKBinding.m; sourceTree = "<group>"; };
-		8B25A4201718E2AC00472842 /* RKBlockBasedValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKBlockBasedValueTransformer.h; path = ../RKBlockBasedValueTransformer.h; sourceTree = "<group>"; };
-		8B25A4211718E2AC00472842 /* RKBlockBasedValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKBlockBasedValueTransformer.m; path = ../RKBlockBasedValueTransformer.m; sourceTree = "<group>"; };
-		8B25A4221718E2AC00472842 /* RKDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKDefaults.h; path = ../RKDefaults.h; sourceTree = "<group>"; };
-		8B25A4231718E2AC00472842 /* RKDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKDefaults.m; path = ../RKDefaults.m; sourceTree = "<group>"; };
-		8B25A4241718E2AC00472842 /* RKPossibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPossibility.h; path = ../RKPossibility.h; sourceTree = "<group>"; };
-		8B25A4251718E2AC00472842 /* RKPossibility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPossibility.m; path = ../RKPossibility.m; sourceTree = "<group>"; };
-		8B25A4261718E2AC00472842 /* RKPrelude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPrelude.h; path = ../RKPrelude.h; sourceTree = "<group>"; };
-		8B25A4271718E2AC00472842 /* RKPrelude.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPrelude.m; path = ../RKPrelude.m; sourceTree = "<group>"; };
-		8B25A4281718E2AC00472842 /* RKPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKPromise.h; path = ../RKPromise.h; sourceTree = "<group>"; };
-		8B25A4291718E2AC00472842 /* RKPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKPromise.m; path = ../RKPromise.m; sourceTree = "<group>"; };
-		8B25A42A1718E2AC00472842 /* RKReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKReachability.h; path = ../RKReachability.h; sourceTree = "<group>"; };
-		8B25A42B1718E2AC00472842 /* RKReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKReachability.m; path = ../RKReachability.m; sourceTree = "<group>"; };
-		8B25A42C1718E2AC00472842 /* RKURLRequestPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKURLRequestPromise.h; path = ../RKURLRequestPromise.h; sourceTree = "<group>"; };
-		8B25A42D1718E2AC00472842 /* RKURLRequestPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKURLRequestPromise.m; path = ../RKURLRequestPromise.m; sourceTree = "<group>"; };
-		8B25A42E1718E2AC00472842 /* RKURLRequestPromiseCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RKURLRequestPromiseCacheManager.h; path = ../RKURLRequestPromiseCacheManager.h; sourceTree = "<group>"; };
-		8B25A42F1718E2AC00472842 /* RKURLRequestPromiseCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RKURLRequestPromiseCacheManager.m; path = ../RKURLRequestPromiseCacheManager.m; sourceTree = "<group>"; };
-		8B25A4301718E2AC00472842 /* RoundaboutKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RoundaboutKit.h; path = ../RoundaboutKit.h; sourceTree = "<group>"; };
 		8B25A43C1718E2D600472842 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		8B25A43E1718E2F000472842 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		8B25A4401718E2F300472842 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
-		8B25A4421718E32500472842 /* RKPreludeTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPreludeTests.h; sourceTree = "<group>"; };
-		8B25A4431718E32500472842 /* RKPreludeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeTests.m; sourceTree = "<group>"; };
-		8B25A4451718E97E00472842 /* RKActivityManagerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKActivityManagerTests.h; sourceTree = "<group>"; };
-		8B25A4461718E97F00472842 /* RKActivityManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKActivityManagerTests.m; sourceTree = "<group>"; };
-		8B25A4481718EA6900472842 /* RKDefaultsTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKDefaultsTests.h; sourceTree = "<group>"; };
-		8B25A4491718EA6900472842 /* RKDefaultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKDefaultsTests.m; sourceTree = "<group>"; };
-		8B73FAF51718EBFF0004C984 /* RKPossibilityTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPossibilityTests.h; sourceTree = "<group>"; };
-		8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPossibilityTests.m; sourceTree = "<group>"; };
-		8BB69376173828F600B9B988 /* RKPromiseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPromiseTests.h; sourceTree = "<group>"; };
-		8BB69377173828F600B9B988 /* RKPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPromiseTests.m; sourceTree = "<group>"; };
-		8BB693791738290400B9B988 /* RKMockPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockPromise.h; sourceTree = "<group>"; };
-		8BB6937A1738290400B9B988 /* RKMockPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockPromise.m; sourceTree = "<group>"; };
-		8BB6937C173835FF00B9B988 /* RKAwaitTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKAwaitTests.h; sourceTree = "<group>"; };
-		8BB6937D173835FF00B9B988 /* RKAwaitTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKAwaitTests.m; sourceTree = "<group>"; };
-		8BB6937F1738363900B9B988 /* RunLoopHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunLoopHelper.h; sourceTree = "<group>"; };
-		8BB693801738363900B9B988 /* RunLoopHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunLoopHelper.m; sourceTree = "<group>"; };
-		8BB693821738399700B9B988 /* RKMockURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockURLProtocol.h; sourceTree = "<group>"; };
-		8BB693831738399700B9B988 /* RKMockURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockURLProtocol.m; sourceTree = "<group>"; };
-		8BB6938517384A7500B9B988 /* RKURLRequestPromiseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKURLRequestPromiseTests.h; sourceTree = "<group>"; };
-		8BB6938617384A7500B9B988 /* RKURLRequestPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKURLRequestPromiseTests.m; sourceTree = "<group>"; };
-		8BB6938817384AFB00B9B988 /* PredeterminedResponses.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = PredeterminedResponses.plist; sourceTree = "<group>"; };
+		8BB6938D173858D100B9B988 /* RoundaboutKitTests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "RoundaboutKitTests-Info.plist"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,20 +136,22 @@
 			isa = PBXGroup;
 			children = (
 				8B25A40D1718E26600472842 /* Supporting Files */,
-				8B25A4421718E32500472842 /* RKPreludeTests.h */,
-				8B25A4431718E32500472842 /* RKPreludeTests.m */,
-				8B25A4451718E97E00472842 /* RKActivityManagerTests.h */,
-				8B25A4461718E97F00472842 /* RKActivityManagerTests.m */,
-				8B25A4481718EA6900472842 /* RKDefaultsTests.h */,
-				8B25A4491718EA6900472842 /* RKDefaultsTests.m */,
-				8B73FAF51718EBFF0004C984 /* RKPossibilityTests.h */,
-				8B73FAF61718EBFF0004C984 /* RKPossibilityTests.m */,
-				8BB69376173828F600B9B988 /* RKPromiseTests.h */,
-				8BB69377173828F600B9B988 /* RKPromiseTests.m */,
-				8BB6937C173835FF00B9B988 /* RKAwaitTests.h */,
-				8BB6937D173835FF00B9B988 /* RKAwaitTests.m */,
-				8BB6938517384A7500B9B988 /* RKURLRequestPromiseTests.h */,
-				8BB6938617384A7500B9B988 /* RKURLRequestPromiseTests.m */,
+				8B1D6C811738594D004545C3 /* RKActivityManagerTests.h */,
+				8B1D6C821738594D004545C3 /* RKActivityManagerTests.m */,
+				8B1D6C831738594D004545C3 /* RKAwaitTests.h */,
+				8B1D6C841738594D004545C3 /* RKAwaitTests.m */,
+				8B1D6C851738594D004545C3 /* RKCacheManagerTests.h */,
+				8B1D6C861738594D004545C3 /* RKCacheManagerTests.m */,
+				8B1D6C871738594D004545C3 /* RKDefaultsTests.h */,
+				8B1D6C881738594D004545C3 /* RKDefaultsTests.m */,
+				8B1D6C891738594D004545C3 /* RKPossibilityTests.h */,
+				8B1D6C8A1738594D004545C3 /* RKPossibilityTests.m */,
+				8B1D6C8B1738594D004545C3 /* RKPreludeTests.h */,
+				8B1D6C8C1738594D004545C3 /* RKPreludeTests.m */,
+				8B1D6C8D1738594D004545C3 /* RKPromiseTests.h */,
+				8B1D6C8E1738594D004545C3 /* RKPromiseTests.m */,
+				8B1D6C8F1738594D004545C3 /* RKURLRequestPromiseTests.h */,
+				8B1D6C901738594D004545C3 /* RKURLRequestPromiseTests.m */,
 			);
 			path = RoundaboutKitTests;
 			sourceTree = "<group>";
@@ -156,16 +159,15 @@
 		8B25A40D1718E26600472842 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				8B25A40E1718E26600472842 /* RoundaboutKitTests-Info.plist */,
-				8B25A40F1718E26600472842 /* InfoPlist.strings */,
+				8B1D6CA217385966004545C3 /* InfoPlist.strings */,
+				8BB6938D173858D100B9B988 /* RoundaboutKitTests-Info.plist */,
 				8B25A4151718E26600472842 /* RoundaboutKitTests-Prefix.pch */,
-				8BB693791738290400B9B988 /* RKMockPromise.h */,
-				8BB6937A1738290400B9B988 /* RKMockPromise.m */,
-				8BB693821738399700B9B988 /* RKMockURLProtocol.h */,
-				8BB693831738399700B9B988 /* RKMockURLProtocol.m */,
-				8BB6937F1738363900B9B988 /* RunLoopHelper.h */,
-				8BB693801738363900B9B988 /* RunLoopHelper.m */,
-				8BB6938817384AFB00B9B988 /* PredeterminedResponses.plist */,
+				8B1D6C991738595A004545C3 /* RKMockPromise.h */,
+				8B1D6C9A1738595A004545C3 /* RKMockPromise.m */,
+				8B1D6C9B1738595A004545C3 /* RKMockURLProtocol.h */,
+				8B1D6C9C1738595A004545C3 /* RKMockURLProtocol.m */,
+				8B1D6C9D1738595A004545C3 /* RunLoopHelper.h */,
+				8B1D6C9E1738595A004545C3 /* RunLoopHelper.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -173,29 +175,29 @@
 		8B25A4191718E29A00472842 /* RoundaboutKit */ = {
 			isa = PBXGroup;
 			children = (
-				8B25A41A1718E2AC00472842 /* RKActivityManager.h */,
-				8B25A41B1718E2AC00472842 /* RKActivityManager.m */,
-				8B25A4221718E2AC00472842 /* RKDefaults.h */,
-				8B25A4231718E2AC00472842 /* RKDefaults.m */,
-				8B25A4261718E2AC00472842 /* RKPrelude.h */,
-				8B25A4271718E2AC00472842 /* RKPrelude.m */,
-				8B25A4241718E2AC00472842 /* RKPossibility.h */,
-				8B25A4251718E2AC00472842 /* RKPossibility.m */,
-				8B25A41C1718E2AC00472842 /* RKAwait.h */,
-				8B25A41D1718E2AC00472842 /* RKAwait.m */,
-				8B25A41E1718E2AC00472842 /* RKBinding.h */,
-				8B25A41F1718E2AC00472842 /* RKBinding.m */,
-				8B25A4201718E2AC00472842 /* RKBlockBasedValueTransformer.h */,
-				8B25A4211718E2AC00472842 /* RKBlockBasedValueTransformer.m */,
-				8B25A4281718E2AC00472842 /* RKPromise.h */,
-				8B25A4291718E2AC00472842 /* RKPromise.m */,
-				8B25A42A1718E2AC00472842 /* RKReachability.h */,
-				8B25A42B1718E2AC00472842 /* RKReachability.m */,
-				8B25A42C1718E2AC00472842 /* RKURLRequestPromise.h */,
-				8B25A42D1718E2AC00472842 /* RKURLRequestPromise.m */,
-				8B25A42E1718E2AC00472842 /* RKURLRequestPromiseCacheManager.h */,
-				8B25A42F1718E2AC00472842 /* RKURLRequestPromiseCacheManager.m */,
-				8B25A4301718E2AC00472842 /* RoundaboutKit.h */,
+				8B1D6C5F17385939004545C3 /* RKActivityManager.h */,
+				8B1D6C6017385939004545C3 /* RKActivityManager.m */,
+				8B1D6C6117385939004545C3 /* RKAwait.h */,
+				8B1D6C6217385939004545C3 /* RKAwait.m */,
+				8B1D6C6317385939004545C3 /* RKBinding.h */,
+				8B1D6C6417385939004545C3 /* RKBinding.m */,
+				8B1D6C6517385939004545C3 /* RKBlockBasedValueTransformer.h */,
+				8B1D6C6617385939004545C3 /* RKBlockBasedValueTransformer.m */,
+				8B1D6C6717385939004545C3 /* RKDefaults.h */,
+				8B1D6C6817385939004545C3 /* RKDefaults.m */,
+				8B1D6C6917385939004545C3 /* RKPossibility.h */,
+				8B1D6C6A17385939004545C3 /* RKPossibility.m */,
+				8B1D6C6B17385939004545C3 /* RKPrelude.h */,
+				8B1D6C6C17385939004545C3 /* RKPrelude.m */,
+				8B1D6C6D17385939004545C3 /* RKPromise.h */,
+				8B1D6C6E17385939004545C3 /* RKPromise.m */,
+				8B1D6C6F17385939004545C3 /* RKReachability.h */,
+				8B1D6C7017385939004545C3 /* RKReachability.m */,
+				8B1D6C7117385939004545C3 /* RKURLRequestPromise.h */,
+				8B1D6C7217385939004545C3 /* RKURLRequestPromise.m */,
+				8B1D6C7317385939004545C3 /* RKURLRequestPromiseCacheManager.h */,
+				8B1D6C7417385939004545C3 /* RKURLRequestPromiseCacheManager.m */,
+				8B1D6C7517385939004545C3 /* RoundaboutKit.h */,
 			);
 			name = RoundaboutKit;
 			sourceTree = "<group>";
@@ -251,8 +253,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B25A4111718E26600472842 /* InfoPlist.strings in Resources */,
-				8BB6938917384AFB00B9B988 /* PredeterminedResponses.plist in Resources */,
+				8B1D6CA417385966004545C3 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,37 +280,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8B25A4311718E2AC00472842 /* RKActivityManager.m in Sources */,
-				8B25A4321718E2AC00472842 /* RKAwait.m in Sources */,
-				8B25A4331718E2AC00472842 /* RKBinding.m in Sources */,
-				8B25A4341718E2AC00472842 /* RKBlockBasedValueTransformer.m in Sources */,
-				8B25A4351718E2AC00472842 /* RKDefaults.m in Sources */,
-				8B25A4361718E2AC00472842 /* RKPossibility.m in Sources */,
-				8B25A4371718E2AC00472842 /* RKPrelude.m in Sources */,
-				8B25A4381718E2AC00472842 /* RKPromise.m in Sources */,
-				8B25A4391718E2AC00472842 /* RKReachability.m in Sources */,
-				8B25A43A1718E2AC00472842 /* RKURLRequestPromise.m in Sources */,
-				8B25A43B1718E2AC00472842 /* RKURLRequestPromiseCacheManager.m in Sources */,
-				8B25A4441718E32500472842 /* RKPreludeTests.m in Sources */,
-				8B25A4471718E97F00472842 /* RKActivityManagerTests.m in Sources */,
-				8B25A44A1718EA6900472842 /* RKDefaultsTests.m in Sources */,
-				8B73FAF71718EBFF0004C984 /* RKPossibilityTests.m in Sources */,
-				8BB69378173828F600B9B988 /* RKPromiseTests.m in Sources */,
-				8BB6937B1738290400B9B988 /* RKMockPromise.m in Sources */,
-				8BB6937E173835FF00B9B988 /* RKAwaitTests.m in Sources */,
-				8BB693811738363A00B9B988 /* RunLoopHelper.m in Sources */,
-				8BB693841738399800B9B988 /* RKMockURLProtocol.m in Sources */,
-				8BB6938717384A7500B9B988 /* RKURLRequestPromiseTests.m in Sources */,
+				8B1D6C7617385939004545C3 /* RKActivityManager.m in Sources */,
+				8B1D6C7717385939004545C3 /* RKAwait.m in Sources */,
+				8B1D6C7817385939004545C3 /* RKBinding.m in Sources */,
+				8B1D6C7917385939004545C3 /* RKBlockBasedValueTransformer.m in Sources */,
+				8B1D6C7A17385939004545C3 /* RKDefaults.m in Sources */,
+				8B1D6C7B17385939004545C3 /* RKPossibility.m in Sources */,
+				8B1D6C7C17385939004545C3 /* RKPrelude.m in Sources */,
+				8B1D6C7D17385939004545C3 /* RKPromise.m in Sources */,
+				8B1D6C7E17385939004545C3 /* RKReachability.m in Sources */,
+				8B1D6C7F17385939004545C3 /* RKURLRequestPromise.m in Sources */,
+				8B1D6C8017385939004545C3 /* RKURLRequestPromiseCacheManager.m in Sources */,
+				8B1D6C911738594D004545C3 /* RKActivityManagerTests.m in Sources */,
+				8B1D6C921738594D004545C3 /* RKAwaitTests.m in Sources */,
+				8B1D6C931738594D004545C3 /* RKCacheManagerTests.m in Sources */,
+				8B1D6C941738594D004545C3 /* RKDefaultsTests.m in Sources */,
+				8B1D6C951738594D004545C3 /* RKPossibilityTests.m in Sources */,
+				8B1D6C961738594D004545C3 /* RKPreludeTests.m in Sources */,
+				8B1D6C971738594D004545C3 /* RKPromiseTests.m in Sources */,
+				8B1D6C981738594D004545C3 /* RKURLRequestPromiseTests.m in Sources */,
+				8B1D6C9F1738595A004545C3 /* RKMockPromise.m in Sources */,
+				8B1D6CA01738595A004545C3 /* RKMockURLProtocol.m in Sources */,
+				8B1D6CA11738595A004545C3 /* RunLoopHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		8B25A40F1718E26600472842 /* InfoPlist.strings */ = {
+		8B1D6CA217385966004545C3 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				8B25A4101718E26600472842 /* en */,
+				8B1D6CA317385966004545C3 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -350,7 +352,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RoundaboutKitTests/RoundaboutKitTests-Prefix.pch";
+				GCC_PREFIX_HEADER = "RoundaboutKitTests-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -360,7 +362,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = "RoundaboutKitTests/RoundaboutKitTests-Info.plist";
+				INFOPLIST_FILE = "RoundaboutKitTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -389,12 +391,12 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "RoundaboutKitTests/RoundaboutKitTests-Prefix.pch";
+				GCC_PREFIX_HEADER = "RoundaboutKitTests-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_FILE = "RoundaboutKitTests/RoundaboutKitTests-Info.plist";
+				INFOPLIST_FILE = "RoundaboutKitTests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
