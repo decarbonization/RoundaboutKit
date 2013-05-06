@@ -151,10 +151,39 @@ static void runloop_run_for(NSTimeInterval seconds)
         finished = YES;
     });
     
-    runloop_run_for(1.0);
+    runloop_run_for(0.6);
     
     STAssertTrue(finished, @"RKRealize timed out");
     STAssertEquals(accumulator, kNumberOfSuccesses, @"Multi-part promise yielded less times than expected");
+}
+
+#pragma mark -
+
+- (void)testRealizeMultiple
+{
+    NSUInteger const kNumberOfPromises = 5;
+    NSArray *promises = RKCollectionGenerateArray(kNumberOfPromises, ^(NSUInteger promiseNumber) {
+        return [[RKMockPromise alloc] initWithResult:[[RKPossibility alloc] initWithValue:@(promiseNumber)]
+                                            duration:0.1
+                                           canCancel:YES
+                                   numberOfSuccesses:1];
+    });
+    
+    __block BOOL finished = NO;
+    __block NSArray *results = nil;
+    RKRealizePromises(promises, ^(NSArray *possibilities) {
+        finished = YES;
+        results = RKCollectionMapToArray(possibilities, ^id(RKPossibility *probablyValue) {
+            STAssertEquals(probablyValue.state, kRKPossibilityStateValue, @"A promise unexpectedly failed");
+            
+            return probablyValue.value;
+        });
+    });
+    
+    runloop_run_for(0.7);
+    
+    STAssertTrue(finished, @"RKRealizePromises timed out");
+    STAssertEqualObjects(results, (@[ @0, @1, @2, @3, @4 ]), @"RKRealizePromises yielded wrong value");
 }
 
 @end
