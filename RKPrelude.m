@@ -227,7 +227,7 @@ id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPat
 
 #pragma mark - Mac Image Tools
 
-#if TARGET_OS_MAC
+#if TARGET_OS_MAC && defined(_APPKITDEFINES_H)
 
 static NSData *NSImageRepresentationOfType(NSImage *image, NSBitmapImageFileType fileType)
 {
@@ -254,4 +254,4 @@ RK_OVERLOADABLE NSData *NSImageJPGRepresentation(NSImage *image)
     return NSImageRepresentationOfType(image, NSJPEGFileType);
 }
 
-#endif /* TARGET_OS_MAC */
+#endif /* TARGET_OS_MAC && defined(_APPKITDEFINES_H) */

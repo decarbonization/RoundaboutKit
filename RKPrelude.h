@@ -244,7 +244,7 @@ RK_INLINE void RKObjectRelease(id <NSObject> object)
 
 #pragma mark - Mac Image Tools
 
-#if TARGET_OS_MAC
+#if TARGET_OS_MAC && defined(_APPKITDEFINES_H)
 
 ///Returns the data for the specified image in PNG format.
 RK_EXTERN_OVERLOADABLE NSData *NSImagePNGRepresentation(NSImage *image);
@@ -252,6 +252,6 @@ RK_EXTERN_OVERLOADABLE NSData *NSImagePNGRepresentation(NSImage *image);
 ///Returns the data for the specified image in PNG format.
 RK_EXTERN_OVERLOADABLE NSData *NSImageJPGRepresentation(NSImage *image);
 
-#endif /* TARGET_OS_MAC */
+#endif /* TARGET_OS_MAC && defined(_APPKITDEFINES_H) */
 
 #endif /* RKPrelude_h */
