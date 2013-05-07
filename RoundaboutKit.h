@@ -35,4 +35,5 @@
 #import "RKConnectivityManager.h"
 #import "RKURLRequestPromise.h"
 #import "RKURLRequestPromiseCacheManager.h"
+#import "RKPossibility.h"
 #import "RKActivityManager.h"

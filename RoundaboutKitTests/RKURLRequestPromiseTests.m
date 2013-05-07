@@ -13,9 +13,6 @@
 #define PLAIN_TEXT_URL_STRING   @"http://test/plaintext"
 #define PLAIN_TEXT_STRING       (@"hello, world!")
 
-#define JSON_OBJECT_URL_STRING  @"http://test/json"
-#define JSON_OBJECT             (@{})
-
 @interface RKURLRequestPromiseTests ()
 
 @property RKConnectivityManager *connectivityManager;
@@ -221,8 +218,6 @@
     STAssertEquals(error.code, kRKURLRequestPromiseErrorCannotLoadCache, @"Error has wrong code");
 }
 
-#pragma mark -
-
 - (void)testCacheManagerPreloading
 {
     NSString *const kCacheIdentifier = PLAIN_TEXT_URL_STRING;
@@ -257,6 +252,67 @@
     STAssertFalse(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
     STAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
     STAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
+}
+
+#pragma mark -
+
+- (void)testPostProcessorChaining
+{
+    RKPostProcessorBlock postProcessor1 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+        return RKRefinePossibility(maybeData, ^RKPossibility *(NSString *value) {
+            NSString *newValue = [value stringByAppendingString:@" fizz"];
+            return [[RKPossibility alloc] initWithValue:newValue];
+        }, kRKPossibilityDefaultEmptyRefiner, kRKPossibilityDefaultErrorRefiner);
+    };
+    
+    RKPostProcessorBlock postProcessor2 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+        return RKRefinePossibility(maybeData, ^RKPossibility *(NSString *value) {
+            NSString *newValue = [value stringByAppendingString:@"buzz"];
+            return [[RKPossibility alloc] initWithValue:newValue];
+        }, kRKPossibilityDefaultEmptyRefiner, kRKPossibilityDefaultErrorRefiner);
+    };
+    
+    RKPostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
+    RKPossibility *result = postProcessor3([[RKPossibility alloc] initWithValue:@"it should equal"], nil);
+    STAssertEquals(result.state, kRKPossibilityStateValue, @"Unexpected state");
+    STAssertEqualObjects(result.value, @"it should equal fizzbuzz", @"Unexpected value");
+}
+
+- (void)testJSONPostProcessor
+{
+    NSDictionary *goodTest = @{@"I like": @"cookies",
+                               @"contains": @"potatoes",
+                               @"array": @[ @1, @2, @3 ],
+                               @"dictionary": @{@"a": @1, @"b": @2, @"c": @3},
+                               @"null": [NSNull null]};
+    
+    NSData *goodTestData = [NSJSONSerialization dataWithJSONObject:goodTest options:0 error:NULL];
+    RKPossibility *goodResult = kRKJSONPostProcessorBlock([[RKPossibility alloc] initWithValue:goodTestData], nil);
+    STAssertEquals(goodResult.state, kRKPossibilityStateValue, @"Unexpected state");
+    STAssertEqualObjects(goodResult.value, goodTest, @"Unexpected value");
+    
+    NSData *badTestData = [@"this is pure garbage" dataUsingEncoding:NSUTF8StringEncoding];
+    RKPossibility *badResult = kRKJSONPostProcessorBlock([[RKPossibility alloc] initWithValue:badTestData], nil);
+    STAssertEquals(badResult.state, kRKPossibilityStateError, @"Unexpected state");
+    STAssertNotNil(badResult.error, @"Missing error");
+}
+
+- (void)testImagePostProcessor
+{
+    NSURL *goodTestLocation = [[NSBundle bundleForClass:[self class]] URLForImageResource:@"RKPostProcessorTestImage"];
+    NSImage *goodTest = [[NSImage alloc] initWithContentsOfURL:goodTestLocation];
+    STAssertNotNil(goodTest, @"Missing test image");
+    
+    NSData *goodTestData = NSImagePNGRepresentation(goodTest);
+    RKPossibility *goodResult = kRKImagePostProcessorBlock([[RKPossibility alloc] initWithValue:goodTestData], nil);
+    STAssertEquals(goodResult.state, kRKPossibilityStateValue, @"Unexpected state");
+    STAssertNotNil(goodResult.value, @"Unexpected missing value");
+    STAssertTrue(NSEqualSizes(goodTest.size, [goodResult.value size]), @"Size mismatch");
+    
+    NSData *badTestData = [@"this is most definitely not a valid image" dataUsingEncoding:NSUTF8StringEncoding];
+    RKPossibility *badResult = kRKImagePostProcessorBlock([[RKPossibility alloc] initWithValue:badTestData], nil);
+    STAssertEquals(badResult.state, kRKPossibilityStateError, @"Unexpected state");
+    STAssertNotNil(badResult.error, @"Missing error");
 }
 
 @end

@@ -31,6 +31,7 @@
 		8B1D6CA11738595A004545C3 /* RunLoopHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6C9E1738595A004545C3 /* RunLoopHelper.m */; };
 		8B1D6CA417385966004545C3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B1D6CA217385966004545C3 /* InfoPlist.strings */; };
 		8B1D6CA717385EE3004545C3 /* RKMockURLRequestPromiseCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B1D6CA617385EE3004545C3 /* RKMockURLRequestPromiseCacheManager.m */; };
+		8B1D6CAE173880A8004545C3 /* RKPostProcessorTestImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B1D6CAD173880A8004545C3 /* RKPostProcessorTestImage.png */; };
 		8B25A43D1718E2D600472842 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B25A43C1718E2D600472842 /* SystemConfiguration.framework */; };
 		8B25A43F1718E2F000472842 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B25A43E1718E2F000472842 /* SenTestingKit.framework */; };
 		8B25A4411718E2F300472842 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B25A4401718E2F300472842 /* Cocoa.framework */; };
@@ -85,6 +86,7 @@
 		8B1D6CA317385966004545C3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
 		8B1D6CA517385EE3004545C3 /* RKMockURLRequestPromiseCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockURLRequestPromiseCacheManager.h; sourceTree = SOURCE_ROOT; };
 		8B1D6CA617385EE3004545C3 /* RKMockURLRequestPromiseCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockURLRequestPromiseCacheManager.m; sourceTree = SOURCE_ROOT; };
+		8B1D6CAD173880A8004545C3 /* RKPostProcessorTestImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RKPostProcessorTestImage.png; sourceTree = SOURCE_ROOT; };
 		8B25A4091718E26600472842 /* RoundaboutKitTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoundaboutKitTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B25A4151718E26600472842 /* RoundaboutKitTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RoundaboutKitTests-Prefix.pch"; sourceTree = "<group>"; };
 		8B25A43C1718E2D600472842 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
@@ -162,6 +164,7 @@
 		8B25A40D1718E26600472842 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				8B1D6CAD173880A8004545C3 /* RKPostProcessorTestImage.png */,
 				8B1D6CA217385966004545C3 /* InfoPlist.strings */,
 				8BB6938D173858D100B9B988 /* RoundaboutKitTests-Info.plist */,
 				8B25A4151718E26600472842 /* RoundaboutKitTests-Prefix.pch */,
@@ -259,6 +262,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B1D6CA417385966004545C3 /* InfoPlist.strings in Resources */,
+				8B1D6CAE173880A8004545C3 /* RKPostProcessorTestImage.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

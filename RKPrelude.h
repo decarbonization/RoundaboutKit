@@ -242,4 +242,16 @@ RK_INLINE void RKObjectRelease(id <NSObject> object)
     ((void(*)(id, SEL))objc_msgSend)(object, NSSelectorFromString(@"release"));
 }
 
+#pragma mark - Mac Image Tools
+
+#if TARGET_OS_MAC
+
+///Returns the data for the specified image in PNG format.
+RK_EXTERN_OVERLOADABLE NSData *NSImagePNGRepresentation(NSImage *image);
+
+///Returns the data for the specified image in PNG format.
+RK_EXTERN_OVERLOADABLE NSData *NSImageJPGRepresentation(NSImage *image);
+
+#endif /* TARGET_OS_MAC */
+
 #endif /* RKPrelude_h */

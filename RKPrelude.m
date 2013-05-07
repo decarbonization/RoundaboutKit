@@ -224,3 +224,34 @@ id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPat
     
     return value;
 }
+
+#pragma mark - Mac Image Tools
+
+#if TARGET_OS_MAC
+
+static NSData *NSImageRepresentationOfType(NSImage *image, NSBitmapImageFileType fileType)
+{
+    if(!image)
+        return nil;
+    
+	for (id imageRep in [image representations])
+	{
+		if([imageRep respondsToSelector:@selector(representationUsingType:properties:)])
+			return [imageRep representationUsingType:fileType properties:nil];
+	}
+	
+	NSBitmapImageRep *temporaryImageRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
+	return [temporaryImageRep representationUsingType:fileType properties:nil];
+}
+
+RK_OVERLOADABLE NSData *NSImagePNGRepresentation(NSImage *image)
+{
+    return NSImageRepresentationOfType(image, NSPNGFileType);
+}
+
+RK_OVERLOADABLE NSData *NSImageJPGRepresentation(NSImage *image)
+{
+    return NSImageRepresentationOfType(image, NSJPEGFileType);
+}
+
+#endif /* TARGET_OS_MAC */
