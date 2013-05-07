@@ -39,6 +39,12 @@
 
 static NSMutableArray *_Routes = nil;
 
+@interface RKMockURLProtocol ()
+
+@property BOOL canceled;
+
+@end
+
 @implementation RKMockURLProtocol
 
 #pragma mark - Routes
@@ -119,6 +125,11 @@ static NSMutableArray *_Routes = nil;
 
 #pragma mark - Primitive Methods
 
++ (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request
+{
+    return request;
+}
+
 + (BOOL)canInitWithRequest:(NSURLRequest *)request
 {
     return ([self routeForRequest:request] != nil);
@@ -128,20 +139,38 @@ static NSMutableArray *_Routes = nil;
 {
     RKMockURLProtocolRoute *route = [[self class] routeForRequest:self.request];
     if(route.error) {
-        [self.client URLProtocol:self didFailWithError:route.error];
+        RKDoAsync(^{
+            if(self.canceled)
+                return;
+            [self.client URLProtocol:self didFailWithError:route.error];
+        });
     } else {
-        NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:route.URL
-                                                                  statusCode:route.statusCode
-                                                                 HTTPVersion:@"HTTP/1.1"
-                                                                headerFields:route.headers];
-        [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
-        [self.client URLProtocol:self didLoadData:route.responseData];
-        [self.client URLProtocolDidFinishLoading:self];
+        RKDoAsync(^{
+            NSHTTPURLResponse *response = [[NSHTTPURLResponse alloc] initWithURL:route.URL
+                                                                      statusCode:route.statusCode
+                                                                     HTTPVersion:@"HTTP/1.1"
+                                                                    headerFields:route.headers];
+            if(self.canceled)
+                return;
+            
+            [self.client URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
+            
+            if(self.canceled)
+                return;
+            
+            [self.client URLProtocol:self didLoadData:route.responseData];
+            
+            if(self.canceled)
+                return;
+            
+            [self.client URLProtocolDidFinishLoading:self];
+        });
     }
 }
 
 - (void)stopLoading
 {
+    self.canceled = YES;
 }
 
 @end

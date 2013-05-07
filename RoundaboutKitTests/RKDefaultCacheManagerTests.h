@@ -8,6 +8,6 @@
 
 #import <SenTestingKit/SenTestingKit.h>
 
-@interface RKCacheManagerTests : SenTestCase
+@interface RKDefaultCacheManagerTests : SenTestCase
 
 @end

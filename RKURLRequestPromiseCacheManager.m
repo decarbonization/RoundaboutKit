@@ -126,7 +126,7 @@
     
     const char *identifierAsCString = [identifer UTF8String];
     unsigned char result[CC_MD5_DIGEST_LENGTH];
-    CC_MD5(identifierAsCString, strlen(identifierAsCString), result);
+    CC_MD5(identifierAsCString, (CC_LONG)strlen(identifierAsCString), result);
     
     NSMutableString *sanitizedIdentifier = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
     for (NSUInteger index = 0; index < CC_MD5_DIGEST_LENGTH; index++) {

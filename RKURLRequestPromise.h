@@ -17,7 +17,7 @@ RK_EXTERN NSString *const RKURLRequestPromiseErrorDomain;
 ///The key used to embed the affected cache identifier into errors by RKURLRequestPromise.
 RK_EXTERN NSString *const RKURLRequestPromiseCacheIdentifierErrorUserInfoKey;
 
-enum {
+enum RKURLRequestPromiseErrors : NSInteger {
     ///The cache cannot be loaded.
     kRKURLRequestPromiseErrorCannotLoadCache = 'nrch',
     
@@ -28,7 +28,7 @@ enum {
 
 ///The callback block type expected in `-[RKURLRequestPromise loadCachedDataWithCallbackQueue:block:]`.
 ///
-/// \param  maybeData   The cached data. The state of the possibility corresponds to the state of the cache.
+/// \param  maybeData   The cached data. The state of the possibility corresponds to the state of the cache. Required.
 ///
 typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 
@@ -41,6 +41,12 @@ typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 ///
 ///Identifiers must not begin with a double underscore, these identifiers are
 ///reserved for the use of the implementation of the cache manager only.
+///
+///At the time of writing this documentation, if the cache is determined to be current
+///the cache manager takes over for the request promise's underlying connection. As such,
+///any errors that occur while reading the cache are propagated back to the realizer,
+///and the promise will fail. Cache manager's should take steps to remove any cache that
+///is found to be corrupted to prevent future requests from failing.
 @protocol RKURLRequestPromiseCacheManager <NSObject>
 
 ///Returns the last recorded revision for a given identifier.
@@ -100,6 +106,13 @@ typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 
 ///The RKPostProcessorBlock functor encapsulates conversion of one type of data into another.
 ///
+/// \param  maybeData   The possibility the post-processor should operate on. Required.
+/// \param  request     The request invoking the post-processor block. May be nil.
+///                     When this parameter is passed in cache from the cache preloading
+///                     methods, certain properties on `RKURLRequestPromise` will be nil.
+///                     Any tests done using these properties should be assumed to pass
+///                     if their value is nil so that post-processors behave as expected.
+///
 ///Top level RKPostProcessorBlocks will typically be given an NSData object.
 ///Blocks chained from this point will be given user-defined objects.
 typedef RKPossibility *(^RKPostProcessorBlock)(RKPossibility *maybeData, RKURLRequestPromise *request);
@@ -124,8 +137,8 @@ RK_EXTERN RKPostProcessorBlock const kRKImagePostProcessorBlock;
 ///executed before a RKURLRequestPromise may be executed. This functor will be called
 ///on the request promise's operation queue.
 ///
-/// \param  request     The current request of the promise.
-/// \param  outError    On return, should contain an error describing any problems.
+/// \param  request     The current request of the promise. Required
+/// \param  outError    On return, should contain an error describing any problems. Required
 ///
 /// \result A NSURLRequest instance to use for the request-promise, or nil if an error occurs.
 typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSError **outError);
@@ -146,7 +159,9 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 
 #pragma mark -
 
-///The RKURLRequestPromise class encapsulates a network request.
+@class RKConnectivityManager;
+    
+///The RKURLRequestPromise class encapsulates a network request promise.
 ///
 ///This class uses Etags to track changes to remote response. When
 ///server responses do not contain an Etag, then two behaviors can
@@ -206,6 +221,12 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
          requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
 
 #pragma mark - Properties
+
+///The connectivity manager object used to determine if the receiver is connected to its target.
+///
+///Defaults to `+[RKConnectivityManager defaultInternetConnectivityManager]`.
+///This property is primarily provided for the purposes of testing.
+@property (RK_NONATOMIC_IOSONLY) RKConnectivityManager *connectivityManager;
 
 ///The URL request.
 @property (readonly, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
@@ -269,13 +290,29 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 ///Loads any data cached under the identifier assigned to
 ///the receiver using the receiver's cache manager object.
 ///
-/// \param  block   The block to invoke when the loading operation has been completed. Required.
+/// \param  callbackQueue   The queue to invoke the given block on. Required.
+/// \param  block           The block to invoke when the loading operation has been completed. Required.
 ///
 ///This method does nothing when the receiver has either no cacheIdentifier and/or cacheManager.
 ///
 ///The cached data will be passed through the receiver's post-processor, and may be
 ///consumed in exactly the same manner as the `success` value from realizing the receiver.
 - (void)loadCachedDataWithCallbackQueue:(NSOperationQueue *)callbackQueue block:(RKURLRequestPromiseCacheLoadingBlock)block;
+
+///Loads any data cached under the identifier assigned to
+///the receiver using the receiver's cache manager object.
+///
+/// \param  block   The block to invoke when the loading operation has been completed. Required.
+///
+///This method does nothing when the receiver has either no cacheIdentifier and/or cacheManager.
+///
+///The cached data will be passed through the receiver's post-processor, and may be
+///consumed in exactly the same manner as the `success` value from realizing the receiver.
+///
+///The block is invoked on the same operation queue that this method was initially called on.
+///
+/// \seealso(-[self loadCachedDataWithCallbackQueue:block:])
+- (void)loadCachedDataWithBlock:(RKURLRequestPromiseCacheLoadingBlock)block;
 
 @end
 

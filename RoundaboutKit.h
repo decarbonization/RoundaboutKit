@@ -32,7 +32,7 @@
 #import "RKDefaults.h"
 #import "RKBinding.h"
 #import "RKBlockBasedValueTransformer.h"
-#import "RKReachability.h"
+#import "RKConnectivityManager.h"
 #import "RKURLRequestPromise.h"
 #import "RKURLRequestPromiseCacheManager.h"
 #import "RKActivityManager.h"

@@ -7,7 +7,7 @@
 //
 
 #import "RKURLRequestPromise.h"
-#import "RKReachability.h"
+#import "RKConnectivityManager.h"
 #import "RKActivityManager.h"
 
 NSString *const RKURLRequestPromiseErrorDomain = @"RKURLRequestPromiseErrorDomain";
@@ -294,6 +294,8 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
         self.requestQueue = requestQueue;
         
         self.cacheIdentifier = [request.URL absoluteString];
+        
+        self.connectivityManager = [RKConnectivityManager defaultInternetConnectivityManager];
     }
     
     return self;
@@ -328,7 +330,7 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
             _loadedData = [NSMutableData new];
         }
         
-        _isInOfflineMode = ![RKReachability defaultInternetConnectionReachability].isConnected;
+        _isInOfflineMode = !self.connectivityManager.isConnected;
         [[RKActivityManager sharedActivityManager] incrementActivityCount];
         
         if(_preflight) {
@@ -345,7 +347,9 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
         RequestDidIsBecomingActive(self);
         
         if(_isInOfflineMode) {
-            [self loadCache];
+            [self.requestQueue addOperationWithBlock:^{
+                [self loadCacheAndReportError:YES];
+            }];
         } else {
             self.connection = [[NSURLConnection alloc] initWithRequest:self.request
                                                               delegate:self
@@ -383,37 +387,39 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
 
 #pragma mark - Cache Support
 
-- (void)loadCache
+- (BOOL)loadCacheAndReportError:(BOOL)reportError
 {
     if(!self.cacheManager || self.cacheIdentifier == nil)
-        return;
+        return NO;
     
     if(self.cancelled) {
         if(!_isInOfflineMode)
             [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
-        return;
+        return YES;
     }
     
-    [self.requestQueue addOperationWithBlock:^{
-        NSError *error = nil;
-        NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
-        if(data) {
-            self.isCacheLoaded = YES;
-            
-            [self invokeSuccessCallbackWithData:data];
-        } else if(_isInOfflineMode) {
-            NSDictionary *userInfo = @{
-                NSUnderlyingErrorKey: error,
-                NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
-                RKURLRequestPromiseCacheIdentifierErrorUserInfoKey: self.cacheIdentifier,
-            };
-            NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                                          code:kRKURLRequestPromiseErrorCannotLoadCache
-                                                      userInfo:userInfo];
-            [self invokeFailureCallbackWithError:highLevelError];
-        }
-    }];
+    NSError *error = nil;
+    NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
+    if(data) {
+        self.isCacheLoaded = YES;
+        
+        [self invokeSuccessCallbackWithData:data];
+    } else if(reportError) {
+        NSDictionary *userInfo = @{
+            NSUnderlyingErrorKey: error,
+            NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
+            RKURLRequestPromiseCacheIdentifierErrorUserInfoKey: self.cacheIdentifier,
+        };
+        NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
+                                                      code:kRKURLRequestPromiseErrorCannotLoadCache
+                                                  userInfo:userInfo];
+        [self invokeFailureCallbackWithError:highLevelError];
+        
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (void)loadCachedDataWithCallbackQueue:(NSOperationQueue *)callbackQueue block:(RKURLRequestPromiseCacheLoadingBlock)block
@@ -428,7 +434,10 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
         NSError *error = nil;
         NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
         if(data) {
-            RKPossibility *maybeValue = self.postProcessor([[RKPossibility alloc] initWithValue:data], self);
+            RKPossibility *maybeValue = [[RKPossibility alloc] initWithValue:data];
+            if(self.postProcessor)
+                maybeValue = self.postProcessor(maybeValue, self);
+            
             [callbackQueue addOperationWithBlock:^{
                 block(maybeValue);
             }];
@@ -450,6 +459,13 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
             }];
         }
     }];
+}
+
+- (void)loadCachedDataWithBlock:(RKURLRequestPromiseCacheLoadingBlock)block
+{
+    NSParameterAssert(block);
+    
+    [self loadCachedDataWithCallbackQueue:[NSOperationQueue currentQueue] block:block];
 }
 
 #pragma mark - Invoking Callbacks
@@ -565,7 +581,7 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
                     self.isFinished = YES;
             }];
         } else {
-            [self loadCache];
+            [self loadCacheAndReportError:YES];
         }
     }
 }

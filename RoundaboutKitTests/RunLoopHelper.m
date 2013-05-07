@@ -20,7 +20,7 @@
     NSParameterAssert(predicate);
     
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-    while (predicate && [runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+    while (!predicate() && [runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
 }
 
 @end

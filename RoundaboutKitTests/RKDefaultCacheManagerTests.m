@@ -6,8 +6,8 @@
 //
 //
 
-#import "RKCacheManagerTests.h"
+#import "RKDefaultCacheManagerTests.h"
 
-@implementation RKCacheManagerTests
+@implementation RKDefaultCacheManagerTests
 
 @end
