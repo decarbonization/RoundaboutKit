@@ -70,18 +70,4 @@
     });
 }
 
-#pragma mark - Collection Tools
-
-- (void)testIterateValues
-{
-    //This function is likely to be deprecated and obsoleted.
-    (void)&RKPossibilitiesIterateValues;
-}
-
-- (void)testIterateErrors
-{
-    //This function is likely to be deprecated and obsoleted.
-    (void)&RKPossibilitiesIterateErrors;
-}
-
 @end

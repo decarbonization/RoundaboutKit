@@ -59,24 +59,24 @@ typedef enum RKPossibilityState : NSUInteger {
 #pragma mark - Default Matchers/Refiners
 
 ///The default value possibility refiner.
-#define kRKPossibilityDefaultValueRefiner nil
+RK_EXTERN RKPossibility *(^kRKPossibilityDefaultValueRefiner)(id);
 
 ///The default empty possibility refiner.
-#define kRKPossibilityDefaultEmptyRefiner nil
+RK_EXTERN RKPossibility *(^kRKPossibilityDefaultEmptyRefiner)();
 
 ///The default error possibility refiner.
-#define kRKPossibilityDefaultErrorRefiner nil
+RK_EXTERN RKPossibility *(^kRKPossibilityDefaultErrorRefiner)(NSError *);
 
 #pragma mark -
 
 ///The default value possibility matcher.
-#define kRKPossibilityDefaultValueMatcher nil
+RK_EXTERN void(^kRKPossibilityDefaultValueMatcher)(id);
 
 ///The default empty possibility matcher.
-#define kRKPossibilityDefaultEmptyMatcher nil
+RK_EXTERN void(^kRKPossibilityDefaultEmptyMatcher)();
 
 ///The default error possibility matcher.
-#define kRKPossibilityDefaultErrorMatcher nil
+RK_EXTERN void(^kRKPossibilityDefaultErrorMatcher)(NSError *);
 
 #pragma mark - Refining and Matching
 
@@ -115,21 +115,5 @@ RK_EXTERN_OVERLOADABLE void RKMatchPossibility(RKPossibility *possibility,
                                                void(^value)(id value),
                                                void(^empty)(),
                                                void(^error)(NSError *error));
-
-#pragma mark - Collection Tools
-
-///Enumerates an array of possibilities, invoking a callback for every possibility that has a value.
-///
-/// \param  possibilities   An array of RKPossibility instances.
-/// \param  callback        The callback. Required.
-///
-RK_EXTERN_OVERLOADABLE void RKPossibilitiesIterateValues(NSArray *possibilities, void(^callback)(id value, NSUInteger index, BOOL *stop));
-
-///Enumerates an array of possibilities, invoking a callback for every possibility that has an error.
-///
-/// \param  possibilities   An array of RKPossibility instances.
-/// \param  callback        The callback. Required.
-///
-RK_EXTERN_OVERLOADABLE void RKPossibilitiesIterateErrors(NSArray *possibilities, void(^callback)(NSError *error, NSUInteger index, BOOL *stop));
 
 #endif /* RKPossibility_h */
