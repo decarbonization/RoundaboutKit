@@ -21,7 +21,9 @@
 ///Runs the main run loop until the given predicate yields NO.
 ///
 /// \param  predicate   A block which returns a BOOL indicating whether or not the run loop should continue. Required.
+/// \param  seconds     The timeout for the run loop cycle. Must be greater than 0.0.
 ///
-+ (void)runUntil:(BOOL(^)())predicate;
+/// \result YES if the run cycle ended naturally; NO if it timed out.
++ (BOOL)runUntil:(BOOL(^)())predicate orSecondsHasElapsed:(NSTimeInterval)seconds;
 
 @end

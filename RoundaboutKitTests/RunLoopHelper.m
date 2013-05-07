@@ -15,12 +15,18 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:seconds]];
 }
 
-+ (void)runUntil:(BOOL(^)())predicate
++ (BOOL)runUntil:(BOOL(^)())predicate orSecondsHasElapsed:(NSTimeInterval)seconds
 {
     NSParameterAssert(predicate);
     
+    NSDate *startTime = [NSDate date];
+    BOOL lessThanStartTime = YES;
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-    while (!predicate() && [runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+    while (!predicate() &&
+           (lessThanStartTime = (-[startTime timeIntervalSinceNow] < seconds)) &&
+           [runLoop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+    
+    return lessThanStartTime;
 }
 
 @end

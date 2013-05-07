@@ -405,18 +405,33 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
         self.isCacheLoaded = YES;
         
         [self invokeSuccessCallbackWithData:data];
-    } else if(reportError) {
-        NSDictionary *userInfo = @{
-            NSUnderlyingErrorKey: error,
-            NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
-            RKURLRequestPromiseCacheIdentifierErrorUserInfoKey: self.cacheIdentifier,
-        };
-        NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                                      code:kRKURLRequestPromiseErrorCannotLoadCache
-                                                  userInfo:userInfo];
-        [self invokeFailureCallbackWithError:highLevelError];
+    } else {
+        NSError *removeError = nil;
+        BOOL removedCache = [self.cacheManager removeCacheForIdentifier:self.cacheIdentifier error:&removeError];
         
-        return NO;
+        if(reportError) {
+            NSDictionary *userInfo = nil;
+            if(removedCache) {
+                userInfo = @{
+                    NSUnderlyingErrorKey: error,
+                    NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
+                    RKURLRequestPromiseCacheIdentifierErrorUserInfoKey: self.cacheIdentifier,
+                };
+            } else {
+                userInfo = @{
+                    NSUnderlyingErrorKey: error,
+                    NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
+                    RKURLRequestPromiseCacheIdentifierErrorUserInfoKey: self.cacheIdentifier,
+                    @"RKURLRequestPromiseCacheRemovalErrorUserInfoKey": removeError,
+                };
+            }
+            NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
+                                                          code:kRKURLRequestPromiseErrorCannotLoadCache
+                                                      userInfo:userInfo];
+            [self invokeFailureCallbackWithError:highLevelError];
+            
+            return NO;
+        }
     }
     
     return YES;

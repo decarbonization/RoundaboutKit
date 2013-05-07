@@ -83,4 +83,7 @@ RK_EXTERN NSString *const kRKMockURLRequestPromiseCacheManagerItemErrorKey;
 ///Whether or not the method was called.
 @property (readonly) BOOL cachedDataForIdentifierErrorWasCalled;
 
+///Whether or not the method was called.
+@property (readonly) BOOL removeCacheForIdentifierErrorWasCalled;
+
 @end

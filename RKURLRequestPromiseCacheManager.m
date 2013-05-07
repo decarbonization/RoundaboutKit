@@ -36,7 +36,7 @@
                                                                      create:YES
                                                                       error:&error];
     NSAssert(cachesLocation != nil, @"Could not find caches directory. %@", error);
-    return [[cachesLocation URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]] URLByAppendingPathComponent:@"RKURLRequestPromiseCache"];
+    return [[cachesLocation URLByAppendingPathComponent:[[NSBundle bundleForClass:[self class]] bundleIdentifier]] URLByAppendingPathComponent:@"RKURLRequestPromiseCache"];
 }
 
 ///Returns the location of a bucket with a given name.
@@ -169,12 +169,12 @@
         NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
         NSURL *dataLocation = [_bucketLocation URLByAppendingPathComponent:sanitizedIdentifier];
         
-        if(![data writeToURL:dataLocation options:NSAtomicWrite error:error]) {
+        if([data writeToURL:dataLocation options:NSAtomicWrite error:error]) {
+            _metadata[sanitizedIdentifier] = @{@"revision": revision};
+            [self synchronizeMetadata];
+        } else {
             success = NO;
         }
-        
-        _metadata[sanitizedIdentifier] = @{@"revision": revision};
-        [self synchronizeMetadata];
     });
     
     return success;
@@ -195,13 +195,58 @@
     if(data) {
         return data;
     } else {
-        if(error.code == NSFileNoSuchFileError) {
+        if(error.code == NSFileReadNoSuchFileError) {
             return nil;
         } else {
             if(outError) *outError = error;
             return nil;
         }
     }
+}
+
+- (BOOL)removeCacheForIdentifier:(NSString *)identifier error:(NSError **)outError
+{
+    NSParameterAssert(identifier);
+    
+    __block BOOL success = YES;
+    __block NSError *error = nil;
+    dispatch_barrier_sync(_accessQueue, ^{
+        NSString *sanitizedIdentifier = [self sanitizedIdentifier:identifier];
+        NSURL *dataLocation = [_bucketLocation URLByAppendingPathComponent:sanitizedIdentifier];
+        
+        if([[NSFileManager defaultManager] removeItemAtURL:dataLocation error:&error] || error.code == NSFileNoSuchFileError) {
+            [_metadata removeObjectForKey:sanitizedIdentifier];
+            [self synchronizeMetadata];
+            
+            error = nil;
+        } else {
+            success = NO;
+        }
+    });
+    
+    if(outError) *outError = error;
+    
+    return success;
+}
+
+- (BOOL)removeAllCache:(NSError **)outError
+{
+    __block BOOL success = YES;
+    __block NSError *error = nil;
+    dispatch_barrier_sync(_accessQueue, ^{
+        if([[NSFileManager defaultManager] removeItemAtURL:_bucketLocation error:&error] || error.code == NSFileNoSuchFileError) {
+            [_metadata removeAllObjects];
+            [self synchronizeMetadata];
+            
+            error = nil;
+        } else {
+            success = NO;
+        }
+    });
+    
+    if(outError) *outError = error;
+    
+    return success;
 }
 
 @end

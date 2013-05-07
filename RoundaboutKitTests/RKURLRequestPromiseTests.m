@@ -148,6 +148,7 @@
     STAssertTrue(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
     STAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
     STAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
+    STAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
     
     NSString *resultString = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
     STAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Wrong result was given");
@@ -181,6 +182,7 @@
     STAssertTrue(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
     STAssertTrue(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
     STAssertFalse(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
+    STAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
     
     NSString *resultString = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
     STAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Wrong result was given");
@@ -212,6 +214,7 @@
     NSData *result = RKAwait(testPromise, &error);
     STAssertNil(result, @"RKAwait unexpectedly succeeded");
     STAssertNotNil(error, @"RKAwait propagated no error");
+    STAssertTrue(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was not called");
     
     STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
     STAssertEqualObjects(error.domain, RKURLRequestPromiseErrorDomain, @"Error has wrong domain");
@@ -245,13 +248,15 @@
         maybeValue = maybeData;
     }];
     
-    [RunLoopHelper runUntil:^BOOL{ return (hasLoaded == YES); }];
+    BOOL finishedNaturally = [RunLoopHelper runUntil:^BOOL{ return (hasLoaded == YES); } orSecondsHasElapsed:1.0];
     
+    STAssertTrue(finishedNaturally, @"load timed out.");
     STAssertNotNil(maybeValue, @"No value was given to cached data block.");
     STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
     STAssertFalse(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
     STAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
     STAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
+    STAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
 }
 
 #pragma mark -

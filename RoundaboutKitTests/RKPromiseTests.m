@@ -175,8 +175,9 @@
         });
     });
     
-    [RunLoopHelper runUntil:^BOOL{ return (results != nil); }];
+    BOOL finishedNaturally = [RunLoopHelper runUntil:^BOOL{ return (results != nil); } orSecondsHasElapsed:1.0];
     
+    STAssertTrue(finishedNaturally, @"realize timed out");
     STAssertTrue(finished, @"RKRealizePromises timed out");
     STAssertEqualObjects(results, (@[ @0, @1, @2, @3, @4 ]), @"RKRealizePromises yielded wrong value");
 }

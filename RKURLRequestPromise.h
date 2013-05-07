@@ -17,7 +17,7 @@ RK_EXTERN NSString *const RKURLRequestPromiseErrorDomain;
 ///The key used to embed the affected cache identifier into errors by RKURLRequestPromise.
 RK_EXTERN NSString *const RKURLRequestPromiseCacheIdentifierErrorUserInfoKey;
 
-enum RKURLRequestPromiseErrors : NSInteger {
+NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
     ///The cache cannot be loaded.
     kRKURLRequestPromiseErrorCannotLoadCache = 'nrch',
     
@@ -45,8 +45,10 @@ typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 ///At the time of writing this documentation, if the cache is determined to be current
 ///the cache manager takes over for the request promise's underlying connection. As such,
 ///any errors that occur while reading the cache are propagated back to the realizer,
-///and the promise will fail. Cache manager's should take steps to remove any cache that
-///is found to be corrupted to prevent future requests from failing.
+///and the promise will fail. When the request promise detects errors from the cache manager,
+///it will call `-[<RKURLRequestPromiseCacheManager> removeCacheForIdentifier:error]`.
+///
+/// \seealso(-[<RKURLRequestPromiseCacheManager> removeCacheForIdentifier:error])
 @protocol RKURLRequestPromiseCacheManager <NSObject>
 
 ///Returns the last recorded revision for a given identifier.
@@ -82,6 +84,30 @@ typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 ///This method should return nil and leave the `out error`
 ///empty to indicate there is no available value.
 - (NSData *)cachedDataForIdentifier:(NSString *)identifier error:(NSError **)error;
+
+///Deletes all cache manager state related to a given identifier.
+///
+/// \param  identifier  The identifier to delete. Required.
+/// \param  outError    out NSError.
+///
+/// \result Whether or not the cache state could be deleted.
+///
+///This method is called by `RKURLRequestPromise` when an error
+///is returned by the cache manager when the cache manager has
+///taken over for the underlying URL connection.
+///
+///Ideally this method should not fail.
+- (BOOL)removeCacheForIdentifier:(NSString *)identifier error:(NSError **)outError;
+
+///Removes all cached values from the receiver.
+///
+/// \param  outError    out NSError.
+///
+/// \result YES if the cached values could be removed; NO otherwise.
+///
+///This method is not directly called by RKURLRequestPromise at the time
+///of writing this documentation.
+- (BOOL)removeAllCache:(NSError **)outError;
 
 @end
 

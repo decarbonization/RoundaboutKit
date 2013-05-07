@@ -18,6 +18,7 @@ NSString *const kRKMockURLRequestPromiseCacheManagerItemErrorKey = @"error";
 @property (readwrite) BOOL revisionForIdentifierWasCalled;
 @property (readwrite) BOOL cacheDataForIdentifierWithRevisionErrorWasCalled;
 @property (readwrite) BOOL cachedDataForIdentifierErrorWasCalled;
+@property (readwrite) BOOL removeCacheForIdentifierErrorWasCalled;
 
 @end
 
@@ -89,6 +90,29 @@ NSString *const kRKMockURLRequestPromiseCacheManagerItemErrorKey = @"error";
         
         return item[kRKMockURLRequestPromiseCacheManagerItemDataKey];
     }
+}
+
+- (BOOL)removeCacheForIdentifier:(NSString *)identifier error:(NSError **)outError
+{
+    if([NSThread isMainThread])
+        self.wasCalledFromMainThread = YES;
+    
+    self.removeCacheForIdentifierErrorWasCalled = YES;
+    
+    @synchronized(_cachedData) {
+        [_cachedData removeObjectForKey:identifier];
+    }
+    
+    return YES;
+}
+
+- (BOOL)removeAllCache:(NSError **)outError
+{
+    @synchronized(_cachedData) {
+        [_cachedData removeAllObjects];
+    }
+    
+    return YES;
 }
 
 #pragma mark - Deterministic Failure
