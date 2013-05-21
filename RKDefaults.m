@@ -8,19 +8,38 @@
 
 #import "RKDefaults.h"
 
+static BOOL _TestMode = NO;
+
+static NSMutableDictionary *TestModeBackingDictionary()
+{
+    static NSMutableDictionary *testModeBackingDictionary = nil;
+    if(!testModeBackingDictionary)
+        testModeBackingDictionary = [NSMutableDictionary dictionary];
+    
+    return testModeBackingDictionary;
+}
+
 #pragma mark Defaults Short-hand
 
 id RKSetPersistentObject(NSString *key, id object)
 {
 	NSCParameterAssert(key);
-	[[NSUserDefaults standardUserDefaults] setObject:object forKey:key];
-	return object;
+    
+    if(_TestMode)
+        [TestModeBackingDictionary() setValue:object forKey:key];
+    else
+        [[NSUserDefaults standardUserDefaults] setObject:object forKey:key];
+	
+    return object;
 }
 
 id RKGetPersistentObject(NSString *key)
 {
 	NSCParameterAssert(key);
-	return [[NSUserDefaults standardUserDefaults] objectForKey:key];
+	if(_TestMode)
+        return [TestModeBackingDictionary() objectForKey:key];
+    else
+        return [[NSUserDefaults standardUserDefaults] objectForKey:key];
 }
 
 #pragma mark -
@@ -28,14 +47,14 @@ id RKGetPersistentObject(NSString *key)
 NSInteger RKSetPersistentInteger(NSString *key, NSInteger value)
 {
 	NSCParameterAssert(key);
-	[[NSUserDefaults standardUserDefaults] setInteger:value forKey:key];
+	RKSetPersistentObject(key, @(value));
 	return value;
 }
 
 NSInteger RKGetPersistentInteger(NSString *key)
 {
 	NSCParameterAssert(key);
-	return [[NSUserDefaults standardUserDefaults] integerForKey:key];
+	return [RKGetPersistentObject(key) integerValue];
 }
 
 #pragma mark -
@@ -43,14 +62,14 @@ NSInteger RKGetPersistentInteger(NSString *key)
 float RKSetPersistentFloat(NSString *key, float value)
 {
 	NSCParameterAssert(key);
-	[[NSUserDefaults standardUserDefaults] setFloat:value forKey:key];
+	RKSetPersistentObject(key, @(value));
 	return value;
 }
 
 float RKGetPersistentFloat(NSString *key)
 {
 	NSCParameterAssert(key);
-	return [[NSUserDefaults standardUserDefaults] floatForKey:key];
+	return [RKGetPersistentObject(key) floatValue];
 }
 
 #pragma mark -
@@ -58,14 +77,14 @@ float RKGetPersistentFloat(NSString *key)
 BOOL RKSetPersistentBool(NSString *key, BOOL value)
 {
 	NSCParameterAssert(key);
-	[[NSUserDefaults standardUserDefaults] setBool:value forKey:key];
+    RKSetPersistentObject(key, @(value));
 	return value;
 }
 
 BOOL RKGetPersistentBool(NSString *key)
 {
 	NSCParameterAssert(key);
-	return [[NSUserDefaults standardUserDefaults] boolForKey:key];
+	return [RKGetPersistentObject(key) boolValue];
 }
 
 #pragma mark -
@@ -73,5 +92,15 @@ BOOL RKGetPersistentBool(NSString *key)
 BOOL RKPersistentValueExists(NSString *key)
 {
 	NSCParameterAssert(key);
-	return ([[NSUserDefaults standardUserDefaults] objectForKey:key] != nil);
+    if(_TestMode)
+        return ([TestModeBackingDictionary() objectForKey:key] != nil);
+    else
+        return ([[NSUserDefaults standardUserDefaults] objectForKey:key] != nil);
+}
+
+#pragma mark - Testing Support
+
+void RKDefaultsActivateTestMode()
+{
+    _TestMode = YES;
 }

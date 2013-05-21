@@ -51,4 +51,9 @@ RK_EXTERN BOOL RKGetPersistentBool(NSString *key);
 ///Returns a boolean indicating whether or not a persistent value exists.
 RK_EXTERN BOOL RKPersistentValueExists(NSString *key);
 
+#pragma mark - Testing Support
+
+///Turns off the persistent backing of the RKDefaults functions. Intended for use with unit tests.
+RK_EXTERN void RKDefaultsActivateTestMode();
+
 #endif /* RKDefaults_h */
