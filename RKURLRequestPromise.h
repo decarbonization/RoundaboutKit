@@ -153,11 +153,14 @@ typedef RKPossibility *(^RKPostProcessorBlock)(RKPossibility *maybeData, RKURLRe
 RK_EXTERN_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProcessorBlock source,
                                                                       RKPostProcessorBlock refiner);
 
-///A post-processor block that takes an NSData object and yields JSON.
+///A post-processor block that takes an NSData object and yields JSON objects.
 RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 
 ///A post-processor block that takes an NSData object and yields an NS/UIImage.
 RK_EXTERN RKPostProcessorBlock const kRKImagePostProcessorBlock;
+
+///A post-processor block that takes an NSData object and yields a property list objects.
+RK_EXTERN RKPostProcessorBlock const kRKPropertyListPostProcessorBlock;
 
 ///The RKURLRequestPreflightBlock functor encapsulates a series of actions that must be
 ///executed before a RKURLRequestPromise may be executed. This functor will be called

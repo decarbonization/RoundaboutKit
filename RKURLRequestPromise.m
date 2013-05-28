@@ -39,7 +39,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         } else {
             return [[RKPossibility alloc] initWithError:error];
         }
-    }, nil /* ignore empty */, nil /* ignore error */);
+    }, kRKPossibilityDefaultEmptyRefiner, kRKPossibilityDefaultErrorRefiner);
 };
 
 RKPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
@@ -56,7 +56,19 @@ RKPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossi
                                                                             code:'!img'
                                                                         userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}]];
         }
-    }, nil /* ignore empty */, nil /* ignore error */);
+    }, kRKPossibilityDefaultEmptyRefiner, kRKPossibilityDefaultErrorRefiner);
+};
+
+RKPostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    return RKRefinePossibility(maybeData, ^RKPossibility *(NSData *data) {
+        NSError *error = nil;
+        id result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];
+        if(result) {
+            return [[RKPossibility alloc] initWithValue:result];
+        } else {
+            return [[RKPossibility alloc] initWithError:error];
+        }
+    }, kRKPossibilityDefaultEmptyRefiner, kRKPossibilityDefaultErrorRefiner);
 };
 
 #if RKURLRequestPromise_Option_TrackActiveRequests
