@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version       8L
+#define RoundaboutKit_Version       9L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
 #define RoundaboutKit_Stable        1
@@ -152,6 +152,11 @@ RK_EXTERN NSArray *RKCollectionFilterToArray(id input, RKPredicateBlock predicat
 
 #pragma mark - • Matching
 
+///Returns the first object in a given collection.
+///
+///The passed in collection must be array-like and support subscript indexing and have a count method.
+RK_EXTERN id RKCollectionGetFirstObject(id collection);
+
 ///Returns YES if any value in a given collection passes a specified predicate; NO otherwise.
 RK_EXTERN BOOL RKCollectionDoesAnyValueMatch(id input, RKPredicateBlock predicate);
 
@@ -171,6 +176,13 @@ RK_EXTERN id RKCollectionFindFirstMatch(id input, RKPredicateBlock predicate);
 
 #pragma mark - Utilities
 
+///Returns a BOOL indicating whether or not the current process is running under a debugger.
+///
+///The result of this function is cached after its initial call.
+RK_EXTERN BOOL RKProcessIsRunningInDebugger();
+
+#pragma mark -
+
 ///Returns an NSString sans 'the' at the beginning.
 RK_EXTERN NSString *RKSanitizeStringForSorting(NSString *string);
 
@@ -186,6 +198,8 @@ RK_EXTERN NSString *RKSanitizeStringForSorting(NSString *string);
 ///This function should be considered the functional replacement for
 ///the deprecated (and soon to be obsoleted) `RKGenerateSongID` function.
 RK_EXTERN NSString *RKGenerateIdentifierForStrings(NSArray *strings);
+
+#pragma mark -
 
 ///Returns `nil` if `value` is NSNull, `value` otherwise.
 RK_INLINE id RKFilterOutNSNull(id value)
@@ -206,6 +220,30 @@ RK_INLINE id RKFilterOutNSNull(id value)
 ///
 ///This function filters out NSNull values.
 RK_EXTERN id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPath);
+
+#pragma mark -
+
+///Returns the MD5 hash of a given string.
+///
+/// \param  string  The string to get the hash for. May be nil.
+///
+/// \result An MD5 of the string.
+RK_EXTERN NSString *RKStringGetMD5Hash(NSString *string);
+
+///Returns a URL-encoded copy of a specified string using stricter rules than `-[NSString stringByAddingPercentEscapesUsingEncoding:]`.
+///
+/// \param  string      The string to encode. May be nil.
+/// \param  encoding    The encoding to use for the resultant string.
+///
+/// \result A URL ready copy of the passed in string.
+RK_EXTERN NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEncoding encoding);
+
+///Returns a URL query string composed of a specified dictionary.
+///
+/// \param  parameters  A dictionary whose keys and values are NSStrings.
+///
+/// \result A string representing the passed in dictionary.
+RK_EXTERN NSString *RKDictionaryToURLParametersString(NSDictionary *parameters);
 
 #pragma mark -
 

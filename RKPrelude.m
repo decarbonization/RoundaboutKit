@@ -8,6 +8,13 @@
 
 #import "RKPrelude.h"
 
+#import <sys/types.h>
+#import <unistd.h>
+
+#import <sys/sysctl.h>
+
+#import <CommonCrypto/CommonCrypto.h>
+
 #pragma mark Collection Operations
 
 #pragma mark - • Generation
@@ -96,6 +103,14 @@ NSArray *RKCollectionFilterToArray(id input, RKPredicateBlock predicate)
 
 #pragma mark - • Matching
 
+id RKCollectionGetFirstObject(id collection)
+{
+    if([collection count] > 0)
+        return collection[0];
+    
+    return nil;
+}
+
 BOOL RKCollectionDoesAnyValueMatch(id input, RKPredicateBlock predicate)
 {
 	NSCParameterAssert(predicate);
@@ -160,6 +175,32 @@ NSString *RKMakeStringFromTimeInterval(NSTimeInterval total)
 
 #pragma mark - Utilities
 
+BOOL RKProcessIsRunningInDebugger()
+{
+    //From <http://lists.apple.com/archives/Cocoa-dev/2006/Jun/msg01622.html>
+    static BOOL isRunningInDebugger = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        struct kinfo_proc info;
+        size_t infoSize = sizeof(info);
+        int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, getppid() };
+        
+        char nameBuffer[255];
+        if(sysctl(mib, 4, &info, &infoSize, NULL, 0) == noErr) {
+            
+            strncpy(nameBuffer, info.kp_proc.p_comm, sizeof(nameBuffer));
+            
+            isRunningInDebugger = ((strcmp(nameBuffer, "gdb") == 0) ||
+                                   (strcmp(nameBuffer, "lldb") == 0) ||
+                                   (strcmp(nameBuffer, "debugserver") == 0));
+        }
+    });
+    
+    return isRunningInDebugger;
+}
+
+#pragma mark -
+
 NSString *RKSanitizeStringForSorting(NSString *string)
 {
 	if([string length] <= 4)
@@ -210,6 +251,8 @@ NSString *RKGenerateIdentifierForStrings(NSArray *strings)
     return [sortedStrings componentsJoinedByString:@""];
 }
 
+#pragma mark -
+
 id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPath)
 {
     NSCParameterAssert(keyPath);
@@ -223,6 +266,54 @@ id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPat
     }
     
     return value;
+}
+
+#pragma mark -
+
+NSString *RKStringGetMD5Hash(NSString *string)
+{
+    if(!string)
+        return nil;
+    
+    const char *identifierAsCString = [string UTF8String];
+    unsigned char result[CC_MD5_DIGEST_LENGTH];
+    CC_MD5(identifierAsCString, (CC_LONG)strlen(identifierAsCString), result);
+    
+    NSMutableString *sanitizedIdentifier = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
+    for (NSUInteger index = 0; index < CC_MD5_DIGEST_LENGTH; index++) {
+        [sanitizedIdentifier appendFormat:@"%02x", result[index]];
+    }
+    
+    return sanitizedIdentifier;
+}
+
+NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEncoding encoding)
+{
+    if(!string)
+        return nil;
+    
+    return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                                 (__bridge CFStringRef)(string),
+                                                                                 CFSTR(":/?#[]@!$&'()*+,;="),
+                                                                                 NULL,
+                                                                                 CFStringConvertNSStringEncodingToEncoding(encoding));
+}
+
+NSString *RKDictionaryToURLParametersString(NSDictionary *parameters)
+{
+    if(parameters.count == 0)
+        return @"";
+    
+	NSMutableString *parameterString = [NSMutableString string];
+	
+    [parameters enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
+		[parameterString appendFormat:@"%@=%@&", RKStringEscapeForInclusionInURL(key, NSUTF8StringEncoding), RKStringEscapeForInclusionInURL(value, NSUTF8StringEncoding)];
+	}];
+	
+	//Remove the trailing '&' from the query string.
+	[parameterString deleteCharactersInRange:NSMakeRange([parameterString length] - 1, 1)];
+	
+	return parameterString;
 }
 
 #pragma mark - Mac Image Tools

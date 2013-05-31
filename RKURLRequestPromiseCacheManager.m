@@ -120,20 +120,11 @@
 #pragma mark - Sanitizing Identifiers
 
 ///Returns the sanitized form of an identifier.
-- (NSString *)sanitizedIdentifier:(NSString *)identifer
+- (NSString *)sanitizedIdentifier:(NSString *)identifier
 {
-    NSParameterAssert(identifer);
+    NSParameterAssert(identifier);
     
-    const char *identifierAsCString = [identifer UTF8String];
-    unsigned char result[CC_MD5_DIGEST_LENGTH];
-    CC_MD5(identifierAsCString, (CC_LONG)strlen(identifierAsCString), result);
-    
-    NSMutableString *sanitizedIdentifier = [NSMutableString stringWithCapacity:CC_MD5_DIGEST_LENGTH * 2];
-    for (NSUInteger index = 0; index < CC_MD5_DIGEST_LENGTH; index++) {
-        [sanitizedIdentifier appendFormat:@"%02x", result[index]];
-    }
-    
-    return sanitizedIdentifier;
+    return RKStringGetMD5Hash(identifier);
 }
 
 #pragma mark - Metadata
