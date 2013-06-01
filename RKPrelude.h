@@ -12,14 +12,17 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version       9L
+#define RoundaboutKit_Version                     10L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
-#define RoundaboutKit_Stable        1
+#define RoundaboutKit_Stable                      1
 
 ///Whether or not the RoundaboutKit should emit warnings
 ///for questionable but presently valid behaviour.
-#define RoundaboutKit_EmitWarnings  1
+#define RoundaboutKit_EmitWarnings                1
+
+///Whether or not to include compatibility devices for RoundaboutKit versions < 10.
+#define RoundaboutKit_EnableCompatibilityPreV10   1
 
 #pragma mark - Linkage Goop
 
@@ -140,11 +143,6 @@ RK_EXTERN NSMutableArray *RKCollectionMapToMutableArray(id input, RKMapperBlock 
 ///Returns a collection mapped to an ordered set.
 RK_EXTERN NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapper);
 
-///This method is deprecated and should not be used in new code.
-///
-///Returns a dictionary mapped.
-DEPRECATED_ATTRIBUTE RK_EXTERN NSDictionary *RKDictionaryMap(NSDictionary *input, RKMapperBlock mapper);
-
 #pragma mark - • Filtering
 
 ///Returns a given collection filtered into an array.
@@ -195,8 +193,7 @@ RK_EXTERN NSString *RKSanitizeStringForSorting(NSString *string);
 ///
 ///The result of this method is safe to use as a file system name.
 ///
-///This function should be considered the functional replacement for
-///the deprecated (and soon to be obsoleted) `RKGenerateSongID` function.
+///This function is the the replacement for the obsoleted `RKGenerateSongID` function.
 RK_EXTERN NSString *RKGenerateIdentifierForStrings(NSArray *strings);
 
 #pragma mark -
@@ -247,10 +244,10 @@ RK_EXTERN NSString *RKDictionaryToURLParametersString(NSDictionary *parameters);
 
 #pragma mark -
 
-///Retains a given object implementing the `<NSObject>` protocol.
-///
-///This function should be considered unsafe.
-RK_INLINE id RKObjectRetain(id <NSObject> object)
+#if RoundaboutKit_EnableCompatibilityPreV10
+
+///Deprecated; will be obsoleted
+DEPRECATED_ATTRIBUTE RK_INLINE id RKObjectRetain(id <NSObject> object)
 {
     //So we don't have to include the objc runtime headers.
     extern id objc_msgSend(id, SEL, ...);
@@ -258,10 +255,8 @@ RK_INLINE id RKObjectRetain(id <NSObject> object)
     return objc_msgSend(object, NSSelectorFromString(@"retain"));
 }
 
-///Autoreleases a given object implementing the `<NSObject>` protocol.
-///
-///This function should be considered unsafe.
-RK_INLINE id RKObjectAutorelease(id <NSObject> object)
+///Deprecated; will be obsoleted
+DEPRECATED_ATTRIBUTE RK_INLINE id RKObjectAutorelease(id <NSObject> object)
 {
     //So we don't have to include the objc runtime headers.
     extern id objc_msgSend(id, SEL, ...);
@@ -269,16 +264,16 @@ RK_INLINE id RKObjectAutorelease(id <NSObject> object)
     return objc_msgSend(object, NSSelectorFromString(@"autorelease"));
 }
 
-///Releases a given object implementing the `<NSObject>` protocol.
-///
-///This function should be considered unsafe.
-RK_INLINE void RKObjectRelease(id <NSObject> object)
+///Deprecated; will be obsoleted
+DEPRECATED_ATTRIBUTE RK_INLINE void RKObjectRelease(id <NSObject> object)
 {
     //So we don't have to include the objc runtime headers.
     extern id objc_msgSend(id, SEL, ...);
     
     ((void(*)(id, SEL))objc_msgSend)(object, NSSelectorFromString(@"release"));
 }
+
+#endif /* RoundaboutKit_EnableCompatibilityPreV10 */
 
 #pragma mark - Mac Image Tools
 

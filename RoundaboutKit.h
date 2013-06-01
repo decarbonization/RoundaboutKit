@@ -34,6 +34,7 @@
 #import "RKBlockBasedValueTransformer.h"
 #import "RKConnectivityManager.h"
 #import "RKURLRequestPromise.h"
-#import "RKURLRequestPromiseCacheManager.h"
+#import "RKFileSystemCacheManager.h"
+#import "RKRequestFactory.h"
 #import "RKPossibility.h"
 #import "RKActivityManager.h"

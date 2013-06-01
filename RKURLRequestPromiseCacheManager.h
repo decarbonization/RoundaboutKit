@@ -1,30 +1,24 @@
 //
 //  RKURLRequestPromiseCacheManager.h
-//  RoundaboutKit
+//  Pinna
 //
-//  Created by Kevin MacWhinnie on 1/7/13.
+//  Created by Kevin MacWhinnie on 5/31/13.
 //  Copyright (c) 2013 Roundabout Software, LLC. All rights reserved.
 //
 
-#import "RKURLRequestPromise.h"
+#if RoundaboutKit_EnableCompatibilityPreV10
 
-///The RKURLRequestPromiseCacheManager class encapsulates a simple file
-///system based cache manager for use with RKURLRequestPromises.
-///
-///Instances of RKURLRequestPromiseCacheManager are asynchronously initialized
-///to reduce the cost of calling `+[RKURLRequestPromiseCacheManager sharedCacheManagerForBucket]`.
-///Instances' access methods will block until initialization has been completed.
-@interface RKURLRequestPromiseCacheManager : NSObject <RKURLRequestPromiseCacheManager>
+///Starting in Version 10 of RoundaboutKit the RKURLRequestPromiseCacheManager class
+///was refactored into RKFileSystemCacheManager. The method names have remained
+///compatible so in order to ease in transitioning to the new class name a compatibility
+///alias is provided as well as a forwarding header.
 
-///Returns the shared cache manager for a given bucket, creating it if it does not exist.
-///
-///This method call is relatively expensive, and as such the result should be
-///assigned to a property or ivar of the class that is asking for a cache manager.
-+ (RKURLRequestPromiseCacheManager *)sharedCacheManagerForBucket:(NSString *)bucketName;
+#   warning Deprecated Header
 
-#pragma mark - Properties
+#   import "RKFileSystemCacheManager.h"
 
-///The name of the bucket associated with this cache manager.
-@property (readonly, copy) NSString *bucketName;
+#else
 
-@end
+#   error Obsoleted Header
+
+#endif /* RoundaboutKit_EnableCompatibilityPreV10 */

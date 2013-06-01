@@ -249,6 +249,30 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
   useCacheWhenOffline:(BOOL)useCacheWhenOffline
          requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
 
+///Initialize the receiver with a given request.
+///
+/// \param  request                 The request to execute. Required.
+/// \param  cacheManager            The cache manager to use. Optional.
+/// \param  requestQueue            The queue to execute the request in. Required.
+///
+/// \result A fully initialized request promise object.
+///
+///This intiializer assumes you wish to use cache when in offline mode.
+- (id)initWithRequest:(NSURLRequest *)request
+         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
+
+///Initialize the receiver with a given request.
+///
+/// \param  request                 The request to execute. Required.
+/// \param  cacheManager            The cache manager to use. Optional.
+/// \param  requestQueue            The queue to execute the request in. Required.
+///
+/// \result A fully initialized request promise object.
+///
+///This intiializer assumes you do not want to use a cache manager.
+- (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
+
 #pragma mark - Properties
 
 ///The connectivity manager object used to determine if the receiver is connected to its target.

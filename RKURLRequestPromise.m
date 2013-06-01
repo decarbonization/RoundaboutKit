@@ -173,25 +173,12 @@ static NSArray *ActiveRequestArrayGetInstanteousCopy()
     return nil;
 }
 
-RK_INLINE void RequestDidIsBecomingActive(RKURLRequestPromise *request)
-{
-}
-
-RK_INLINE void RequestDidFail(RKURLRequestPromise *request)
-{
-}
-
-RK_INLINE void RequestDidSucceed(RKURLRequestPromise *request)
-{
-}
-
-RK_INLINE void RequestCancelled(RKURLRequestPromise *request)
-{
-}
-
-RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
-{
-}
+#define RequestDidIsBecomingActive(...)
+#define RequestDidFail(...)
+#define RequestDidSucceed(...)
+#define RequestCancelled(...)
+#define RequestIsDeallocating(...)
+#define RequestDidIsBecomingActive(...)
 
 #endif /* RKURLRequestPromise_Option_TrackActiveRequests */
 
@@ -311,6 +298,18 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
     }
     
     return self;
+}
+
+- (id)initWithRequest:(NSURLRequest *)request
+         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+         requestQueue:(NSOperationQueue *)requestQueue
+{
+    return [self initWithRequest:request cacheManager:cacheManager useCacheWhenOffline:YES requestQueue:requestQueue];
+}
+
+- (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue
+{
+    return [self initWithRequest:request cacheManager:nil useCacheWhenOffline:NO requestQueue:requestQueue];
 }
 
 #pragma mark - Identity

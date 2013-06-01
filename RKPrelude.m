@@ -71,20 +71,6 @@ NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapper)
 	return [result copyWithZone:[input zone]];
 }
 
-NSDictionary *RKDictionaryMap(NSDictionary *input, RKMapperBlock mapper)
-{
-	NSCParameterAssert(mapper);
-	
-	NSMutableDictionary *result = [NSMutableDictionary dictionary];
-	[input enumerateKeysAndObjectsUsingBlock:^(id key, id object, BOOL *stop) {
-		id mappedObject = mapper(object);
-		if(mappedObject)
-			[result setObject:mappedObject forKey:key];
-	}];
-	
-	return [result copy];
-}
-
 #pragma mark - • Filtering
 
 NSArray *RKCollectionFilterToArray(id input, RKPredicateBlock predicate)
