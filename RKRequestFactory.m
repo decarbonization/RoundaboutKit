@@ -12,7 +12,8 @@
 @interface RKRequestFactory ()
 
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURL *baseURL;
-@property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
+@property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> readCacheManager;
+@property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> writeCacheManager;
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
 @property (readwrite, copy, RK_NONATOMIC_IOSONLY) RKPostProcessorBlock postProcessor;
 
@@ -21,7 +22,8 @@
 @implementation RKRequestFactory
 
 - (id)initWithBaseURL:(NSURL *)baseURL
-         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+     readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
+    writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
          requestQueue:(NSOperationQueue *)requestQueue
         postProcessor:(RKPostProcessorBlock)postProcessor
 {
@@ -30,7 +32,8 @@
     
     if((self = [super init])) {
         self.baseURL = baseURL;
-        self.cacheManager = cacheManager;
+        self.readCacheManager = readCacheManager;
+        self.writeCacheManager = writeCacheManager;
         self.requestQueue = requestQueue;
         self.postProcessor = postProcessor;
     }
@@ -79,35 +82,45 @@
 
 #pragma mark -
 
-- (NSData *)bodyForPayload:(id)payload
+- (NSData *)bodyForPayload:(id)body bodyType:(RKRequestFactoryBodyType)bodyType
 {
-    if(!payload)
+    if(!body)
         return nil;
     
-    NSData *data = RK_TRY_CAST(NSData, payload);
-    if(!data) {
-        NSError *error = nil;
-        data = [NSJSONSerialization dataWithJSONObject:payload options:0 error:&error];
-        if(!data)
-            [NSException raise:NSInternalInconsistencyException format:@"Could not convert %@ to JSON. %@", payload, error];
+    switch (bodyType) {
+        case kRKRequestFactoryBodyTypeData: {
+            return body;
+        }
+            
+        case kRKRequestFactoryBodyTypeURLParameters: {
+            return [RKDictionaryToURLParametersString(body) dataUsingEncoding:NSUTF8StringEncoding];
+        }
+            
+        case kRKRequestFactoryBodyTypeJSON: {
+            NSError *error = nil;
+            NSData *JSONData = [NSJSONSerialization dataWithJSONObject:body options:0 error:&error];
+            if(!JSONData)
+                [NSException raise:NSInternalInconsistencyException format:@"Could not convert %@ to JSON. %@", body, error];
+            
+            return JSONData;
+        }
+            
     }
-    
-    return data;
 }
 
-- (NSURLRequest *)POSTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters payload:(id)payload
+- (NSURLRequest *)POSTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters body:(id)body bodyType:(RKRequestFactoryBodyType)bodyType
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self URLWithPath:path parameters:parameters]];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[self bodyForPayload:payload]];
+    [request setHTTPBody:[self bodyForPayload:body bodyType:bodyType]];
     return request;
 }
 
-- (NSURLRequest *)PUTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters payload:(id)payload
+- (NSURLRequest *)PUTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters body:(id)body bodyType:(RKRequestFactoryBodyType)bodyType
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self URLWithPath:path parameters:parameters]];
     [request setHTTPMethod:@"PUT"];
-    [request setHTTPBody:[self bodyForPayload:payload]];
+    [request setHTTPBody:[self bodyForPayload:body bodyType:bodyType]];
     return request;
 }
 
@@ -115,10 +128,12 @@
 
 - (RKURLRequestPromise *)requestPromiseWithRequest:(NSURLRequest *)request
 {
+    id <RKURLRequestPromiseCacheManager> cacheManager = [request.HTTPMethod isEqualToString:@"GET"]? self.readCacheManager : self.writeCacheManager;
     RKURLRequestPromise *requestPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                          cacheManager:self.cacheManager
+                                                                          cacheManager:cacheManager
                                                                           requestQueue:self.requestQueue];
     requestPromise.postProcessor = self.postProcessor;
+    requestPromise.authenticationHandler = self.authenticationHandler;
     return requestPromise;
 }
 
@@ -136,14 +151,20 @@
 
 #pragma mark -
 
-- (RKURLRequestPromise *)POSTRequestPromiseWithPath:(NSString *)path parameters:(NSDictionary *)parameters payload:(id)payload
+- (RKURLRequestPromise *)POSTRequestPromiseWithPath:(NSString *)path
+                                         parameters:(NSDictionary *)parameters
+                                            body:(id)body 
+                                        bodyType:(RKRequestFactoryBodyType)bodyType
 {
-    return [self requestPromiseWithRequest:[self POSTRequestWithPath:path parameters:parameters payload:payload]];
+    return [self requestPromiseWithRequest:[self POSTRequestWithPath:path parameters:parameters body:body bodyType:bodyType]];
 }
 
-- (RKURLRequestPromise *)PUTRequestPromiseWithPath:(NSString *)path parameters:(NSDictionary *)parameters payload:(id)payload
+- (RKURLRequestPromise *)PUTRequestPromiseWithPath:(NSString *)path
+                                        parameters:(NSDictionary *)parameters
+                                           body:(id)body 
+                                       bodyType:(RKRequestFactoryBodyType)bodyType
 {
-    return [self requestPromiseWithRequest:[self PUTRequestWithPath:path parameters:parameters payload:payload]];
+    return [self requestPromiseWithRequest:[self PUTRequestWithPath:path parameters:parameters body:body bodyType:bodyType]];
 }
 
 @end

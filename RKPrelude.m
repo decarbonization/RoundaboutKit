@@ -273,6 +273,20 @@ NSString *RKStringGetMD5Hash(NSString *string)
     return sanitizedIdentifier;
 }
 
+#pragma mark -
+
+RKURLParameterStringifier kRKURLParameterStringifierDefault = ^NSString *(id value) {
+    if([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]]) {
+        NSError *error = nil;
+        NSData *JSONData = [NSJSONSerialization dataWithJSONObject:value options:0 error:&error];
+        if(!JSONData)
+            [NSException raise:NSInternalInconsistencyException format:@"Invalid JSON object passed. %@", [error localizedDescription]];
+        
+        return [[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding];
+    }
+    return [value description];
+};
+
 NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEncoding encoding)
 {
     if(!string)
@@ -285,21 +299,28 @@ NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEncoding enc
                                                                                  CFStringConvertNSStringEncodingToEncoding(encoding));
 }
 
-NSString *RKDictionaryToURLParametersString(NSDictionary *parameters)
+RK_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters, RKURLParameterStringifier valueStringifier)
 {
+    NSCParameterAssert(valueStringifier);
+    
     if(parameters.count == 0)
         return @"";
     
 	NSMutableString *parameterString = [NSMutableString string];
 	
-    [parameters enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *value, BOOL *stop) {
-		[parameterString appendFormat:@"%@=%@&", RKStringEscapeForInclusionInURL(key, NSUTF8StringEncoding), RKStringEscapeForInclusionInURL(value, NSUTF8StringEncoding)];
+    [parameters enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *stop) {
+		[parameterString appendFormat:@"%@=%@&", RKStringEscapeForInclusionInURL(key, NSUTF8StringEncoding), RKStringEscapeForInclusionInURL(valueStringifier(value), NSUTF8StringEncoding)];
 	}];
 	
 	//Remove the trailing '&' from the query string.
 	[parameterString deleteCharactersInRange:NSMakeRange([parameterString length] - 1, 1)];
 	
 	return parameterString;
+}
+
+RK_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters)
+{
+    return RKDictionaryToURLParametersString(parameters, kRKURLParameterStringifierDefault);
 }
 
 #pragma mark - Mac Image Tools

@@ -227,6 +227,16 @@ RK_EXTERN id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSStri
 /// \result An MD5 of the string.
 RK_EXTERN NSString *RKStringGetMD5Hash(NSString *string);
 
+#pragma mark -
+
+///A block used to convert a value into a string suitable for inclusion in URL Parameters.
+typedef NSString *(^RKURLParameterStringifier)(id value);
+
+///The default value stringifier.
+///
+///This stringifier supports strings and numbers and will convert arrays and dictionaries into JSON.
+RK_EXTERN RKURLParameterStringifier kRKURLParameterStringifierDefault;
+
 ///Returns a URL-encoded copy of a specified string using stricter rules than `-[NSString stringByAddingPercentEscapesUsingEncoding:]`.
 ///
 /// \param  string      The string to encode. May be nil.
@@ -237,10 +247,12 @@ RK_EXTERN NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEn
 
 ///Returns a URL query string composed of a specified dictionary.
 ///
-/// \param  parameters  A dictionary whose keys and values are NSStrings.
+/// \param  parameters          A dictionary whose keys and values are NSStrings.
+/// \param  valueStringifier    The block to use to convert the values into NSStrings. This parameter may be omitted.
 ///
 /// \result A string representing the passed in dictionary.
-RK_EXTERN NSString *RKDictionaryToURLParametersString(NSDictionary *parameters);
+RK_EXTERN_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters, RKURLParameterStringifier valueStringifier);
+RK_EXTERN_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters);
 
 #pragma mark -
 
