@@ -311,13 +311,15 @@ void RKFileSystemCacheManagerEmitCacheRemovalErrorWarning(NSError *error)
         data = [NSData dataWithContentsOfURL:dataLocation options:0 error:&error];
         
         NSMutableDictionary *itemMetadata = [_cacheMetadata[sanitizedIdentifier] mutableCopy];
-        NSDate *lastAccessed = itemMetadata[kLastAccessedDateKey];
-        itemMetadata[kLastAccessedDateKey] = [NSDate date];
-        _cacheMetadata[sanitizedIdentifier] = itemMetadata;
-        if(!lastAccessed || -[lastAccessed timeIntervalSinceNow] >= kExpirationInterval / 2.0) {
-            dispatch_barrier_async(_accessControlQueue, ^{
-                [self synchronizeMetadata];
-            });
+        if(itemMetadata) {
+            NSDate *lastAccessed = itemMetadata[kLastAccessedDateKey];
+            itemMetadata[kLastAccessedDateKey] = [NSDate date];
+            _cacheMetadata[sanitizedIdentifier] = itemMetadata;
+            if(!lastAccessed || -[lastAccessed timeIntervalSinceNow] >= kExpirationInterval / 2.0) {
+                dispatch_barrier_async(_accessControlQueue, ^{
+                    [self synchronizeMetadata];
+                });
+            }
         }
     });
     

@@ -38,3 +38,7 @@
 #import "RKRequestFactory.h"
 #import "RKPossibility.h"
 #import "RKActivityManager.h"
+
+#if TARGET_OS_IPHONE
+#   import "RKImageLoader.h"
+#endif /* TARGET_OS_IPHONE */
