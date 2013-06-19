@@ -69,11 +69,20 @@
     
     imageView.image = placeholder;
     
-    if(imagePromise && ![_knownInvalidURLs containsObject:imagePromise.request.URL]) {
+    NSURL *imageURL = imagePromise.request.URL;
+    if(!imageURL)
+        return;
+    
+    if([imageURL scheme].length == 0) {
+        NSString *normalizedURLString = [NSString stringWithFormat:@"http:%@", [imageURL absoluteString]];
+        imageURL = [NSURL URLWithString:normalizedURLString];
+    }
+    
+    if(imagePromise && ![_knownInvalidURLs containsObject:imageURL]) {
         [[self.imageMap objectForKey:imageView] cancel:nil];
         [self.imageMap removeObjectForKey:imageView];
         
-        UIImage *existingImage = [self.inMemoryCache objectForKey:imagePromise.request.URL];
+        UIImage *existingImage = [self.inMemoryCache objectForKey:imageURL];
         if(existingImage) {
             imageView.image = existingImage;
             
@@ -91,13 +100,13 @@
             UITableViewCell *superCell = RK_TRY_CAST(UITableViewCell, imageView.superview.superview);
             [superCell setNeedsLayout];
             
-            [self.inMemoryCache setObject:image forKey:imagePromise.request.URL cost:image.size.width + image.size.height];
+            [self.inMemoryCache setObject:image forKey:imageURL cost:image.size.width + image.size.height];
             [self.imageMap removeObjectForKey:imageView];
             
             if(completionHandler)
                 completionHandler(YES);
         }, ^(NSError *error) {
-            [self.knownInvalidURLs addObject:imagePromise.request.URL];
+            [self.knownInvalidURLs addObject:imageURL];
             [self.imageMap removeObjectForKey:imageView];
             
             if(error.code != '!img')
