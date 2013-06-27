@@ -6,8 +6,8 @@
 //
 //
 
-#import "RKDefaultCacheManagerTests.h"
-#import "RKURLRequestPromiseCacheManager.h"
+#import "RKFileSystemCacheManagerTests.h"
+#import "RKFileSystemCacheManager.h"
 
 static NSString *const kTestDataString = @"this is some lovely data you've got here";
 
@@ -16,19 +16,19 @@ static NSString *const kRevision = @"1";
 
 static NSString *const kNonExistentCacheIdentiifer = @"SmarchFifth";
 
-@interface RKDefaultCacheManagerTests ()
+@interface RKFileSystemCacheManagerTests ()
 
-@property RKURLRequestPromiseCacheManager *cacheManager;
+@property RKFileSystemCacheManager *cacheManager;
 
 @end
 
-@implementation RKDefaultCacheManagerTests
+@implementation RKFileSystemCacheManagerTests
 
 - (void)setUp
 {
     [super setUp];
     
-    self.cacheManager = [RKURLRequestPromiseCacheManager sharedCacheManagerForBucket:@"Test"];
+    self.cacheManager = [RKFileSystemCacheManager sharedCacheManager];
 }
 
 #pragma mark -

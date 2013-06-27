@@ -25,7 +25,7 @@
 
 - (NSUInteger)hash
 {
-    return 42 + ([self.URL hash] + [self.method hash]) >> 1;
+    return (42 + ([self.URL hash] + [self.method hash])) >> 1;
 }
 
 - (NSString *)description

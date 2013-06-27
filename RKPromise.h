@@ -30,6 +30,11 @@ typedef void(^RKPromiseFailureBlock)(NSError *error);
 ///Most built-in promise processing functions do not support multi-part promises.
 - (BOOL)isMultiPart;
 
+///The cache identifier to use.
+///
+///Default value is nil.
+@property (copy) NSString *cacheIdentifier;
+
 #pragma mark - Canceling
 
 ///Whether or not the abstract promise is cancelled.

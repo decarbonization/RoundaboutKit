@@ -316,11 +316,6 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 
 #pragma mark - Cache
 
-///The cache identifier to use.
-///
-///This defaults to the absolute string of the request's URL.
-@property (copy) NSString *cacheIdentifier;
-
 ///The cache manager of the request.
 @property (readonly, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
 

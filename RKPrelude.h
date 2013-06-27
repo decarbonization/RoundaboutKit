@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version                     10L
+#define RoundaboutKit_Version                     11L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
 #define RoundaboutKit_Stable                      1
@@ -20,9 +20,6 @@
 ///Whether or not the RoundaboutKit should emit warnings
 ///for questionable but presently valid behaviour.
 #define RoundaboutKit_EmitWarnings                1
-
-///Whether or not to include compatibility devices for RoundaboutKit versions < 10.
-#define RoundaboutKit_EnableCompatibilityPreV10   1
 
 #pragma mark - Linkage Goop
 
@@ -253,39 +250,6 @@ RK_EXTERN NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEn
 /// \result A string representing the passed in dictionary.
 RK_EXTERN_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters, RKURLParameterStringifier valueStringifier);
 RK_EXTERN_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters);
-
-#pragma mark -
-
-#if RoundaboutKit_EnableCompatibilityPreV10
-
-///Deprecated; will be obsoleted
-DEPRECATED_ATTRIBUTE RK_INLINE id RKObjectRetain(id <NSObject> object)
-{
-    //So we don't have to include the objc runtime headers.
-    extern id objc_msgSend(id, SEL, ...);
-    
-    return objc_msgSend(object, NSSelectorFromString(@"retain"));
-}
-
-///Deprecated; will be obsoleted
-DEPRECATED_ATTRIBUTE RK_INLINE id RKObjectAutorelease(id <NSObject> object)
-{
-    //So we don't have to include the objc runtime headers.
-    extern id objc_msgSend(id, SEL, ...);
-    
-    return objc_msgSend(object, NSSelectorFromString(@"autorelease"));
-}
-
-///Deprecated; will be obsoleted
-DEPRECATED_ATTRIBUTE RK_INLINE void RKObjectRelease(id <NSObject> object)
-{
-    //So we don't have to include the objc runtime headers.
-    extern id objc_msgSend(id, SEL, ...);
-    
-    ((void(*)(id, SEL))objc_msgSend)(object, NSSelectorFromString(@"release"));
-}
-
-#endif /* RoundaboutKit_EnableCompatibilityPreV10 */
 
 #pragma mark - Mac Image Tools
 

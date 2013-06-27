@@ -33,6 +33,13 @@
 ///controls. The `isActive` property should be used in stead.
 @property NSUInteger activityCount;
 
+#if TARGET_OS_IPHONE
+
+///Whether or not the activity manager updates the network activity indicator.
+@property (nonatomic) BOOL updatesNetworkActivityIndicator;
+
+#endif /* TARGET_OS_IPHONE */
+
 #pragma mark - Activity
 
 ///Increments the activity count of the receiver.

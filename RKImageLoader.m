@@ -23,9 +23,9 @@
 ///The in-memory cache for the image loader.
 @property (nonatomic) NSCache *inMemoryCache;
 
-///The URLs known to be invalid to the image loader.
+///The cache identifiers known to be invalid to the image loader.
 ///Used to prevent redundant network requests in a session.
-@property (nonatomic) NSMutableSet *knownInvalidURLs;
+@property (nonatomic) NSMutableSet *knownInvalidCacheIdentifiers;
 
 #pragma mark - Readwrite
 
@@ -55,7 +55,7 @@
         self.inMemoryCache = [NSCache new];
         self.inMemoryCache.name = @"com.livenationlabs.libTap.ImageLoader.inMemoryCache";
         
-        self.knownInvalidURLs = [NSMutableSet set];
+        self.knownInvalidCacheIdentifiers = [NSMutableSet set];
     }
     
     return self;
@@ -63,26 +63,17 @@
 
 #pragma mark - Image Loading
 
-- (void)loadImagePromise:(RKURLRequestPromise *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
+- (void)loadImagePromise:(RKPromise *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
 {
     NSParameterAssert(imageView);
     
     imageView.image = placeholder;
     
-    NSURL *imageURL = imagePromise.request.URL;
-    if(!imageURL)
-        return;
-    
-    if([imageURL scheme].length == 0) {
-        NSString *normalizedURLString = [NSString stringWithFormat:@"http:%@", [imageURL absoluteString]];
-        imageURL = [NSURL URLWithString:normalizedURLString];
-    }
-    
-    if(imagePromise && ![_knownInvalidURLs containsObject:imageURL]) {
+    if(imagePromise && ![_knownInvalidCacheIdentifiers containsObject:imagePromise.cacheIdentifier]) {
         [[self.imageMap objectForKey:imageView] cancel:nil];
         [self.imageMap removeObjectForKey:imageView];
         
-        UIImage *existingImage = [self.inMemoryCache objectForKey:imageURL];
+        UIImage *existingImage = [self.inMemoryCache objectForKey:imagePromise.cacheIdentifier];
         if(existingImage) {
             imageView.image = existingImage;
             
@@ -100,13 +91,13 @@
             UITableViewCell *superCell = RK_TRY_CAST(UITableViewCell, imageView.superview.superview);
             [superCell setNeedsLayout];
             
-            [self.inMemoryCache setObject:image forKey:imageURL cost:image.size.width + image.size.height];
+            [self.inMemoryCache setObject:image forKey:imagePromise.cacheIdentifier cost:image.size.width + image.size.height];
             [self.imageMap removeObjectForKey:imageView];
             
             if(completionHandler)
                 completionHandler(YES);
         }, ^(NSError *error) {
-            [self.knownInvalidURLs addObject:imageURL];
+            [self.knownInvalidCacheIdentifiers addObject:imagePromise.cacheIdentifier];
             [self.imageMap removeObjectForKey:imageView];
             
             if(error.code != '!img')

@@ -37,6 +37,10 @@
     if((object == self) && [keyPath isEqualToString:@"activityCount"]) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self willChangeValueForKey:@"isActive"];
+#if TARGET_OS_IPHONE
+            if(_updatesNetworkActivityIndicator)
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = self.isActive;
+#endif /* TARGET_OS_IPHONE */
             [self didChangeValueForKey:@"isActive"];
         }];
     } else {

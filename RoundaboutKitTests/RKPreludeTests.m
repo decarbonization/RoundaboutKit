@@ -81,7 +81,7 @@
     NSOrderedSet *mappedOrderedSet = RKCollectionMapToOrderedSet(_pregeneratedArray, ^id(NSString *value) {
         return [value stringByAppendingString:@"0"];
     });
-    NSArray *expectedOrderedSet = [NSOrderedSet orderedSetWithObjects:@"10", @"20", @"30", @"40", @"50", nil];
+    NSOrderedSet *expectedOrderedSet = [NSOrderedSet orderedSetWithObjects:@"10", @"20", @"30", @"40", @"50", nil];
     STAssertEqualObjects(mappedOrderedSet, expectedOrderedSet, @"RKCollectionMapToOrderedSet returned incorrect value");
 }
 
@@ -165,22 +165,24 @@
 
 #pragma mark -
 
-- (void)testObjectRetain
+- (void)testStringGetMD5Hash
 {
-    //Not testable. Likely to be deprecated and removed.
-    (void)&RKObjectRetain;
+    NSString *hashedString = RKStringGetMD5Hash(@"test string");
+    STAssertEqualObjects(hashedString, @"6f8db599de986fab7a21625b7916589c", @"Unexpected hash result");
 }
 
-- (void)testObjectAutorelease
+- (void)testStringEscapeForInclusionInURL
 {
-    //Not testable. Likely to be deprecated and removed.
-    (void)&RKObjectAutorelease;
+    NSString *escapedString = RKStringEscapeForInclusionInURL(@"This is a lovely string :/?#[]@!$&'()*+,;=", NSUTF8StringEncoding);
+    STAssertEqualObjects(escapedString, @"This%20is%20a%20lovely%20string%20:/?#[]@!$&'()*+,;=", @"Unexpected escape result");
 }
 
-- (void)testObjectRelease
+- (void)testDictionaryToURLParametersString
 {
-    //Not testable. Likely to be deprecated and removed.
-    (void)&RKObjectRelease;
+    NSDictionary *test = @{@"test": @"value"};
+    
+    NSString *result = RKDictionaryToURLParametersString(test, kRKURLParameterStringifierDefault);
+    STAssertEqualObjects(result, @"test=value", @"Unexpected result");
 }
 
 @end

@@ -38,7 +38,7 @@ typedef void(^RKImageLoaderCompletionHandler)(BOOL wasSuccessful);
 ///If `imagePromise` is nil, this method simply sets `imageView`'s `image` to `placeholder`.
 ///
 ///This is the primitive loading method of RKImageLoader.
-- (void)loadImagePromise:(RKURLRequestPromise *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler;
+- (void)loadImagePromise:(RKPromise *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler;
 
 ///Asynchronously load an image at a given URL into a specified image view.
 ///

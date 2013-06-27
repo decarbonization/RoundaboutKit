@@ -52,13 +52,6 @@ static NSTimeInterval const kMaintenanceTimerInterval = (RK_TIME_MINUTE * 5.0);
     return maintenanceTimer;
 }
 
-+ (RKFileSystemCacheManager *)sharedCacheManagerForBucket:(NSString *)bucketName
-{
-    NSParameterAssert(bucketName);
-    
-    return [self sharedCacheManager];
-}
-
 + (instancetype)sharedCacheManager
 {
     static RKFileSystemCacheManager *sharedCacheManager = nil;

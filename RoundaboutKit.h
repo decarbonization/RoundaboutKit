@@ -30,8 +30,6 @@
 #import "RKPossibility.h"
 #import "RKAwait.h"
 #import "RKDefaults.h"
-#import "RKBinding.h"
-#import "RKBlockBasedValueTransformer.h"
 #import "RKConnectivityManager.h"
 #import "RKURLRequestPromise.h"
 #import "RKFileSystemCacheManager.h"
