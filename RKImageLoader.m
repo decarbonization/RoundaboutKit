@@ -77,6 +77,9 @@
         if(existingImage) {
             imageView.image = existingImage;
             
+            if(completionHandler)
+                completionHandler(YES);
+            
             return;
         }
         
