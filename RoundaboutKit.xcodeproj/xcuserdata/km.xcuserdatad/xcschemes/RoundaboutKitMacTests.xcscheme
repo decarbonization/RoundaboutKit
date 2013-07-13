@@ -5,22 +5,6 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8BE806F51792189300DFEC35"
-               BuildableName = "RoundaboutKitMac.framework"
-               BlueprintName = "RoundaboutKitMac"
-               ReferencedContainer = "container:RoundaboutKit.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
    </BuildAction>
    <TestAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -32,9 +16,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8B75842F179210F300D45F54"
-               BuildableName = "Tests.octest"
-               BlueprintName = "Tests"
+               BlueprintIdentifier = "8BE807051792189300DFEC35"
+               BuildableName = "RoundaboutKitMacTests.xctest"
+               BlueprintName = "RoundaboutKitMacTests"
                ReferencedContainer = "container:RoundaboutKit.xcodeproj">
             </BuildableReference>
          </TestableReference>

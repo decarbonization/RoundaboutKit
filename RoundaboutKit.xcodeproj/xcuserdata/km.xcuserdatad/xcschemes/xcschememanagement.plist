@@ -14,6 +14,11 @@
 			<key>orderHint</key>
 			<integer>1</integer>
 		</dict>
+		<key>RoundaboutKitMacTests.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
@@ -38,6 +43,16 @@
 			<true/>
 		</dict>
 		<key>8B75842F179210F300D45F54</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>8BE806F51792189300DFEC35</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>8BE807051792189300DFEC35</key>
 		<dict>
 			<key>primary</key>
 			<true/>

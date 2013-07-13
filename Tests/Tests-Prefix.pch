@@ -6,6 +6,6 @@
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
-    #import <RoundaboutKitMac/RoundaboutKitMac.h>
+    #import <RoundaboutKitMac/RoundaboutKit.h>
     #import "RunLoopHelper.h"
 #endif
