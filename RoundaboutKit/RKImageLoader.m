@@ -100,7 +100,8 @@
             if(completionHandler)
                 completionHandler(YES);
         } otherwise:^(NSError *error) {
-            [self.knownInvalidCacheIdentifiers addObject:imagePromise.cacheIdentifier];
+            if(imagePromise.cacheIdentifier)
+                [self.knownInvalidCacheIdentifiers addObject:imagePromise.cacheIdentifier];
             [self.imageMap removeObjectForKey:imageView];
             
             if(error.code != '!img')
