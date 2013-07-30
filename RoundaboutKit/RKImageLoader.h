@@ -10,7 +10,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class RKFileSystemCacheManager, RKPromise;
+@class RKFileSystemCacheManager;
 
 ///A block which is invoked as a callback for an image loader.
 typedef void(^RKImageLoaderCompletionHandler)(BOOL wasSuccessful);
@@ -25,6 +25,18 @@ typedef void(^RKImageLoaderCompletionHandler)(BOOL wasSuccessful);
 
 ///The cache manager for the image loader.
 @property (nonatomic, readonly) RKFileSystemCacheManager *cacheManager;
+
+///The maximum image size that can be cached.
+///
+///This property describes the total area of the image and not a specific size.
+///
+///Default value is the size of the device's screen.
+@property (nonatomic) CGSize maximumCacheableSize;
+
+///The maximum number of images that may be kept in memory at a given time.
+///
+///This property defaults to 8.
+@property (nonatomic) NSUInteger maximumCacheCount;
 
 #pragma mark - Loading Images
 
