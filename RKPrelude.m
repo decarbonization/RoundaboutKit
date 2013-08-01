@@ -294,8 +294,8 @@ NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEncoding enc
     
     return (__bridge_transfer NSString *)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
                                                                                  (__bridge CFStringRef)(string),
-                                                                                 CFSTR(":/?#[]@!$&'()*+,;="),
                                                                                  NULL,
+                                                                                 CFSTR("!*'();:@&=+$/?%#[]"),
                                                                                  CFStringConvertNSStringEncodingToEncoding(encoding));
 }
 
