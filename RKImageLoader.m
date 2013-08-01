@@ -13,6 +13,8 @@
 #import "RKURLRequestPromise.h"
 #import "RKFileSystemCacheManager.h"
 
+#define xCGSizeGetArea(size) (size.width * size.height)
+
 @interface RKImageLoader ()
 
 ///The map that contains the loaded images.
@@ -53,12 +55,35 @@
         
         self.cacheManager = [RKFileSystemCacheManager sharedCacheManager];
         self.inMemoryCache = [NSCache new];
-        self.inMemoryCache.name = @"com.livenationlabs.libTap.ImageLoader.inMemoryCache";
+        self.inMemoryCache.name = @"com.roundabout.roundaboutkit.imageloader.inMemoryCache";
         
         self.knownInvalidCacheIdentifiers = [NSMutableSet set];
+        
+        self.maximumCacheCount = 8;
+        self.maximumCacheableSize = [UIScreen mainScreen].bounds.size;
     }
     
     return self;
+}
+
+#pragma mark - Properties
+
+- (void)setMaximumCacheableSize:(CGSize)maximumCacheableSize
+{
+    _maximumCacheableSize = maximumCacheableSize;
+    
+    self.inMemoryCache.totalCostLimit = xCGSizeGetArea(maximumCacheableSize) * self.maximumCacheCount;
+}
+
+- (void)setMaximumCacheCount:(NSUInteger)maximumCacheCount
+{
+    self.inMemoryCache.countLimit = maximumCacheCount;
+    self.inMemoryCache.totalCostLimit = xCGSizeGetArea(_maximumCacheableSize) * self.maximumCacheCount;
+}
+
+- (NSUInteger)maximumCacheCount
+{
+    return self.inMemoryCache.countLimit;
 }
 
 #pragma mark - Image Loading
@@ -94,7 +119,9 @@
             UITableViewCell *superCell = RK_TRY_CAST(UITableViewCell, imageView.superview.superview);
             [superCell setNeedsLayout];
             
-            [self.inMemoryCache setObject:image forKey:imagePromise.cacheIdentifier cost:image.size.width + image.size.height];
+            if(xCGSizeGetArea(image.size) < xCGSizeGetArea(_maximumCacheableSize))
+                [self.inMemoryCache setObject:image forKey:imagePromise.cacheIdentifier cost:image.size.width + image.size.height];
+            
             [self.imageMap removeObjectForKey:imageView];
             
             if(completionHandler)
