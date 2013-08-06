@@ -12,7 +12,8 @@
 
 #import "RKURLRequestPromise.h"
 #import "RKFileSystemCacheManager.h"
-#import "RKQueueManager.h"
+
+#define xCGSizeGetArea(size) (size.width * size.height)
 
 @interface RKImageLoader ()
 
@@ -54,12 +55,35 @@
         
         self.cacheManager = [RKFileSystemCacheManager sharedCacheManager];
         self.inMemoryCache = [NSCache new];
-        self.inMemoryCache.name = @"com.livenationlabs.libTap.ImageLoader.inMemoryCache";
+        self.inMemoryCache.name = @"com.roundabout.roundaboutkit.imageloader.inMemoryCache";
         
         self.knownInvalidCacheIdentifiers = [NSMutableSet set];
+        
+        self.maximumCacheCount = 8;
+        self.maximumCacheableSize = [UIScreen mainScreen].bounds.size;
     }
     
     return self;
+}
+
+#pragma mark - Properties
+
+- (void)setMaximumCacheableSize:(CGSize)maximumCacheableSize
+{
+    _maximumCacheableSize = maximumCacheableSize;
+    
+    self.inMemoryCache.totalCostLimit = xCGSizeGetArea(maximumCacheableSize) * self.maximumCacheCount;
+}
+
+- (void)setMaximumCacheCount:(NSUInteger)maximumCacheCount
+{
+    self.inMemoryCache.countLimit = maximumCacheCount;
+    self.inMemoryCache.totalCostLimit = xCGSizeGetArea(_maximumCacheableSize) * self.maximumCacheCount;
+}
+
+- (NSUInteger)maximumCacheCount
+{
+    return self.inMemoryCache.countLimit;
 }
 
 #pragma mark - Image Loading
@@ -71,6 +95,7 @@
     imageView.image = placeholder;
     
     if(imagePromise && ![_knownInvalidCacheIdentifiers containsObject:imagePromise.cacheIdentifier]) {
+        [[self.imageMap objectForKey:imageView] cancel:nil];
         [self.imageMap removeObjectForKey:imageView];
         
         UIImage *existingImage = [self.inMemoryCache objectForKey:imagePromise.cacheIdentifier];
@@ -88,19 +113,22 @@
                              (__bridge const void *)imageView,
                              (__bridge const void *)imagePromise);
         
-        [imagePromise then:^(UIImage *image) {
+        RKRealize(imagePromise, ^(UIImage *image) {
             imageView.image = image;
             
             UITableViewCell *superCell = RK_TRY_CAST(UITableViewCell, imageView.superview.superview);
             [superCell setNeedsLayout];
             
-            [self.inMemoryCache setObject:image forKey:imagePromise.cacheIdentifier cost:image.size.width + image.size.height];
+            if(xCGSizeGetArea(image.size) < xCGSizeGetArea(_maximumCacheableSize))
+                [self.inMemoryCache setObject:image forKey:imagePromise.cacheIdentifier cost:image.size.width + image.size.height];
+            
             [self.imageMap removeObjectForKey:imageView];
             
             if(completionHandler)
                 completionHandler(YES);
-        } otherwise:^(NSError *error) {
-            [self.knownInvalidCacheIdentifiers addObject:imagePromise.cacheIdentifier];
+        }, ^(NSError *error) {
+            if(imagePromise.cacheIdentifier)
+                [self.knownInvalidCacheIdentifiers addObject:imagePromise.cacheIdentifier];
             [self.imageMap removeObjectForKey:imageView];
             
             if(error.code != '!img')
@@ -108,7 +136,7 @@
             
             if(completionHandler)
                 completionHandler(NO);
-        }];
+        });
     }
 }
 
@@ -120,7 +148,7 @@
     RKURLRequestPromise *imagePromise = [[RKURLRequestPromise alloc] initWithRequest:imageURLRequest
                                                                         cacheManager:self.cacheManager
                                                                  useCacheWhenOffline:YES
-                                                                        requestQueue:[RKQueueManager commonQueue]];
+                                                                        requestQueue:[RKBlockPromise defaultBlockPromiseQueue]];
     imagePromise.postProcessor = kRKImagePostProcessorBlock;
     
     [self loadImagePromise:imagePromise placeholder:placeholder intoView:imageView completionHandler:completionHandler];
@@ -135,6 +163,7 @@
 {
     NSParameterAssert(imageView);
     
+    [[self.imageMap objectForKey:imageView] cancel:nil];
     [self.imageMap removeObjectForKey:imageView];
 }
 
