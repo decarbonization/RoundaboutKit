@@ -48,6 +48,8 @@
 		8B7584651792114B00D45F54 /* RKURLRequestPromiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */; };
 		8B7584661792114B00D45F54 /* RunLoopHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B75845A1792114B00D45F54 /* RunLoopHelper.m */; };
 		8B7584781792142100D45F54 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7584761792141900D45F54 /* SystemConfiguration.framework */; };
+		8BDA554417ED11E200848C2F /* RoundaboutKitMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */; };
+		8BDA554817ED11F200848C2F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDA554717ED11F200848C2F /* Cocoa.framework */; };
 		8BE806F71792189300DFEC35 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7583EF1792100D00D45F54 /* Cocoa.framework */; };
 		8BE806FD1792189300DFEC35 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8BE806FB1792189300DFEC35 /* InfoPlist.strings */; };
 		8BE8071A179218C200DFEC35 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7584761792141900D45F54 /* SystemConfiguration.framework */; };
@@ -74,6 +76,16 @@
 		8BE8072F179218DA00DFEC35 /* RKDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7583C617920E9A00D45F54 /* RKDefaults.m */; };
 		8BE807311792191900DFEC35 /* RoundaboutKitMac-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 8BE807301792191900DFEC35 /* RoundaboutKitMac-Prefix.pch */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8BDA554217ED11DD00848C2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8B75839017920E7200D45F54 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8BE806F51792189300DFEC35;
+			remoteInfo = RoundaboutKitMac;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		8B75839617920E7200D45F54 /* CopyFiles */ = {
@@ -163,6 +175,8 @@
 		8B7584591792114B00D45F54 /* RunLoopHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunLoopHelper.h; sourceTree = "<group>"; };
 		8B75845A1792114B00D45F54 /* RunLoopHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunLoopHelper.m; sourceTree = "<group>"; };
 		8B7584761792141900D45F54 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		8BDA554517ED11ED00848C2F /* RubyCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RubyCocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/RubyCocoa.framework; sourceTree = DEVELOPER_DIR; };
+		8BDA554717ED11F200848C2F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoundaboutKitMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BE806FA1792189300DFEC35 /* RoundaboutKitMac-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RoundaboutKitMac-Info.plist"; sourceTree = "<group>"; };
 		8BE806FC1792189300DFEC35 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -184,6 +198,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BDA554817ED11F200848C2F /* Cocoa.framework in Frameworks */,
+				8BDA554417ED11E200848C2F /* RoundaboutKitMac.framework in Frameworks */,
 				8B7584781792142100D45F54 /* SystemConfiguration.framework in Frameworks */,
 				8B758432179210F300D45F54 /* SenTestingKit.framework in Frameworks */,
 			);
@@ -225,6 +241,8 @@
 		8B75839A17920E7200D45F54 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8BDA554717ED11F200848C2F /* Cocoa.framework */,
+				8BDA554517ED11ED00848C2F /* RubyCocoa.framework */,
 				8B7584761792141900D45F54 /* SystemConfiguration.framework */,
 				8B7583E817920F7F00D45F54 /* SystemConfiguration.framework */,
 				8B7583E617920F7C00D45F54 /* UIKit.framework */,
@@ -432,6 +450,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				8BDA554317ED11DD00848C2F /* PBXTargetDependency */,
 			);
 			name = Tests;
 			productName = Tests;
@@ -564,6 +583,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8BDA554317ED11DD00848C2F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8BE806F51792189300DFEC35 /* RoundaboutKitMac */;
+			targetProxy = 8BDA554217ED11DD00848C2F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		8B758436179210F300D45F54 /* InfoPlist.strings */ = {

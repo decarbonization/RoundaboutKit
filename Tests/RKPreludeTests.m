@@ -127,14 +127,14 @@
 
 - (void)testCast
 {
-    STAssertThrows((void)RK_CAST(NSArray, @"this should fail"), @"RK_CAST failed to catch incompatibility between NSArray and NSString");
-    STAssertNoThrow((void)RK_CAST(NSString, [@"this should fail" mutableCopy]), @"RK_CAST failed to match compatibility between NSString and NSMutableString");
+    STAssertThrows((void)RK_CAST_OR_THROW(NSArray, @"this should fail"), @"RK_CAST_OR_THROW failed to catch incompatibility between NSArray and NSString");
+    STAssertNoThrow((void)RK_CAST_OR_THROW(NSString, [@"this should fail" mutableCopy]), @"RK_CAST_OR_THROW failed to match compatibility between NSString and NSMutableString");
 }
 
 - (void)testTryCast
 {
-    STAssertNil(RK_TRY_CAST(NSArray, @"this should fail"), @"RK_TRY_CAST failed to catch incompatibility between NSArray and NSString");
-    STAssertNotNil(RK_CAST(NSString, [@"this should fail" mutableCopy]), @"RK_TRY_CAST failed to match compatibility between NSString and NSMutableString");
+    STAssertNil(RK_CAST_OR_NIL(NSArray, @"this should fail"), @"RK_CAST_OR_NIL failed to catch incompatibility between NSArray and NSString");
+    STAssertNotNil(RK_CAST_OR_NIL(NSString, [@"this should fail" mutableCopy]), @"RK_CAST_OR_NIL failed to match compatibility between NSString and NSMutableString");
 }
 
 #pragma mark - Utilities
@@ -174,7 +174,7 @@
 - (void)testStringEscapeForInclusionInURL
 {
     NSString *escapedString = RKStringEscapeForInclusionInURL(@"This is a lovely string :/?#[]@!$&'()*+,;=", NSUTF8StringEncoding);
-    STAssertEqualObjects(escapedString, @"This%20is%20a%20lovely%20string%20:/?#[]@!$&'()*+,;=", @"Unexpected escape result");
+    STAssertEqualObjects(escapedString, @"This%20is%20a%20lovely%20string%20%3A%2F%3F%23%5B%5D%40%21%24%26%27%28%29%2A%2B,%3B%3D", @"Unexpected escape result");
 }
 
 - (void)testDictionaryToURLParametersString

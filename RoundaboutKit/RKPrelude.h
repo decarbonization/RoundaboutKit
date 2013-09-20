@@ -25,13 +25,13 @@
 ///the legacy RKRealize function available.
 ///
 ///RKRealize is deprecated and will be removed.
-#define RoundaboutKit_EnableLegacyRealization   0
+#define RoundaboutKit_EnableLegacyRealization   1
 
 ///Whether or not RoundaboutKit should include the
 ///legacy RKPossibility matching/refining functions.
 ///
 ///This functions are deprecated and will be removed.
-#define RoundaboutKit_EnableLegacyPossibilityFunctions  0
+#define RoundaboutKit_EnableLegacyPossibilityFunctions  1
 
 #pragma mark - Linkage Goop
 
@@ -176,10 +176,12 @@ RK_EXTERN id RKCollectionFindFirstMatch(id input, RKPredicateBlock predicate);
 #pragma mark - Safe Casting
 
 ///Perform a cast with a runtime check.
-#define RK_CAST(ClassType, ...) ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) [NSException raise:@"RKDynamicCastTypeMismatchException" format:@"%@ is not a %s", $value, #ClassType]; (ClassType *)$value; })
+#define RK_CAST_OR_THROW(ClassType, ...)    ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) [NSException raise:@"RKDynamicCastTypeMismatchException" format:@"%@ is not a %s", $value, #ClassType]; (ClassType *)$value; })
+#define RK_CAST                             RK_CAST_OR_THROW /* Deprecated */
 
 ///Perform a cast with a runtime check, yielding nil if there is a type mismatch.
-#define RK_TRY_CAST(ClassType, ...) ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) $value = nil; (ClassType *)$value; })
+#define RK_CAST_OR_NIL(ClassType, ...)  ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) $value = nil; (ClassType *)$value; })
+#define RK_TRY_CAST                     RK_CAST_OR_NIL /* Deprecated */
 
 #pragma mark - Utilities
 

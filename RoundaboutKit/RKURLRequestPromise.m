@@ -189,6 +189,9 @@ static NSArray *ActiveRequestArrayGetInstanteousCopy()
 
 #endif /* RKURLRequestPromise_Option_TrackActiveRequests */
 
+static NSTimeInterval _CumulativeResponseTime = 0.0;
+static NSUInteger _NumberOfCompletedRequests = 0;
+
 #pragma mark -
 
 @interface RKURLRequestPromise () <NSURLConnectionDelegate>
@@ -200,6 +203,15 @@ static NSArray *ActiveRequestArrayGetInstanteousCopy()
 
 ///Whether or not the cache has been successfully loaded.
 @property BOOL isCacheLoaded;
+
+#pragma mark -
+
+#if RKURLRequestPromise_Option_MeasureResponseTimes
+
+///When the request started.
+@property (nonatomic) NSDate *startDate;
+
+#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
 
 #pragma mark - Readwrite Properties
 
@@ -258,6 +270,17 @@ static NSArray *ActiveRequestArrayGetInstanteousCopy()
     }
     
     puts([[NSString stringWithFormat:@"-- end %ld active requests --", (unsigned long)activeRequests.count] UTF8String]);
+}
+
+#pragma mark -
+
++ (NSTimeInterval)averageRequestDuration
+{
+#if RKURLRequestPromise_Option_MeasureResponseTimes
+    return _NumberOfCompletedRequests > 0? _CumulativeResponseTime / _NumberOfCompletedRequests : 0.0;
+#else
+    return 0.0;
+#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
 }
 
 #pragma mark - Lifecycle
@@ -348,6 +371,10 @@ static NSArray *ActiveRequestArrayGetInstanteousCopy()
                 [self loadCacheAndReportError:YES];
             }];
         } else {
+#if RKURLRequestPromise_Option_MeasureResponseTimes
+            self.startDate = [NSDate date];
+#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
+            
             self.connection = [[NSURLConnection alloc] initWithRequest:self.request
                                                               delegate:self
                                                       startImmediately:NO];
@@ -410,7 +437,6 @@ static NSArray *ActiveRequestArrayGetInstanteousCopy()
             NSDictionary *userInfo = nil;
             if(removedCache) {
                 userInfo = @{
-                    NSUnderlyingErrorKey: error,
                     NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Could not load cached data for identifier %@.", self.cacheIdentifier],
                     RKURLRequestPromiseCacheIdentifierErrorUserInfoKey: self.cacheIdentifier,
                 };
@@ -598,6 +624,11 @@ static NSArray *ActiveRequestArrayGetInstanteousCopy()
     @synchronized(self) {
         loadedData = _loadedData;
     }
+    
+#if RKURLRequestPromise_Option_MeasureResponseTimes
+    _CumulativeResponseTime += -[self.startDate timeIntervalSinceNow];
+    _NumberOfCompletedRequests++;
+#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
     
     if(self.cacheManager) {
         NSString *etag = self.response.allHeaderFields[kETagHeaderKey];
