@@ -186,6 +186,9 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 ///Set to 1 to have RKURLRequestPromise track all active requests.
 #define RKURLRequestPromise_Option_TrackActiveRequests  0
 
+///Set to 1 to have RKURLRequestPromise track the average response time of requests.
+#define RKURLRequestPromise_Option_MeasureResponseTimes 1
+
 #pragma mark -
 
 @class RKConnectivityManager;
@@ -228,6 +231,15 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 ///
 ///This method is provided to aid in debugging and should not be used in a production environment.
 + (void)prettyPrintActiveRequests;
+
+#pragma mark -
+
+///Returns the average amount of time requests are active for.
+///
+///This method returns 0 if `RKURLRequestPromise_Option_MeasureResponseTimes` is not set to 1.
+///
+///The returned value excludes cache loading time and completely omits cache-only requests.
++ (NSTimeInterval)averageRequestDuration;
 
 #pragma mark - Lifecycle
 
