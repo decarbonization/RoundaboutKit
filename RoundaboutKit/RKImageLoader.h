@@ -10,7 +10,7 @@
 
 #import <UIKit/UIKit.h>
 
-@class RKFileSystemCacheManager;
+@class RKFileSystemCacheManager, RKPromise;
 
 ///A block which is invoked as a callback for an image loader.
 typedef void(^RKImageLoaderCompletionHandler)(BOOL wasSuccessful);
