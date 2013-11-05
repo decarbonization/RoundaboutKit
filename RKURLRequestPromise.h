@@ -153,6 +153,12 @@ typedef RKPossibility *(^RKPostProcessorBlock)(RKPossibility *maybeData, RKURLRe
 RK_EXTERN_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProcessorBlock source,
                                                                       RKPostProcessorBlock refiner);
 
+///The key used to embed the string representation of malformed data, if possible.
+RK_EXTERN NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey;
+
+///The key used to embed the source URL of an error, if possible.
+RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
+
 ///A post-processor block that takes an NSData object and yields JSON objects.
 RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
 
