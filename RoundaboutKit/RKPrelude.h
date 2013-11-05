@@ -12,20 +12,20 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version                   20L
+#define RoundaboutKit_Version                           20L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
-#define RoundaboutKit_Stable                    1
+#define RoundaboutKit_Stable                            1
 
 ///Whether or not the RoundaboutKit should emit warnings
 ///for questionable but presently valid behaviour.
-#define RoundaboutKit_EmitWarnings              1
+#define RoundaboutKit_EmitWarnings                      1
 
 ///Whether or not RoundaboutKit should include
 ///the legacy RKRealize function available.
 ///
 ///RKRealize is deprecated and will be removed.
-#define RoundaboutKit_EnableLegacyRealization   1
+#define RoundaboutKit_EnableLegacyRealization           1
 
 ///Whether or not RoundaboutKit should include the
 ///legacy RKPossibility matching/refining functions.
