@@ -25,6 +25,9 @@ static NSString *const kDefaultETagKey = @"-1";
 
 #pragma mark - RKPostProcessorBlock
 
+NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey = @"RKPostProcessorBadValueStringRepresentationErrorUserInfoKey";
+NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSourceURLErrorUserInfoKey";
+
 RK_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProcessorBlock source,
                                                                RKPostProcessorBlock refiner)
 {
@@ -44,7 +47,20 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
         if(result) {
             return [[RKPossibility alloc] initWithValue:result];
         } else {
-            return [[RKPossibility alloc] initWithError:error];
+            NSMutableDictionary *userInfoCopy = [[error userInfo] mutableCopy];
+            
+            NSString *stringRepresentation = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if(stringRepresentation)
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = stringRepresentation;
+            else
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = @"(Malformed data)";
+            
+            if(request.request.URL)
+                userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = request.request.URL;
+            
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:error.domain
+                                                                            code:error.code
+                                                                        userInfo:userInfoCopy]];
         }
     }];
 };
@@ -73,7 +89,20 @@ RKPostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(
         if(result) {
             return [[RKPossibility alloc] initWithValue:result];
         } else {
-            return [[RKPossibility alloc] initWithError:error];
+            NSMutableDictionary *userInfoCopy = [[error userInfo] mutableCopy];
+            
+            NSString *stringRepresentation = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if(stringRepresentation)
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = stringRepresentation;
+            else
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = @"(Malformed data)";
+            
+            if(request.request.URL)
+                userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = request.request.URL;
+            
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:error.domain
+                                                                            code:error.code
+                                                                        userInfo:userInfoCopy]];
         }
     }];
 };

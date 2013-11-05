@@ -63,9 +63,21 @@
         
         self.maximumCacheCount = 8;
         self.maximumCacheableSize = [UIScreen mainScreen].bounds.size;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(applicationDidReceiveMemoryWarning:)
+                                                     name:UIApplicationDidReceiveMemoryWarningNotification
+                                                   object:nil];
     }
     
     return self;
+}
+
+#pragma mark - Notifications
+
+- (void)applicationDidReceiveMemoryWarning:(NSNotification *)notification
+{
+    [self.inMemoryCache removeAllObjects];
 }
 
 #pragma mark - Properties

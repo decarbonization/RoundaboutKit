@@ -248,7 +248,7 @@ id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPat
     NSArray *keys = [keyPath componentsSeparatedByString:@"."];
     id value = dictionary;
     for (NSString *key in keys) {
-        value = RKFilterOutNSNull([value valueForKey:key]);
+        value = RKFilterOutNSNull([value objectForKey:key]);
     }
     
     return value;
