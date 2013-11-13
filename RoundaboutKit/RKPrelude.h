@@ -265,6 +265,96 @@ RK_EXTERN NSString *RKStringEscapeForInclusionInURL(NSString *string, NSStringEn
 RK_EXTERN_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters, RKURLParameterStringifier valueStringifier);
 RK_EXTERN_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters);
 
+#pragma mark - Logging
+
+///Set to 1 to enable the RKLog mechanism.
+#define RKLogEnabled    1
+
+///The different types of log messages that can be emitted.
+typedef NS_OPTIONS(NSUInteger, RKLogType) {
+    ///Error messages.
+    kRKLogTypeErrors = (1 << 1),
+    
+    ///Warning messages.
+    kRKLogTypeWarnings = (1 << 2),
+    
+    ///Info messages.
+    kRKLogTypeInfo = (1 << 3),
+    
+    
+    ///All of the different types of log messages.
+    kRKLogTypeAll = (kRKLogTypeErrors | kRKLogTypeWarnings | kRKLogTypeInfo)
+};
+
+///A bit-or'd value describing which types of log messages that should
+///be emitted. Any types omitted from the value will not be logged.
+///
+///This global is only intended to be changed once
+///very early on in the host application's lifecycle.
+///The default value of this global is `kRKLogTypeAll`.
+RK_EXTERN RKLogType RKGlobalLoggingTypesEnabled;
+
+///The primitive logging function used by all RK logging macros. Conditionally
+///prints a given format-string and its arguments to `stderr` if the given
+///logging level is within the scope of the current global logging level.
+///
+/// \param  prettyFunction  The function which the log function is being invoked from. Required.
+/// \param  type            The type of message being logged. Must not be `kNilOptions` or `kRKLogTypeAll`.
+/// \param  format          A format string. Required.
+/// \param  ...             A comma-separated list of arguments to substitute into format.
+///
+///This function should never be invoked directly, but always through one the `RKLog` macros.
+RK_EXTERN void RKLog_Internal(const char *prettyFunction, RKLogType type, NSString *format, ...);
+
+#if RKLogEnabled
+
+///Logs a given error message.
+///
+/// \param  format          A format string. Required.
+/// \param  ...             A comma-separated list of arguments to substitute into format.
+///
+///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeErrors`.
+///
+///Expands to nothing if `RKLogEnabled` is zero or undefined.
+#   define RKLogError(format, ...)     RKLog_Internal(__PRETTY_FUNCTION__, kRKLogTypeErrors, format, ##__VA_ARGS__)
+
+///Logs a given warning message.
+///
+/// \param  format          A format string. Required.
+/// \param  ...             A comma-separated list of arguments to substitute into format.
+///
+///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeWarnings`.
+///
+///Expands to nothing if `RKLogEnabled` is zero or undefined.
+#   define RKLogWarning(format, ...)   RKLog_Internal(__PRETTY_FUNCTION__, kRKLogTypeWarnings, format, ##__VA_ARGS__)
+
+///Logs a given informative message.
+///
+/// \param  format          A format string. Required.
+/// \param  ...             A comma-separated list of arguments to substitute into format.
+///
+///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeInfo`.
+///
+///Expands to nothing if `RKLogEnabled` is zero or undefined.
+#   define RKLogInfo(format, ...)      RKLog_Internal(__PRETTY_FUNCTION__, kRKLogTypeInfo, format, ##__VA_ARGS__)
+
+///Logs a trace indicating a certain line in the containing function has been passed.
+///
+/// \param  format          A format string. Required.
+/// \param  ...             A comma-separated list of arguments to substitute into format.
+///
+///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeInfo`.
+///
+///Expands to nothing if `RKLogEnabled` is zero or undefined.
+#   define RKLogTrace()                RKLog_Internal(__PRETTY_FUNCTION__, kRKLogTypeInfo, @"trace from %d", __LINE__)
+
+#else
+#   define RKLogError(format, ...)
+#   define RKLogWarning(format, ...)
+#   define RKLogInfo(format, ...)
+#   define RKLogTrace()
+#endif /* RKLogEnabled */
+
 #pragma mark - Mac Image Tools
 
 #if TARGET_OS_MAC && defined(_APPKITDEFINES_H)

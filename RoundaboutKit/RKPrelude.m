@@ -12,6 +12,7 @@
 #import <unistd.h>
 
 #import <sys/sysctl.h>
+#import <stdarg.h>
 
 #import <CommonCrypto/CommonCrypto.h>
 
@@ -321,6 +322,43 @@ RK_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parame
 RK_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parameters)
 {
     return RKDictionaryToURLParametersString(parameters, kRKURLParameterStringifierDefault);
+}
+
+#pragma mark - Logging
+
+RKLogType RKGlobalLoggingTypesEnabled = kRKLogTypeAll;
+
+static NSString *RKLogTypeGetLogString(RKLogType type)
+{
+    switch (type) {
+        case kRKLogTypeErrors:
+            return @"Error";
+            
+        case kRKLogTypeWarnings:
+            return @"Warning";
+            
+        case kRKLogTypeInfo:
+            return @"Info";
+            
+        default:
+            [NSException raise:NSInternalInconsistencyException format:@"Invalid log type"];
+            return nil;
+    }
+}
+
+void RKLog_Internal(const char *prettyFunction, RKLogType type, NSString *format, ...)
+{
+    NSCParameterAssert(prettyFunction);
+    NSCAssert((type != kNilOptions && type != kRKLogTypeAll), @"Contextually invalid log type.");
+    
+    if(RK_FLAG_IS_SET(RKGlobalLoggingTypesEnabled, type)) {
+        va_list formatArgs;
+        va_start(formatArgs, format);
+        NSString *message = [[NSString alloc] initWithFormat:format arguments:formatArgs];
+        va_end(formatArgs);
+        
+        NSLog(@"[%@] %@", RKLogTypeGetLogString(type), message);
+    }
 }
 
 #pragma mark - Mac Image Tools
