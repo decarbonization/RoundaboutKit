@@ -146,7 +146,7 @@ static NSTimeInterval const kMaintenanceTimerInterval = (RK_TIME_MINUTE * 5.0);
 void RKFileSystemCacheManagerEmitCacheRemovalErrorWarning(NSError *error)
 {
 #if RoundaboutKit_EmitWarnings
-    NSLog(@"*** Warning, could not remove expired cached data. Add a breakpoint to RKFileSystemCacheManagerEmitCacheRemovalErrorWarning to debug. Error: %@", error);
+    RKLogWarning(@"Could not remove expired cached data. Add a breakpoint to RKFileSystemCacheManagerEmitCacheRemovalErrorWarning to debug. Error: %@", error);
 #endif /* RoundaboutKit_EmitWarnings */
 }
 
