@@ -63,14 +63,14 @@ static NSString *const kContentsKey = @"Contents";
                                             error:&error];
     if(!baseURL) {
         baseURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
-        NSLog(@"*** Warning, could not find documents directory, using temporary directory. %@", error);
+        RKLogWarning(@"Could not find documents directory, using temporary directory. %@", error);
     }
     
     NSURL *bundleSupportURL = [baseURL URLByAppendingPathComponent:bundle.bundleIdentifier isDirectory:YES];
     if(![bundleSupportURL checkResourceIsReachableAndReturnError:NULL]) {
         if(![fileManager createDirectoryAtURL:bundleSupportURL withIntermediateDirectories:YES attributes:nil error:&error]) {
             bundleSupportURL = [NSURL fileURLWithPath:NSTemporaryDirectory()];
-            NSLog(@"*** Warning, could not create bundle application support directory, using temporary directory. %@", error);
+            RKLogWarning(@"Could not create bundle application support directory, using temporary directory. %@", error);
         }
     }
     

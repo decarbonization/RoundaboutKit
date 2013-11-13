@@ -144,7 +144,7 @@
             [self.imageMap removeObjectForKey:imageView];
             
             if(error.code != '!img')
-                NSLog(@"Could not load image. %@", error);
+                RKLogError(@"Could not load image. %@", error);
             
             if(completionHandler)
                 completionHandler(NO);

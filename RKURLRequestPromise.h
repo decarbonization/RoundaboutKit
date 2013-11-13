@@ -181,12 +181,24 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 #pragma mark - Compile Time Options
 
 ///Set to 1 to have all requests logged.
+///
+///##Important:
+///`RKGlobalLoggingTypesEnabled` must contain the flag `kRKLogTypeInfo`, or
+///setting this compile time flag to 1 will do nothing but add extra overhead.
 #define RKURLRequestPromise_Option_LogRequests          0
 
 ///Set to 1 to have all request-responses logged.
+///
+///##Important:
+///`RKGlobalLoggingTypesEnabled` must contain the flag `kRKLogTypeInfo`, or
+///setting this compile time flag to 1 will do nothing but add extra overhead.
 #define RKURLRequestPromise_Option_LogResponses         0
 
 ///Set to 1 to have RKURLRequestPromise errors logged.
+///
+///##Important:
+///`RKGlobalLoggingTypesEnabled` must contain the flag `kRKLogTypeInfo`, or
+///setting this compile time flag to 1 will do nothing but add extra overhead.
 #define RKURLRequestPromise_Option_LogErrors            0
 
 ///Set to 1 to have RKURLRequestPromise track all active requests.

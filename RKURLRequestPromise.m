@@ -192,13 +192,13 @@ RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
 
 static CFIndex ActiveRequestArrayGetInstanteousCount()
 {
-    NSLog(@"*** Warning: Attempting to get number of active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
+    RKLogWarning(@"Attempting to get number of active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
     return 0;
 }
 
 static NSArray *ActiveRequestArrayGetInstanteousCopy()
 {
-    NSLog(@"*** Warning: Attempting to get active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
+    RKLogWarning(@"Attempting to get active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
     return nil;
 }
 
@@ -427,7 +427,7 @@ static NSUInteger _NumberOfCompletedRequests = 0;
         }
         
 #if RKURLRequestPromise_Option_LogRequests
-        NSLog(@"[DEBUG] Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+        RKLogInfo(@"[DEBUG] Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
 #endif /* RKURLRequestPromise_Option_LogRequests */
     }];
 }
@@ -441,7 +441,7 @@ static NSUInteger _NumberOfCompletedRequests = 0;
         }
         
 #if RKURLRequestPromise_Option_LogRequests
-        NSLog(@"[DEBUG] Outgoing request to <%@> cancelled", self.request.URL);
+        RKLogInfo(@"[DEBUG] Outgoing request to <%@> cancelled", self.request.URL);
 #endif /* RKURLRequestPromise_Option_LogRequests */
         
         [[RKActivityManager sharedActivityManager] decrementActivityCount];
@@ -559,7 +559,7 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
 #if RKURLRequestPromise_Option_LogResponses
-    NSLog(@"[DEBUG] %@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    RKLogInfo(@"[DEBUG] %@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 #endif /* RKURLRequestPromise_Option_LogResponses */
     
     RKPossibility *maybeValue = nil;
@@ -596,7 +596,7 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
 #if RKURLRequestPromise_Option_LogErrors
-    NSLog(@"[DEBUG] Error for request to <%@>: %@", self.request.URL, error);
+    RKLogInfo(@"[DEBUG] Error for request to <%@>: %@", self.request.URL, error);
 #endif /* RKURLRequestPromise_Option_LogErrors */
     
     RequestDidFail(self);
