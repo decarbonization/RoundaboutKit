@@ -8,7 +8,7 @@
 
 #import "RKPromise.h"
 
-#import <pthread.h>
+#import <libkern/OSAtomic.h>
 #import <objc/runtime.h>
 #if TARGET_OS_IPHONE
 #   import <UIKit/UIKit.h>
@@ -63,12 +63,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 #pragma mark -
 
 @implementation RKPromise {
-    pthread_mutex_t _stateMutex;
-}
-
-- (void)dealloc
-{
-    pthread_mutex_destroy(&_stateMutex);
+    OSSpinLock _stateMutex;
 }
 
 - (instancetype)init
@@ -76,13 +71,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
     if((self = [super init])) {
         self.promiseName = @"<anonymous>";
         
-        _stateMutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
-        
-        pthread_mutexattr_t attributes;
-        pthread_mutexattr_init(&attributes);
-        pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE);
-        
-        pthread_mutex_init(&_stateMutex, &attributes);
+        _stateMutex = OS_SPINLOCK_INIT;
     }
     
     return self;
@@ -158,13 +147,13 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                        reason:@"Cannot accept a promise more than once"
                                      userInfo:nil];
     
-    pthread_mutex_lock(&_stateMutex);
+    OSSpinLockLock(&_stateMutex);
     {
         self.contents = value;
         self.state = RKPromiseStateValue;
         [self invoke];
     }
-    pthread_mutex_unlock(&_stateMutex);
+    OSSpinLockUnlock(&_stateMutex);
 }
 
 - (void)reject:(NSError *)error
@@ -174,13 +163,13 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                        reason:@"Cannot reject a promise more than once"
                                      userInfo:nil];
     
-    pthread_mutex_lock(&_stateMutex);
+    OSSpinLockLock(&_stateMutex);
     {
         self.contents = error;
         self.state = RKPromiseStateError;
         [self invoke];
     }
-    pthread_mutex_unlock(&_stateMutex);
+    OSSpinLockUnlock(&_stateMutex);
 }
 
 #pragma mark - Realizing
@@ -249,7 +238,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                      userInfo:nil];
     }
     
-    pthread_mutex_lock(&_stateMutex);
+    OSSpinLockLock(&_stateMutex);
     {
         self.thenBlock = then;
         self.otherwiseBlock = otherwise;
@@ -261,7 +250,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
             [self fire];
         }
     }
-    pthread_mutex_unlock(&_stateMutex);
+    OSSpinLockUnlock(&_stateMutex);
 }
 
 #pragma mark -
