@@ -44,6 +44,9 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 ///The contents of the promise, as described by `self.state`.
 @property id contents;
 
+///Whether or not the promise has been invoked.
+@property BOOL hasInvoked;
+
 #pragma mark - Blocks
 
 ///The block to invoke upon success.
@@ -182,13 +185,23 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 
 #pragma mark - Realizing
 
+- (void)doneInvoking
+{
+    self.thenBlock = nil;
+    self.otherwiseBlock = nil;
+    self.queue = nil;
+}
+
 - (void)invoke
 {
     if(self.thenBlock && self.otherwiseBlock && self.queue) {
+        self.hasInvoked = YES;
+        
         switch (self.state) {
             case RKPromiseStateValue: {
                 [self.queue addOperationWithBlock:^{
                     self.thenBlock(self.contents);
+                    [self doneInvoking];
                 }];
                 
                 break;
@@ -197,6 +210,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
             case RKPromiseStateError: {
                 [self.queue addOperationWithBlock:^{
                     self.otherwiseBlock(self.contents);
+                    [self doneInvoking];
                 }];
                 
                 break;
@@ -229,7 +243,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
     NSParameterAssert(otherwise);
     NSParameterAssert(queue);
     
-    if(self.thenBlock || self.otherwiseBlock) {
+    if(self.hasInvoked) {
         @throw [NSException exceptionWithName:NSInternalInconsistencyException
                                        reason:@"Cannot realize a promise more than once"
                                      userInfo:nil];
