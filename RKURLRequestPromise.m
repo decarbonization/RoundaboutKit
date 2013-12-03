@@ -650,8 +650,6 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     NSString *cacheMarker = response.allHeaderFields[kETagHeaderKey] ?: response.allHeaderFields[kExpiresHeaderKey];
     NSString *storedCacheMarker = [self.cacheManager revisionForIdentifier:self.cacheIdentifier];
     if(cacheMarker && storedCacheMarker && [cacheMarker caseInsensitiveCompare:storedCacheMarker] == NSOrderedSame) {
-        NSLog(@"*** Using cache for %@ (%@ == %@", self.request.URL, cacheMarker, storedCacheMarker);
-        
         [self.connection cancel];
         @synchronized(self) {
             _loadedData = nil;
@@ -667,8 +665,6 @@ static NSUInteger _NumberOfCompletedRequests = 0;
         } else {
             [self loadCacheAndReportError:YES];
         }
-    } else {
-        NSLog(@"*** Not using cache for %@ (%@ == %@", self.request.URL, cacheMarker, storedCacheMarker);
     }
 }
 
