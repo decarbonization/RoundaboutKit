@@ -14,7 +14,8 @@ NSString *const RKURLRequestPromiseErrorDomain = @"RKURLRequestPromiseErrorDomai
 NSString *const RKURLRequestPromiseCacheIdentifierErrorUserInfoKey = @"RKURLRequestPromiseCacheIdentifierErrorUserInfoKey";
 
 static NSString *const kETagHeaderKey = @"Etag";
-static NSString *const kDefaultETagKey = @"-1";
+static NSString *const kExpiresHeaderKey = @"Expires";
+static NSString *const kDefaultRevision = @"-1";
 
 #pragma mark - RKPostProcessorBlock
 
@@ -646,9 +647,11 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     if(!self.cacheManager || self.cancelled || self.cacheIdentifier == nil)
         return;
     
-    NSString *etag = response.allHeaderFields[kETagHeaderKey];
-    NSString *cachedEtag = [self.cacheManager revisionForIdentifier:self.cacheIdentifier];
-    if(etag && cachedEtag && [etag caseInsensitiveCompare:cachedEtag] == NSOrderedSame) {
+    NSString *cacheMarker = response.allHeaderFields[kETagHeaderKey] ?: response.allHeaderFields[kExpiresHeaderKey];
+    NSString *storedCacheMarker = [self.cacheManager revisionForIdentifier:self.cacheIdentifier];
+    if(cacheMarker && storedCacheMarker && [cacheMarker caseInsensitiveCompare:storedCacheMarker] == NSOrderedSame) {
+        NSLog(@"*** Using cache for %@ (%@ == %@", self.request.URL, cacheMarker, storedCacheMarker);
+        
         [self.connection cancel];
         @synchronized(self) {
             _loadedData = nil;
@@ -664,6 +667,8 @@ static NSUInteger _NumberOfCompletedRequests = 0;
         } else {
             [self loadCacheAndReportError:YES];
         }
+    } else {
+        NSLog(@"*** Not using cache for %@ (%@ == %@", self.request.URL, cacheMarker, storedCacheMarker);
     }
 }
 
@@ -690,15 +695,15 @@ static NSUInteger _NumberOfCompletedRequests = 0;
 #endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
     
     if(self.cacheManager) {
-        NSString *etag = self.response.allHeaderFields[kETagHeaderKey];
-        if(!etag && self.useCacheWhenOffline)
-            etag = kDefaultETagKey;
+        NSString *cacheMarker = self.response.allHeaderFields[kETagHeaderKey] ?: self.response.allHeaderFields[kExpiresHeaderKey];
+        if(!cacheMarker && self.useCacheWhenOffline)
+            cacheMarker = kDefaultRevision;
         
-        if(etag) {
+        if(cacheMarker) {
             NSError *error = nil;
             if(![self.cacheManager cacheData:loadedData
                                forIdentifier:self.cacheIdentifier
-                                withRevision:etag
+                                withRevision:cacheMarker
                                        error:&error]) {
                 NSDictionary *userInfo = @{
                     NSUnderlyingErrorKey: error,
