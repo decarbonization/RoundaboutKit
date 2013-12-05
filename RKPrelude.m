@@ -328,6 +328,19 @@ RK_OVERLOADABLE NSString *RKDictionaryToURLParametersString(NSDictionary *parame
 
 RKLogType RKGlobalLoggingTypesEnabled = kRKLogTypeAll;
 
+static NSMutableArray *RKGetLogHooks()
+{
+    static NSMutableArray *logHooks = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        logHooks = [NSMutableArray array];
+    });
+    
+    return logHooks;
+}
+
+#pragma mark -
+
 static NSString *RKLogTypeGetLogString(RKLogType type)
 {
     switch (type) {
@@ -346,19 +359,29 @@ static NSString *RKLogTypeGetLogString(RKLogType type)
     }
 }
 
-void RKLog_Internal(const char *prettyFunction, RKLogType type, NSString *format, ...)
+void RKLog_Internal(const char *prettyFunction, int line, RKLogType type, NSString *format, ...)
 {
     NSCParameterAssert(prettyFunction);
     NSCAssert((type != kNilOptions && type != kRKLogTypeAll), @"Contextually invalid log type.");
     
+    va_list formatArgs;
+    va_start(formatArgs, format);
+    NSString *message = [[NSString alloc] initWithFormat:format arguments:formatArgs];
+    va_end(formatArgs);
+    
+    for (RKLogHookBlock hook in RKGetLogHooks())
+        hook(type, prettyFunction, line, message);
+    
     if(RK_FLAG_IS_SET(RKGlobalLoggingTypesEnabled, type)) {
-        va_list formatArgs;
-        va_start(formatArgs, format);
-        NSString *message = [[NSString alloc] initWithFormat:format arguments:formatArgs];
-        va_end(formatArgs);
-        
-        NSLog(@"[%@] %@", RKLogTypeGetLogString(type), message);
+        NSLog(@"[%@ from '%s' line %d] %@", RKLogTypeGetLogString(type), prettyFunction, line, message);
     }
+}
+
+void RKLogAddHook(RKLogHookBlock hookBlock)
+{
+    NSCParameterAssert(hookBlock);
+    
+    [RKGetLogHooks() addObject:[hookBlock copy]];
 }
 
 #pragma mark - Mac Image Tools
