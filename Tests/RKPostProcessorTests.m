@@ -26,4 +26,43 @@
     [super tearDown];
 }
 
+#pragma mark - Simple Post Processor Tests
+
+- (void)testValue
+{
+    RKSimplePostProcessor *valueProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+        XCTAssertNotNil(context, @"context missing");
+        XCTAssertEqual(maybeData.state, kRKPossibilityStateValue, @"wrong possibility state");
+        
+        return [maybeData refineValue:^RKPossibility *(NSString *value) {
+            return [[RKPossibility alloc] initWithValue:[value stringByAppendingString:@"foo"]];
+        }];
+    }];
+    
+    [valueProcessor processInputValue:@"test" inputError:nil context:@"context"];
+    
+    XCTAssertNil(valueProcessor.outputError, @"unexpected error");
+    XCTAssertNotNil(valueProcessor.outputValue, @"missing value");
+    XCTAssertEqualObjects(valueProcessor.outputValue, @"testfoo", @"wrong value");
+}
+
+- (void)testError
+{
+    RKSimplePostProcessor *errorProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+        XCTAssertNotNil(context, @"context missing");
+        XCTAssertEqual(maybeData.state, kRKPossibilityStateValue, @"wrong possibility state");
+        
+        return [maybeData refineValue:^RKPossibility *(NSString *value) {
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:@"SillyErrorDomain"
+                                                                            code:'dumb'
+                                                                        userInfo:@{NSLocalizedDescriptionKey: @"It worked!"}]];
+        }];
+    }];
+    
+    [errorProcessor processInputValue:@"test" inputError:nil context:@"context"];
+    
+    XCTAssertNotNil(errorProcessor.outputError, @"missing error");
+    XCTAssertNil(errorProcessor.outputValue, @"unexpected value");
+}
+
 @end
