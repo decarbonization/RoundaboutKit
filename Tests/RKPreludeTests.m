@@ -6,7 +6,11 @@
 //
 //
 
-#import "RKPreludeTests.h"
+#import <XCTest/XCTest.h>
+
+@interface RKPreludeTests : XCTestCase
+
+@end
 
 @implementation RKPreludeTests {
     NSArray *_pregeneratedArray;

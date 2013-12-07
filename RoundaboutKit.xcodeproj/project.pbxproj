@@ -154,11 +154,8 @@
 		8B758437179210F300D45F54 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B75843B179210F300D45F54 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		8B7584411792113D00D45F54 /* RKPostProcessorTestImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RKPostProcessorTestImage.png; sourceTree = "<group>"; };
-		8B7584431792114B00D45F54 /* RKActivityManagerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKActivityManagerTests.h; sourceTree = "<group>"; };
 		8B7584441792114B00D45F54 /* RKActivityManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKActivityManagerTests.m; sourceTree = "<group>"; };
-		8B7584471792114B00D45F54 /* RKDefaultsTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKDefaultsTests.h; sourceTree = "<group>"; };
 		8B7584481792114B00D45F54 /* RKDefaultsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKDefaultsTests.m; sourceTree = "<group>"; };
-		8B7584491792114B00D45F54 /* RKFileSystemCacheManagerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKFileSystemCacheManagerTests.h; sourceTree = "<group>"; };
 		8B75844A1792114B00D45F54 /* RKFileSystemCacheManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKFileSystemCacheManagerTests.m; sourceTree = "<group>"; };
 		8B75844B1792114B00D45F54 /* RKMockPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockPromise.h; sourceTree = "<group>"; };
 		8B75844C1792114B00D45F54 /* RKMockPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockPromise.m; sourceTree = "<group>"; };
@@ -166,13 +163,9 @@
 		8B75844E1792114B00D45F54 /* RKMockURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockURLProtocol.m; sourceTree = "<group>"; };
 		8B75844F1792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockURLRequestPromiseCacheManager.h; sourceTree = "<group>"; };
 		8B7584501792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockURLRequestPromiseCacheManager.m; sourceTree = "<group>"; };
-		8B7584511792114B00D45F54 /* RKPossibilityTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPossibilityTests.h; sourceTree = "<group>"; };
 		8B7584521792114B00D45F54 /* RKPossibilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPossibilityTests.m; sourceTree = "<group>"; };
-		8B7584531792114B00D45F54 /* RKPreludeTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPreludeTests.h; sourceTree = "<group>"; };
 		8B7584541792114B00D45F54 /* RKPreludeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeTests.m; sourceTree = "<group>"; };
-		8B7584551792114B00D45F54 /* RKPromiseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPromiseTests.h; sourceTree = "<group>"; };
 		8B7584561792114B00D45F54 /* RKPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPromiseTests.m; sourceTree = "<group>"; };
-		8B7584571792114B00D45F54 /* RKURLRequestPromiseTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKURLRequestPromiseTests.h; sourceTree = "<group>"; };
 		8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKURLRequestPromiseTests.m; sourceTree = "<group>"; };
 		8B7584591792114B00D45F54 /* RunLoopHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunLoopHelper.h; sourceTree = "<group>"; };
 		8B75845A1792114B00D45F54 /* RunLoopHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunLoopHelper.m; sourceTree = "<group>"; };
@@ -338,19 +331,12 @@
 			isa = PBXGroup;
 			children = (
 				8B7584671792115600D45F54 /* Helpers */,
-				8B7584431792114B00D45F54 /* RKActivityManagerTests.h */,
 				8B7584441792114B00D45F54 /* RKActivityManagerTests.m */,
-				8B7584471792114B00D45F54 /* RKDefaultsTests.h */,
 				8B7584481792114B00D45F54 /* RKDefaultsTests.m */,
-				8B7584491792114B00D45F54 /* RKFileSystemCacheManagerTests.h */,
 				8B75844A1792114B00D45F54 /* RKFileSystemCacheManagerTests.m */,
-				8B7584511792114B00D45F54 /* RKPossibilityTests.h */,
 				8B7584521792114B00D45F54 /* RKPossibilityTests.m */,
-				8B7584531792114B00D45F54 /* RKPreludeTests.h */,
 				8B7584541792114B00D45F54 /* RKPreludeTests.m */,
-				8B7584551792114B00D45F54 /* RKPromiseTests.h */,
 				8B7584561792114B00D45F54 /* RKPromiseTests.m */,
-				8B7584571792114B00D45F54 /* RKURLRequestPromiseTests.h */,
 				8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */,
 				8B7D8E4C1852B11700215AE5 /* RKPostProcessorTests.m */,
 				8B758434179210F300D45F54 /* Supporting Files */,

@@ -6,14 +6,15 @@
 //
 //
 
-#import "RKURLRequestPromiseTests.h"
+#import <XCTest/XCTest.h>
 #import "RKMockURLProtocol.h"
 #import "RKMockURLRequestPromiseCacheManager.h"
 
 #define PLAIN_TEXT_URL_STRING   @"http://test/plaintext"
 #define PLAIN_TEXT_STRING       (@"hello, world!")
 
-@interface RKURLRequestPromiseTests ()
+
+@interface RKURLRequestPromiseTests : XCTestCase
 
 @property RKConnectivityManager *connectivityManager;
 

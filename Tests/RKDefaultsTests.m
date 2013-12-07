@@ -6,7 +6,7 @@
 //
 //
 
-#import "RKDefaultsTests.h"
+#import <XCTest/XCTest.h>
 
 //Change the affectedKeys array below if anything is added or removed.
 static NSString *const PersistentObjectKey = @"com.roundabout.roundaboutkitests/PersistentObject";
@@ -15,7 +15,7 @@ static NSString *const PersistentFloatKey = @"com.roundabout.roundaboutkitests/P
 static NSString *const PersistentBoolKey = @"com.roundabout.roundaboutkitests/PersistentBool";
 static NSString *const TestDefault1Key = @"com.roundabout.roundaboutkitests/TestDefault1";
 
-@interface RKDefaultsTests ()
+@interface RKDefaultsTests : XCTestCase
 
 @property (copy) NSArray *affectedKeys;
 

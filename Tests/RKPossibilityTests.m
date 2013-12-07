@@ -6,7 +6,11 @@
 //
 //
 
-#import "RKPossibilityTests.h"
+#import <XCTest/XCTest.h>
+
+@interface RKPossibilityTests : XCTestCase
+
+@end
 
 @implementation RKPossibilityTests {
     NSString *_testObject;

@@ -6,7 +6,7 @@
 //
 //
 
-#import "RKPromiseTests.h"
+#import <XCTest/XCTest.h>
 #import "RKMockPromise.h"
 
 #define DEFAULT_DURATION            0.3
@@ -14,7 +14,8 @@
 
 #pragma mark -
 
-@interface RKPromiseTests ()
+
+@interface RKPromiseTests : XCTestCase
 
 @property RKPossibility *successPossibility;
 @property RKPossibility *errorPossibility;

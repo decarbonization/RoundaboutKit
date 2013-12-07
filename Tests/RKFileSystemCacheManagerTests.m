@@ -6,7 +6,7 @@
 //
 //
 
-#import "RKFileSystemCacheManagerTests.h"
+#import <XCTest/XCTest.h>
 #import "RKFileSystemCacheManager.h"
 
 static NSString *const kTestDataString = @"this is some lovely data you've got here";
@@ -16,7 +16,8 @@ static NSString *const kRevision = @"1";
 
 static NSString *const kNonExistentCacheIdentiifer = @"SmarchFifth";
 
-@interface RKFileSystemCacheManagerTests ()
+
+@interface RKFileSystemCacheManagerTests : XCTestCase
 
 @property RKFileSystemCacheManager *cacheManager;
 

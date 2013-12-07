@@ -6,7 +6,11 @@
 //
 //
 
-#import "RKActivityManagerTests.h"
+#import <XCTest/XCTest.h>
+
+@interface RKActivityManagerTests : XCTestCase
+
+@end
 
 @implementation RKActivityManagerTests
 
