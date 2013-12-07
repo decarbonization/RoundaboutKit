@@ -12,10 +12,10 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version                           20L
+#define RoundaboutKit_Version                           21L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
-#define RoundaboutKit_Stable                            1
+#define RoundaboutKit_Stable                            0
 
 ///Whether or not the RoundaboutKit should emit warnings
 ///for questionable but presently valid behaviour.
