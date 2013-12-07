@@ -143,4 +143,45 @@
     STAssertNotNil(error, @"RKAwait failed to yield error");
 }
 
+#pragma mark - Test Post Processors
+
+- (void)testSuccessPostProcessor
+{
+    RKSimplePostProcessor *goodProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+        return [maybeData refineValue:^RKPossibility *(NSString *string) {
+            return [[RKPossibility alloc] initWithValue:[string stringByAppendingString:@"foo"]];
+        }];
+    }];
+    
+    RKPromise *goodPromise = [RKPromise new];
+    [goodPromise addPostProcessor:goodProcessor];
+    [goodPromise accept:@"test"];
+    
+    NSError *error = nil;
+    id value = [goodPromise waitForRealization:&error];
+    STAssertNil(error, @"unexpected error");
+    STAssertNotNil(value, @"missing value");
+    STAssertEqualObjects(value, @"testfoo", @"unexpected value");
+}
+
+- (void)testFailurePostProcessor
+{
+    RKSimplePostProcessor *badProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+        return [maybeData refineValue:^RKPossibility *(NSString *string) {
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:@"SillyErrorDomain"
+                                                                            code:'dumb'
+                                                                        userInfo:@{NSLocalizedDescriptionKey: @"It worked!"}]];
+        }];
+    }];
+    
+    RKPromise *goodPromise = [RKPromise new];
+    [goodPromise addPostProcessor:badProcessor];
+    [goodPromise accept:@"test"];
+    
+    NSError *error = nil;
+    id value = [goodPromise waitForRealization:&error];
+    STAssertNotNil(error, @"missing error");
+    STAssertNil(value, @"unexpected value value");
+}
+
 @end

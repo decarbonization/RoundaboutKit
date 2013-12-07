@@ -28,6 +28,7 @@
 #import "RKPrelude.h"
 #import "RKQueueManager.h"
 #import "RKPromise.h"
+#import "RKPostProcessor.h"
 #import "RKPossibility.h"
 #import "RKDefaults.h"
 #import "RKConnectivityManager.h"
