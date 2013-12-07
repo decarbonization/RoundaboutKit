@@ -100,6 +100,8 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 ///Attempting to do so after will result in an exception being raised. As such,
 ///promises that use post-processors should be fully initialized before tasks that
 ///will communicate through them are started.
+///
+///__Important:__ post processors are run on the thread that the promise is accepted/rejected from.
 - (void)addPostProcessor:(id <RKPostProcessor>)processor;
 
 ///Removes all of the post-processors of the promise.

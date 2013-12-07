@@ -60,9 +60,9 @@
     
     [RunLoopHelper runFor:DEFAULT_TIMEOUT];
     
-    STAssertTrue(finished, @"RKRealize timed out generating value.");
-    STAssertTrue(succeeded, @"RKRealize failed to generate value.");
-    STAssertNotNil(outValue, @"RKRealize yielded nil value.");
+    XCTAssertTrue(finished, @"RKRealize timed out generating value.");
+    XCTAssertTrue(succeeded, @"RKRealize failed to generate value.");
+    XCTAssertNotNil(outValue, @"RKRealize yielded nil value.");
 }
 
 - (void)testFailedRealize
@@ -85,9 +85,9 @@
     
     [RunLoopHelper runFor:DEFAULT_TIMEOUT];
     
-    STAssertTrue(finished, @"RKRealize timed out generating error.");
-    STAssertTrue(failed, @"RKRealize failed to generate error.");
-    STAssertNotNil(outError, @"RKRealize yielded nil error.");
+    XCTAssertTrue(finished, @"RKRealize timed out generating error.");
+    XCTAssertTrue(failed, @"RKRealize failed to generate error.");
+    XCTAssertNotNil(outError, @"RKRealize yielded nil error.");
 }
 
 #pragma mark -
@@ -104,7 +104,7 @@
     [[RKPromise when:promises] then:^(NSArray *possibilities) {
         finished = YES;
         results = RKCollectionMapToArray(possibilities, ^id(RKPossibility *probablyValue) {
-            STAssertEquals(probablyValue.state, kRKPossibilityStateValue, @"A promise unexpectedly failed");
+            XCTAssertEqual(probablyValue.state, kRKPossibilityStateValue, @"A promise unexpectedly failed");
             
             return probablyValue.value;
         });
@@ -114,9 +114,9 @@
     
     BOOL finishedNaturally = [RunLoopHelper runUntil:^BOOL{ return (results != nil); } orSecondsHasElapsed:1.0];
     
-    STAssertTrue(finishedNaturally, @"realize timed out");
-    STAssertTrue(finished, @"RKRealizePromises timed out");
-    STAssertEqualObjects(results, (@[ @0, @1, @2, @3, @4 ]), @"RKRealizePromises yielded wrong value");
+    XCTAssertTrue(finishedNaturally, @"realize timed out");
+    XCTAssertTrue(finished, @"RKRealizePromises timed out");
+    XCTAssertEqualObjects(results, (@[ @0, @1, @2, @3, @4 ]), @"RKRealizePromises yielded wrong value");
 }
 
 #pragma mark - Test Await
@@ -128,8 +128,8 @@
     
     NSError *error = nil;
     id result = [testPromise waitForRealization:&error];
-    STAssertNotNil(result, @"RKAwait failed to yield value");
-    STAssertNil(error, @"RKAwait unexpectedly yielded error");
+    XCTAssertNotNil(result, @"RKAwait failed to yield value");
+    XCTAssertNil(error, @"RKAwait unexpectedly yielded error");
 }
 
 - (void)testErrorAwait
@@ -139,8 +139,8 @@
     
     NSError *error = nil;
     id result = [testPromise waitForRealization:&error];
-    STAssertNil(result, @"RKAwait unexpectedly yielded error");
-    STAssertNotNil(error, @"RKAwait failed to yield error");
+    XCTAssertNil(result, @"RKAwait unexpectedly yielded error");
+    XCTAssertNotNil(error, @"RKAwait failed to yield error");
 }
 
 #pragma mark - Test Post Processors
@@ -159,9 +159,9 @@
     
     NSError *error = nil;
     id value = [goodPromise waitForRealization:&error];
-    STAssertNil(error, @"unexpected error");
-    STAssertNotNil(value, @"missing value");
-    STAssertEqualObjects(value, @"testfoo", @"unexpected value");
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(value, @"missing value");
+    XCTAssertEqualObjects(value, @"testfoo", @"unexpected value");
 }
 
 - (void)testFailurePostProcessor
@@ -180,8 +180,8 @@
     
     NSError *error = nil;
     id value = [goodPromise waitForRealization:&error];
-    STAssertNotNil(error, @"missing error");
-    STAssertNil(value, @"unexpected value value");
+    XCTAssertNotNil(error, @"missing error");
+    XCTAssertNil(value, @"unexpected value value");
 }
 
 @end

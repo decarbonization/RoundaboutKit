@@ -6,8 +6,8 @@
 //
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
-@interface RKFileSystemCacheManagerTests : SenTestCase
+@interface RKFileSystemCacheManagerTests : XCTestCase
 
 @end

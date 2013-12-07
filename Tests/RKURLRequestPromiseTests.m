@@ -65,10 +65,10 @@
     
     NSError *error = nil;
     NSData *result = [testPromise waitForRealization:&error];
-    STAssertNotNil(result, @"RKAwait unexpectedly failed");
+    XCTAssertNotNil(result, @"RKAwait unexpectedly failed");
     
     NSString *resultString = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-    STAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Incorrect result");
+    XCTAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Incorrect result");
 }
 
 #pragma mark -
@@ -90,11 +90,11 @@
     
     NSError *error = nil;
     NSData *result = [testPromise waitForRealization:&error];
-    STAssertNotNil(result, @"RKAwait unexpectedly failed");
+    XCTAssertNotNil(result, @"RKAwait unexpectedly failed");
     
-    STAssertTrue(hadRequest, @"No request was passed to preflight");
-    STAssertTrue(hadOutError, @"No outError was passed to preflight");
-    STAssertTrue(hadSecondaryThread, @"Preflight was invoked from main thread");
+    XCTAssertTrue(hadRequest, @"No request was passed to preflight");
+    XCTAssertTrue(hadOutError, @"No outError was passed to preflight");
+    XCTAssertTrue(hadSecondaryThread, @"Preflight was invoked from main thread");
 }
 
 - (void)testPostProcessorAssumptions
@@ -112,10 +112,10 @@
     
     NSError *error = nil;
     NSData *result = [testPromise waitForRealization:&error];
-    STAssertNotNil(result, @"RKAwait unexpectedly failed");
+    XCTAssertNotNil(result, @"RKAwait unexpectedly failed");
     
-    STAssertTrue(hadPossibility, @"Post-processor was given no data");
-    STAssertTrue(hadSecondaryThread, @"Post-processor was invoked from main thread");
+    XCTAssertTrue(hadPossibility, @"Post-processor was given no data");
+    XCTAssertTrue(hadSecondaryThread, @"Post-processor was invoked from main thread");
 }
 
 #pragma mark -
@@ -142,16 +142,16 @@
     
     NSError *error = nil;
     NSData *result = [testPromise waitForRealization:&error];
-    STAssertNotNil(result, @"RKAwait unexpectedly failed");
+    XCTAssertNotNil(result, @"RKAwait unexpectedly failed");
     
-    STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
-    STAssertTrue(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
-    STAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
-    STAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
-    STAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
+    XCTAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
+    XCTAssertTrue(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
+    XCTAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
+    XCTAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
+    XCTAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
     
     NSString *resultString = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-    STAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Wrong result was given");
+    XCTAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Wrong result was given");
 }
 
 - (void)testCacheManagerAssumptionsWithDifferentEtag
@@ -176,16 +176,16 @@
     
     NSError *error = nil;
     NSData *result = [testPromise waitForRealization:&error];
-    STAssertNotNil(result, @"RKAwait unexpectedly failed");
+    XCTAssertNotNil(result, @"RKAwait unexpectedly failed");
     
-    STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
-    STAssertTrue(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
-    STAssertTrue(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
-    STAssertFalse(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
-    STAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
+    XCTAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
+    XCTAssertTrue(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
+    XCTAssertTrue(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
+    XCTAssertFalse(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
+    XCTAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
     
     NSString *resultString = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
-    STAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Wrong result was given");
+    XCTAssertEqualObjects(resultString, PLAIN_TEXT_STRING, @"Wrong result was given");
 }
 
 - (void)testCacheManagerAssumptionsAboutFailure
@@ -212,13 +212,13 @@
     
     NSError *error = nil;
     NSData *result = [testPromise waitForRealization:&error];
-    STAssertNil(result, @"RKAwait unexpectedly succeeded");
-    STAssertNotNil(error, @"RKAwait propagated no error");
-    STAssertTrue(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was not called");
+    XCTAssertNil(result, @"RKAwait unexpectedly succeeded");
+    XCTAssertNotNil(error, @"RKAwait propagated no error");
+    XCTAssertTrue(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was not called");
     
-    STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
-    STAssertEqualObjects(error.domain, RKURLRequestPromiseErrorDomain, @"Error has wrong domain");
-    STAssertEquals(error.code, kRKURLRequestPromiseErrorCannotLoadCache, @"Error has wrong code");
+    XCTAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
+    XCTAssertEqualObjects(error.domain, RKURLRequestPromiseErrorDomain, @"Error has wrong domain");
+    XCTAssertEqual(error.code, kRKURLRequestPromiseErrorCannotLoadCache, @"Error has wrong code");
 }
 
 - (void)testCacheManagerPreloading
@@ -250,13 +250,13 @@
     
     BOOL finishedNaturally = [RunLoopHelper runUntil:^BOOL{ return (hasLoaded == YES); } orSecondsHasElapsed:1.0];
     
-    STAssertTrue(finishedNaturally, @"load timed out.");
-    STAssertNotNil(maybeValue, @"No value was given to cached data block.");
-    STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
-    STAssertFalse(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
-    STAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
-    STAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
-    STAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
+    XCTAssertTrue(finishedNaturally, @"load timed out.");
+    XCTAssertNotNil(maybeValue, @"No value was given to cached data block.");
+    XCTAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
+    XCTAssertFalse(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
+    XCTAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
+    XCTAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
+    XCTAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
 }
 
 #pragma mark -
@@ -279,8 +279,8 @@
     
     RKPostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
     RKPossibility *result = postProcessor3([[RKPossibility alloc] initWithValue:@"it should equal"], nil);
-    STAssertEquals(result.state, kRKPossibilityStateValue, @"Unexpected state");
-    STAssertEqualObjects(result.value, @"it should equal fizzbuzz", @"Unexpected value");
+    XCTAssertEqual(result.state, kRKPossibilityStateValue, @"Unexpected state");
+    XCTAssertEqualObjects(result.value, @"it should equal fizzbuzz", @"Unexpected value");
 }
 
 - (void)testJSONPostProcessor
@@ -293,31 +293,31 @@
     
     NSData *goodTestData = [NSJSONSerialization dataWithJSONObject:goodTest options:0 error:NULL];
     RKPossibility *goodResult = kRKJSONPostProcessorBlock([[RKPossibility alloc] initWithValue:goodTestData], nil);
-    STAssertEquals(goodResult.state, kRKPossibilityStateValue, @"Unexpected state");
-    STAssertEqualObjects(goodResult.value, goodTest, @"Unexpected value");
+    XCTAssertEqual(goodResult.state, kRKPossibilityStateValue, @"Unexpected state");
+    XCTAssertEqualObjects(goodResult.value, goodTest, @"Unexpected value");
     
     NSData *badTestData = [@"this is pure garbage" dataUsingEncoding:NSUTF8StringEncoding];
     RKPossibility *badResult = kRKJSONPostProcessorBlock([[RKPossibility alloc] initWithValue:badTestData], nil);
-    STAssertEquals(badResult.state, kRKPossibilityStateError, @"Unexpected state");
-    STAssertNotNil(badResult.error, @"Missing error");
+    XCTAssertEqual(badResult.state, kRKPossibilityStateError, @"Unexpected state");
+    XCTAssertNotNil(badResult.error, @"Missing error");
 }
 
 - (void)testImagePostProcessor
 {
     NSURL *goodTestLocation = [[NSBundle bundleForClass:[self class]] URLForImageResource:@"RKPostProcessorTestImage"];
     NSImage *goodTest = [[NSImage alloc] initWithContentsOfURL:goodTestLocation];
-    STAssertNotNil(goodTest, @"Missing test image");
+    XCTAssertNotNil(goodTest, @"Missing test image");
     
     NSData *goodTestData = NSImagePNGRepresentation(goodTest);
     RKPossibility *goodResult = kRKImagePostProcessorBlock([[RKPossibility alloc] initWithValue:goodTestData], nil);
-    STAssertEquals(goodResult.state, kRKPossibilityStateValue, @"Unexpected state");
-    STAssertNotNil(goodResult.value, @"Unexpected missing value");
-    STAssertTrue(NSEqualSizes(goodTest.size, [goodResult.value size]), @"Size mismatch");
+    XCTAssertEqual(goodResult.state, kRKPossibilityStateValue, @"Unexpected state");
+    XCTAssertNotNil(goodResult.value, @"Unexpected missing value");
+    XCTAssertTrue(NSEqualSizes(goodTest.size, [goodResult.value size]), @"Size mismatch");
     
     NSData *badTestData = [@"this is most definitely not a valid image" dataUsingEncoding:NSUTF8StringEncoding];
     RKPossibility *badResult = kRKImagePostProcessorBlock([[RKPossibility alloc] initWithValue:badTestData], nil);
-    STAssertEquals(badResult.state, kRKPossibilityStateError, @"Unexpected state");
-    STAssertNotNil(badResult.error, @"Missing error");
+    XCTAssertEqual(badResult.state, kRKPossibilityStateError, @"Unexpected state");
+    XCTAssertNotNil(badResult.error, @"Missing error");
 }
 
 @end

@@ -7,8 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
-@interface RKPreludeTests : SenTestCase
+@interface RKPreludeTests : XCTestCase
 
 @end

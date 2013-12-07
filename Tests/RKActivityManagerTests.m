@@ -26,24 +26,24 @@
 {
     RKActivityManager *activityManager = [RKActivityManager sharedActivityManager];
     
-    STAssertFalse(activityManager.isActive, @".isActive is wrong");
-    STAssertEquals(activityManager.activityCount, 0UL, @".activityCount is wrong");
+    XCTAssertFalse(activityManager.isActive, @".isActive is wrong");
+    XCTAssertEqual(activityManager.activityCount, 0UL, @".activityCount is wrong");
     
     [activityManager incrementActivityCount];
     [activityManager incrementActivityCount];
     
-    STAssertTrue(activityManager.isActive, @".isActive is wrong");
-    STAssertEquals(activityManager.activityCount, 2UL, @".activityCount is wrong");
+    XCTAssertTrue(activityManager.isActive, @".isActive is wrong");
+    XCTAssertEqual(activityManager.activityCount, 2UL, @".activityCount is wrong");
     
     [activityManager decrementActivityCount];
     [activityManager decrementActivityCount];
     
-    STAssertFalse(activityManager.isActive, @".isActive is wrong");
-    STAssertEquals(activityManager.activityCount, 0UL, @".activityCount is wrong");
+    XCTAssertFalse(activityManager.isActive, @".isActive is wrong");
+    XCTAssertEqual(activityManager.activityCount, 0UL, @".activityCount is wrong");
     
     [activityManager decrementActivityCount];
     
-    STAssertEquals(activityManager.activityCount, 0UL, @".activityCount is wrong");
+    XCTAssertEqual(activityManager.activityCount, 0UL, @".activityCount is wrong");
 }
 
 @end

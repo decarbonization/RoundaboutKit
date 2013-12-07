@@ -50,36 +50,36 @@ static NSString *const TestDefault1Key = @"com.roundabout.roundaboutkitests/Test
 - (void)testPersistentObject
 {
     RKSetPersistentObject(PersistentObjectKey, @"potatoes");
-    STAssertEqualObjects(RKGetPersistentObject(PersistentObjectKey), @"potatoes", @"RK*PersistentObject is broken");
+    XCTAssertEqualObjects(RKGetPersistentObject(PersistentObjectKey), @"potatoes", @"RK*PersistentObject is broken");
 }
 
 - (void)testPersistentInteger
 {
     RKSetPersistentInteger(PersistentIntegerKey, 42);
-    STAssertEquals(RKGetPersistentInteger(PersistentIntegerKey), 42L, @"RK*PersistentInteger is broken");
+    XCTAssertEqual(RKGetPersistentInteger(PersistentIntegerKey), 42L, @"RK*PersistentInteger is broken");
 }
 
 - (void)testPersistentFloat
 {
     RKSetPersistentFloat(PersistentFloatKey, 42.f);
-    STAssertEquals(RKGetPersistentFloat(PersistentFloatKey), 42.f, @"RK*PersistentFloat is broken");
+    XCTAssertEqual(RKGetPersistentFloat(PersistentFloatKey), 42.f, @"RK*PersistentFloat is broken");
 }
 
 - (void)testPersistentBool
 {
     RKSetPersistentBool(PersistentBoolKey, YES);
-    STAssertEquals(RKGetPersistentBool(PersistentBoolKey), YES, @"RK*PersistentBOOL is broken");
+    XCTAssertEqual(RKGetPersistentBool(PersistentBoolKey), YES, @"RK*PersistentBOOL is broken");
 }
 
 #pragma mark -
 
 - (void)testPersistentValueExists
 {
-    STAssertFalse(RKPersistentValueExists(TestDefault1Key), @"RKPersistentValueExists returned wrong result");
+    XCTAssertFalse(RKPersistentValueExists(TestDefault1Key), @"RKPersistentValueExists returned wrong result");
     
     RKSetPersistentObject(TestDefault1Key, @"potatoes");
     
-    STAssertTrue(RKPersistentValueExists(TestDefault1Key), @"RKPersistentValueExists returned wrong result");
+    XCTAssertTrue(RKPersistentValueExists(TestDefault1Key), @"RKPersistentValueExists returned wrong result");
 }
 
 @end

@@ -33,7 +33,6 @@
 		8B7584291792106800D45F54 /* RKConnectivityManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C317920E9A00D45F54 /* RKConnectivityManager.h */; };
 		8B75842A1792106800D45F54 /* RKActivityManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C117920E9A00D45F54 /* RKActivityManager.h */; };
 		8B75842B1792106800D45F54 /* RKDefaults.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C517920E9A00D45F54 /* RKDefaults.h */; };
-		8B758432179210F300D45F54 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B758431179210F300D45F54 /* SenTestingKit.framework */; };
 		8B758438179210F300D45F54 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8B758436179210F300D45F54 /* InfoPlist.strings */; };
 		8B7584421792113D00D45F54 /* RKPostProcessorTestImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B7584411792113D00D45F54 /* RKPostProcessorTestImage.png */; };
 		8B75845B1792114B00D45F54 /* RKActivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7584441792114B00D45F54 /* RKActivityManagerTests.m */; };
@@ -51,6 +50,7 @@
 		8B7D8E491852977500215AE5 /* RKPostProcessor.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7D8E471852977500215AE5 /* RKPostProcessor.h */; };
 		8B7D8E4A1852977500215AE5 /* RKPostProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D8E481852977500215AE5 /* RKPostProcessor.m */; };
 		8B7D8E4B1852977500215AE5 /* RKPostProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D8E481852977500215AE5 /* RKPostProcessor.m */; };
+		8B7D8E4D1852B11700215AE5 /* RKPostProcessorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D8E4C1852B11700215AE5 /* RKPostProcessorTests.m */; };
 		8BDA554417ED11E200848C2F /* RoundaboutKitMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */; };
 		8BDA554817ED11F200848C2F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDA554717ED11F200848C2F /* Cocoa.framework */; };
 		8BE806F71792189300DFEC35 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7583EF1792100D00D45F54 /* Cocoa.framework */; };
@@ -149,8 +149,7 @@
 		8B7583F21792100D00D45F54 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8B7583F31792100D00D45F54 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		8B7583F41792100D00D45F54 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		8B758430179210F300D45F54 /* Tests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8B758431179210F300D45F54 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		8B758430179210F300D45F54 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B758435179210F300D45F54 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		8B758437179210F300D45F54 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8B75843B179210F300D45F54 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
@@ -180,6 +179,7 @@
 		8B7584761792141900D45F54 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		8B7D8E471852977500215AE5 /* RKPostProcessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPostProcessor.h; sourceTree = "<group>"; };
 		8B7D8E481852977500215AE5 /* RKPostProcessor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPostProcessor.m; sourceTree = "<group>"; };
+		8B7D8E4C1852B11700215AE5 /* RKPostProcessorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPostProcessorTests.m; sourceTree = "<group>"; };
 		8BDA554517ED11ED00848C2F /* RubyCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RubyCocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/RubyCocoa.framework; sourceTree = DEVELOPER_DIR; };
 		8BDA554717ED11F200848C2F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoundaboutKitMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -206,7 +206,6 @@
 				8BDA554817ED11F200848C2F /* Cocoa.framework in Frameworks */,
 				8BDA554417ED11E200848C2F /* RoundaboutKitMac.framework in Frameworks */,
 				8B7584781792142100D45F54 /* SystemConfiguration.framework in Frameworks */,
-				8B758432179210F300D45F54 /* SenTestingKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,7 +236,7 @@
 			isa = PBXGroup;
 			children = (
 				8B75839817920E7200D45F54 /* libRoundaboutKit.a */,
-				8B758430179210F300D45F54 /* Tests.octest */,
+				8B758430179210F300D45F54 /* Tests.xctest */,
 				8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */,
 			);
 			name = Products;
@@ -255,7 +254,6 @@
 				8B7583A917920E7200D45F54 /* XCTest.framework */,
 				8B7583AC17920E7200D45F54 /* UIKit.framework */,
 				8B7583EF1792100D00D45F54 /* Cocoa.framework */,
-				8B758431179210F300D45F54 /* SenTestingKit.framework */,
 				8B7583F11792100D00D45F54 /* Other Frameworks */,
 			);
 			name = Frameworks;
@@ -354,6 +352,7 @@
 				8B7584561792114B00D45F54 /* RKPromiseTests.m */,
 				8B7584571792114B00D45F54 /* RKURLRequestPromiseTests.h */,
 				8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */,
+				8B7D8E4C1852B11700215AE5 /* RKPostProcessorTests.m */,
 				8B758434179210F300D45F54 /* Supporting Files */,
 			);
 			path = Tests;
@@ -462,8 +461,8 @@
 			);
 			name = Tests;
 			productName = Tests;
-			productReference = 8B758430179210F300D45F54 /* Tests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productReference = 8B758430179210F300D45F54 /* Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		8BE806F51792189300DFEC35 /* RoundaboutKitMac */ = {
 			isa = PBXNativeTarget;
@@ -571,6 +570,7 @@
 				8B7584601792114B00D45F54 /* RKMockURLProtocol.m in Sources */,
 				8B75845D1792114B00D45F54 /* RKDefaultsTests.m in Sources */,
 				8B7584611792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m in Sources */,
+				8B7D8E4D1852B11700215AE5 /* RKPostProcessorTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -733,7 +733,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
@@ -753,7 +752,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;
 		};
