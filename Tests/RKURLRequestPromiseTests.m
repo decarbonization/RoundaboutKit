@@ -64,7 +64,7 @@
     RKURLRequestPromise *testPromise = [self makePlainTextWithNoCacheRequest];
     
     NSError *error = nil;
-    NSData *result = [testPromise await:&error];
+    NSData *result = [testPromise waitForRealization:&error];
     STAssertNotNil(result, @"RKAwait unexpectedly failed");
     
     NSString *resultString = [[NSString alloc] initWithData:result encoding:NSUTF8StringEncoding];
@@ -89,7 +89,7 @@
     };
     
     NSError *error = nil;
-    NSData *result = [testPromise await:&error];
+    NSData *result = [testPromise waitForRealization:&error];
     STAssertNotNil(result, @"RKAwait unexpectedly failed");
     
     STAssertTrue(hadRequest, @"No request was passed to preflight");
@@ -111,7 +111,7 @@
     };
     
     NSError *error = nil;
-    NSData *result = [testPromise await:&error];
+    NSData *result = [testPromise waitForRealization:&error];
     STAssertNotNil(result, @"RKAwait unexpectedly failed");
     
     STAssertTrue(hadPossibility, @"Post-processor was given no data");
@@ -141,7 +141,7 @@
     testPromise.connectivityManager = self.connectivityManager;
     
     NSError *error = nil;
-    NSData *result = [testPromise await:&error];
+    NSData *result = [testPromise waitForRealization:&error];
     STAssertNotNil(result, @"RKAwait unexpectedly failed");
     
     STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
@@ -175,7 +175,7 @@
     testPromise.connectivityManager = self.connectivityManager;
     
     NSError *error = nil;
-    NSData *result = [testPromise await:&error];
+    NSData *result = [testPromise waitForRealization:&error];
     STAssertNotNil(result, @"RKAwait unexpectedly failed");
     
     STAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
@@ -211,7 +211,7 @@
     testPromise.connectivityManager = self.connectivityManager;
     
     NSError *error = nil;
-    NSData *result = [testPromise await:&error];
+    NSData *result = [testPromise waitForRealization:&error];
     STAssertNil(result, @"RKAwait unexpectedly succeeded");
     STAssertNotNil(error, @"RKAwait propagated no error");
     STAssertTrue(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was not called");

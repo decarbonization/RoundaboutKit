@@ -16,6 +16,7 @@
 
 #import "RKQueueManager.h"
 #import "RKPossibility.h"
+#import "RKPostProcessor.h"
 
 ///Returns a string representation for a given state.
 static NSString *RKPromiseStateGetString(RKPromiseState state)
@@ -63,7 +64,11 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 #pragma mark -
 
 @implementation RKPromise {
-    OSSpinLock _stateMutex;
+    ///The lock that regulates access to the promise's contents and state.
+    OSSpinLock _stateGuard;
+    
+    ///Any post-processors associated with the promise. Lazily initialized.
+    NSMutableArray *_postProcessors;
 }
 
 - (instancetype)init
@@ -71,7 +76,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
     if((self = [super init])) {
         self.promiseName = @"<anonymous>";
         
-        _stateMutex = OS_SPINLOCK_INIT;
+        _stateGuard = OS_SPINLOCK_INIT;
     }
     
     return self;
@@ -140,6 +145,40 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 
 #pragma mark - Propagating Values
 
+///Takes an input value and error, passes them through any post-processors
+///associated with the promise, and sets the receivers `self.contents` and
+///`self.state` properties.
+///
+/// \param  value   The value that was accepted, if any.
+/// \param  error   The error occurred, if any. This value being non-nil
+///                 indicates to post-processors that an error occurred.
+///
+///The `self.contents` and `self.state` properties will be set after this
+///method finishes executing. This method should _only_ be called when the
+///`_stateGuard` is locked.
+- (void)processValue:(id)value error:(NSError *)error
+{
+    for (id <RKPostProcessor> postProcessor in _postProcessors) {
+        if(value && ![value isKindOfClass:[postProcessor inputValueType]])
+            [NSException raise:NSInvalidArgumentException format:@"Post-processor %@ given value of type %@, expected %@.", postProcessor, [value class], [postProcessor inputValueType]];
+        
+        [postProcessor processInputValue:value inputError:error context:self];
+        
+        value = postProcessor.outputValue;
+        error = postProcessor.outputError;
+    }
+    
+    if(error) {
+        self.contents = error;
+        self.state = RKPromiseStateError;
+    } else {
+        self.contents = value;
+        self.state = RKPromiseStateValue;
+    }
+}
+
+#pragma mark -
+
 - (void)accept:(id)value
 {
     if(self.contents != nil)
@@ -147,13 +186,12 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                        reason:@"Cannot accept a promise more than once"
                                      userInfo:nil];
     
-    OSSpinLockLock(&_stateMutex);
+    OSSpinLockLock(&_stateGuard);
     {
-        self.contents = value;
-        self.state = RKPromiseStateValue;
+        [self processValue:value error:nil];
         [self invoke];
     }
-    OSSpinLockUnlock(&_stateMutex);
+    OSSpinLockUnlock(&_stateGuard);
 }
 
 - (void)reject:(NSError *)error
@@ -163,13 +201,42 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                        reason:@"Cannot reject a promise more than once"
                                      userInfo:nil];
     
-    OSSpinLockLock(&_stateMutex);
+    OSSpinLockLock(&_stateGuard);
     {
-        self.contents = error;
-        self.state = RKPromiseStateError;
+        [self processValue:nil error:error];
         [self invoke];
     }
-    OSSpinLockUnlock(&_stateMutex);
+    OSSpinLockUnlock(&_stateGuard);
+}
+
+#pragma mark - Processors
+
+- (void)addPostProcessor:(id <RKPostProcessor>)processor
+{
+    NSParameterAssert(processor);
+    
+    if(self.contents != nil)
+        @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                       reason:@"Cannot add a post-processor to an already-realized promise."
+                                     userInfo:nil];
+    
+    OSSpinLockLock(&_stateGuard);
+    {
+        if(!_postProcessors)
+            _postProcessors = [NSMutableArray new];
+        
+        [_postProcessors addObject:processor];
+    }
+    OSSpinLockUnlock(&_stateGuard);
+}
+
+- (void)removeAllPostProcessors
+{
+    OSSpinLockLock(&_stateGuard);
+    {
+        [_postProcessors removeAllObjects];
+    }
+    OSSpinLockUnlock(&_stateGuard);
 }
 
 #pragma mark - Realizing
@@ -238,7 +305,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                      userInfo:nil];
     }
     
-    OSSpinLockLock(&_stateMutex);
+    OSSpinLockLock(&_stateGuard);
     {
         self.thenBlock = then;
         self.otherwiseBlock = otherwise;
@@ -250,7 +317,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
             [self fire];
         }
     }
-    OSSpinLockUnlock(&_stateMutex);
+    OSSpinLockUnlock(&_stateGuard);
 }
 
 #pragma mark -
@@ -287,7 +354,7 @@ static const char *kCurrentPromiseAssociatedObjectKey = "com.roundabout.rk.promi
 
 #pragma mark -
 
-- (id)await:(NSError **)outError
+- (id)waitForRealization:(NSError **)outError
 {
     __block id resultValue = nil;
     __block NSError *resultError = nil;

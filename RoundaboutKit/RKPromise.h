@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol RKPostProcessor;
+
 ///The different states a promise can be in.
 typedef NS_ENUM(NSUInteger, RKPromiseState) {
     ///The promise is not yet realized.
@@ -83,6 +85,26 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 ///This method or `-[self accept:]` may only be called once.
 - (void)reject:(NSError *)error;
 
+#pragma mark - Processors
+
+///Adds a new post-processor block to execute when a promise is either
+///accepted with a value, or rejected with an error. Post processors
+///are executed in the order in which they are added to a promise.
+///Refined values from post-processors are propagated downwards. That is
+///to say, if you start with a post-processor that converts raw data into
+///JSON objects, the next post-processor will receive those JSON objects.
+///
+/// \param  processor   The post-processor block to add. Required.
+///
+///Post-processors may only be added to a promise before it is accepted/rejected.
+///Attempting to do so after will result in an exception being raised. As such,
+///promises that use post-processors should be fully initialized before tasks that
+///will communicate through them are started.
+- (void)addPostProcessor:(id <RKPostProcessor>)processor;
+
+///Removes all of the post-processors of the promise.
+- (void)removeAllPostProcessors;
+
 #pragma mark - Realizing
 
 ///Overriden by subclasses that wish to perform work based on the promise being realized.
@@ -136,7 +158,7 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 ///
 /// \result The result of realizing the promise.
 ///
-- (id)await:(NSError **)outError;
+- (id)waitForRealization:(NSError **)outError;
 
 @end
 
@@ -188,7 +210,7 @@ RK_INLINE RK_OVERLOADABLE void RKRealize(RKPromise *promise,
 ///In this form, if nil is returned it is the result of the promise.
 RK_INLINE RK_OVERLOADABLE id RKAwait(RKPromise *promise, NSError **outError)
 {
-	return [promise await:outError];
+	return [promise waitForRealization:outError];
 }
 RK_INLINE RK_OVERLOADABLE id RKAwait(RKPromise *promise)
 {

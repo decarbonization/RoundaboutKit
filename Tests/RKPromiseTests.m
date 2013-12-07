@@ -127,7 +127,7 @@
                                                               duration:0.05];
     
     NSError *error = nil;
-    id result = [testPromise await:&error];
+    id result = [testPromise waitForRealization:&error];
     STAssertNotNil(result, @"RKAwait failed to yield value");
     STAssertNil(error, @"RKAwait unexpectedly yielded error");
 }
@@ -138,7 +138,7 @@
                                                               duration:0.05];
     
     NSError *error = nil;
-    id result = [testPromise await:&error];
+    id result = [testPromise waitForRealization:&error];
     STAssertNil(result, @"RKAwait unexpectedly yielded error");
     STAssertNotNil(error, @"RKAwait failed to yield error");
 }
