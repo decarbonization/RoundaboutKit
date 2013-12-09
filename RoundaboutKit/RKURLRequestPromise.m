@@ -24,122 +24,6 @@ static NSString *const kETagHeaderKey = @"Etag";
 static NSString *const kExpiresHeaderKey = @"Expires";
 static NSString *const kDefaultRevision = @"-1";
 
-#if RKURLRequestPromise_Option_TrackActiveRequests
-#pragma mark - Tracking Active Requests
-
-#warning RKURLRequestPromise_Option_TrackActiveRequests = 1
-
-static CFMutableArrayRef GetSharedActiveRequestArray()
-{
-    static CFMutableArrayRef _ActiveRequests = NULL;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        CFArrayCallBacks callbacks = {
-            .version = 0,
-            .retain = NULL,
-            .release = NULL,
-            .copyDescription = &CFCopyDescription,
-            .equal = &CFEqual,
-        };
-        _ActiveRequests = CFArrayCreateMutable(kCFAllocatorDefault, 0, &callbacks);
-    });
-    
-    return _ActiveRequests;
-}
-
-static void AddRequestToActiveRequestArray(RKURLRequestPromise *request)
-{
-    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
-    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
-        CFArrayAppendValue(sharedActiveRequestArray, (__bridge const void *)request);
-    }
-}
-
-static void RemoveRequestFromActiveRequestArray(RKURLRequestPromise *request)
-{
-    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
-    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
-        CFIndex indexOfRequest = CFArrayGetFirstIndexOfValue(sharedActiveRequestArray,
-                                                             CFRangeMake(0, CFArrayGetCount(sharedActiveRequestArray)),
-                                                             (__bridge const void *)request);
-        if(indexOfRequest == kCFNotFound)
-            return;
-        
-        CFArrayRemoveValueAtIndex(sharedActiveRequestArray, indexOfRequest);
-    }
-}
-
-static CFIndex ActiveRequestArrayGetInstanteousCount()
-{
-    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
-    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
-        return CFArrayGetCount(sharedActiveRequestArray);
-    }
-}
-
-static NSArray *ActiveRequestArrayGetInstanteousCopy()
-{
-    CFMutableArrayRef sharedActiveRequestArray = GetSharedActiveRequestArray();
-    @synchronized((__bridge NSMutableArray *)sharedActiveRequestArray) {
-        return [(__bridge NSMutableArray *)sharedActiveRequestArray copy];
-    }
-}
-
-#pragma mark -
-
-RK_INLINE void RequestDidIsBecomingActive(RKURLRequestPromise *request)
-{
-    AddRequestToActiveRequestArray(request);
-}
-
-RK_INLINE void RequestDidFail(RKURLRequestPromise *request)
-{
-    RemoveRequestFromActiveRequestArray(request);
-}
-
-RK_INLINE void RequestDidSucceed(RKURLRequestPromise *request)
-{
-    RemoveRequestFromActiveRequestArray(request);
-}
-
-RK_INLINE void RequestCancelled(RKURLRequestPromise *request)
-{
-    RemoveRequestFromActiveRequestArray(request);
-}
-
-RK_INLINE void RequestIsDeallocating(RKURLRequestPromise *request)
-{
-    RemoveRequestFromActiveRequestArray(request);
-}
-
-#else
-
-static CFIndex ActiveRequestArrayGetInstanteousCount()
-{
-    RKLogWarning(@"Attempting to get number of active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
-    return 0;
-}
-
-static NSArray *ActiveRequestArrayGetInstanteousCopy()
-{
-    RKLogWarning(@"Attempting to get active RKURLRequestPromises when RKURLRequestPromise_Option_TrackActiveRequests is set to 0");
-    return nil;
-}
-
-#define RequestDidIsBecomingActive(...)
-#define RequestDidFail(...)
-#define RequestDidSucceed(...)
-#define RequestCancelled(...)
-#define RequestIsDeallocating(...)
-#define RequestDidIsBecomingActive(...)
-
-#endif /* RKURLRequestPromise_Option_TrackActiveRequests */
-
-static NSTimeInterval _CumulativeResponseTime = 0.0;
-static NSUInteger _NumberOfCompletedRequests = 0;
-
-#pragma mark -
-
 @interface RKURLRequestPromise () <NSURLConnectionDelegate>
 
 #pragma mark - Internal Properties
@@ -149,15 +33,6 @@ static NSUInteger _NumberOfCompletedRequests = 0;
 
 ///Whether or not the cache has been successfully loaded.
 @property BOOL isCacheLoaded;
-
-#pragma mark -
-
-#if RKURLRequestPromise_Option_MeasureResponseTimes
-
-///When the request started.
-@property (nonatomic) NSDate *startDate;
-
-#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
 
 #pragma mark - Readwrite Properties
 
@@ -184,58 +59,10 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     RKSimplePostProcessorBlock _legacyPostProcessor;
 }
 
-#pragma mark - Tracking Requests
-
-+ (NSUInteger)numberOfActiveRequests
-{
-    return ActiveRequestArrayGetInstanteousCount();
-}
-
-+ (NSArray *)activeRequests
-{
-    return ActiveRequestArrayGetInstanteousCopy();
-}
-
-+ (void)prettyPrintActiveRequests
-{
-    NSArray *activeRequests = [self activeRequests];
-    puts([[NSString stringWithFormat:@"-- begin %ld active requests --", (unsigned long)activeRequests.count] UTF8String]);
-    putc('\n', stdout);
-    
-    for (RKURLRequestPromise *activeRequest in activeRequests) {
-        NSString *method = activeRequest.request.HTTPMethod;
-        NSURL *url = activeRequest.request.URL;
-        puts([[NSString stringWithFormat:@"%@ %@", method, url] UTF8String]);
-        
-        NSString *cacheIdentiifer = activeRequest.cacheIdentifier;
-        id <RKURLRequestPromiseCacheManager> cacheManager = activeRequest.cacheManager;
-        puts([[NSString stringWithFormat:@"\twith cache id \"%@\" in manager %@", cacheIdentiifer, cacheManager] UTF8String]);
-        
-        NSString *requestQueueName = activeRequest.requestQueue.name ?: [activeRequest.requestQueue description];
-        puts([[NSString stringWithFormat:@"\ton request queue %@", requestQueueName] UTF8String]);
-        
-        putc('\n', stdout);
-    }
-    
-    puts([[NSString stringWithFormat:@"-- end %ld active requests --", (unsigned long)activeRequests.count] UTF8String]);
-}
-
-#pragma mark -
-
-+ (NSTimeInterval)averageRequestDuration
-{
-#if RKURLRequestPromise_Option_MeasureResponseTimes
-    return _NumberOfCompletedRequests > 0? _CumulativeResponseTime / _NumberOfCompletedRequests : 0.0;
-#else
-    return 0.0;
-#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
-}
-
 #pragma mark - Lifecycle
 
 - (void)dealloc
 {
-    RequestIsDeallocating(self);
     [self cancel:nil];
 }
 
@@ -312,8 +139,6 @@ static NSUInteger _NumberOfCompletedRequests = 0;
             }
         }
         
-        RequestDidIsBecomingActive(self);
-        
         if(_isInOfflineMode) {
             [self.requestQueue addOperationWithBlock:^{
                 [self loadCacheAndReportError:YES];
@@ -332,7 +157,7 @@ static NSUInteger _NumberOfCompletedRequests = 0;
         }
         
 #if RKURLRequestPromise_Option_LogRequests
-        RKLogInfo(@"[DEBUG] Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+        RKLogInfo(@"Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
 #endif /* RKURLRequestPromise_Option_LogRequests */
     }];
 }
@@ -346,14 +171,12 @@ static NSUInteger _NumberOfCompletedRequests = 0;
         }
         
 #if RKURLRequestPromise_Option_LogRequests
-        RKLogInfo(@"[DEBUG] Outgoing request to <%@> cancelled", self.request.URL);
+        RKLogInfo(@"Outgoing request to <%@> cancelled", self.request.URL);
 #endif /* RKURLRequestPromise_Option_LogRequests */
         
         [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
         self.cancelled = YES;
-        
-        RequestCancelled(self);
     }
 }
 
@@ -447,14 +270,12 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
 #if RKURLRequestPromise_Option_LogResponses
-    RKLogInfo(@"[DEBUG] %@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    RKLogInfo(@"%@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 #endif /* RKURLRequestPromise_Option_LogResponses */
     
     //Post-processors can be long running.
     if(self.cancelled)
         return;
-    
-    RequestDidSucceed(self);
     
     [self accept:data];
 }
@@ -467,10 +288,8 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
 #if RKURLRequestPromise_Option_LogErrors
-    RKLogInfo(@"[DEBUG] Error for request to <%@>: %@", self.request.URL, error);
+    RKLogInfo(@"Error for request to <%@>: %@", self.request.URL, error);
 #endif /* RKURLRequestPromise_Option_LogErrors */
-    
-    RequestDidFail(self);
     
     [self reject:error];
 }

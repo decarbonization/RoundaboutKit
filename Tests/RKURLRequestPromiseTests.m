@@ -104,12 +104,15 @@
     
     __block BOOL hadPossibility = NO;
     __block BOOL hadSecondaryThread = NO;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     testPromise.postProcessor = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
         hadPossibility = (maybeData != nil);
         hadSecondaryThread = ![NSThread isMainThread];
         
         return maybeData;
     };
+#pragma clang diagnostic pop
     
     NSError *error = nil;
     NSData *result = [testPromise waitForRealization:&error];
@@ -266,7 +269,10 @@
         }];
     };
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RKSimplePostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
+#pragma clang diagnostic pop
     RKPossibility *result = postProcessor3([[RKPossibility alloc] initWithValue:@"it should equal"], nil);
     XCTAssertEqual(result.state, kRKPossibilityStateValue, @"Unexpected state");
     XCTAssertEqualObjects(result.value, @"it should equal fizzbuzz", @"Unexpected value");
