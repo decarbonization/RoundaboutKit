@@ -87,14 +87,14 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 
 #pragma mark - Processors
 
-///Adds a new post-processor block to execute when a promise is either
+///Adds an array of post-processors to execute when a promise is either
 ///accepted with a value, or rejected with an error. Post processors
 ///are executed in the order in which they are added to a promise.
 ///Refined values from post-processors are propagated downwards. That is
 ///to say, if you start with a post-processor that converts raw data into
 ///JSON objects, the next post-processor will receive those JSON objects.
 ///
-/// \param  processor   The post-processor block to add. Required.
+/// \param  processors  An array of objects implementing `<RKPostProcessor>`. Required.
 ///
 ///Post-processors may only be added to a promise before it is accepted/rejected.
 ///Attempting to do so after will result in an exception being raised. As such,
@@ -102,10 +102,13 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 ///will communicate through them are started.
 ///
 ///__Important:__ post processors are run on the thread that the promise is accepted/rejected from.
-- (void)addPostProcessor:(id <RKPostProcessor>)processor;
+- (void)addPostProcessors:(NSArray *)processors;
 
 ///Removes all of the post-processors of the promise.
 - (void)removeAllPostProcessors;
+
+///Returns the post-processors of the promise.
+@property (nonatomic, readonly, copy) NSArray *postProcessors;
 
 #pragma mark - Realizing
 

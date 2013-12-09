@@ -155,7 +155,7 @@
     }];
     
     RKPromise *goodPromise = [RKPromise new];
-    [goodPromise addPostProcessor:goodProcessor];
+    [goodPromise addPostProcessors:@[ goodProcessor ]];
     [goodPromise accept:@"test"];
     
     NSError *error = nil;
@@ -176,7 +176,7 @@
     }];
     
     RKPromise *goodPromise = [RKPromise new];
-    [goodPromise addPostProcessor:badProcessor];
+    [goodPromise addPostProcessors:@[ badProcessor ]];
     [goodPromise accept:@"test"];
     
     NSError *error = nil;

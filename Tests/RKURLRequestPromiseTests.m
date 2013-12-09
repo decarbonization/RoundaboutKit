@@ -242,43 +242,31 @@
     testPromise.cacheIdentifier = kCacheIdentifier;
     testPromise.connectivityManager = self.connectivityManager;
     
-    __block BOOL hasLoaded = NO;
-    __block RKPossibility *maybeValue = nil;
-    [testPromise loadCachedDataWithBlock:^(RKPossibility *maybeData) {
-        hasLoaded = YES;
-        maybeValue = maybeData;
-    }];
-    
-    BOOL finishedNaturally = [RunLoopHelper runUntil:^BOOL{ return (hasLoaded == YES); } orSecondsHasElapsed:1.0];
-    
-    XCTAssertTrue(finishedNaturally, @"load timed out.");
-    XCTAssertNotNil(maybeValue, @"No value was given to cached data block.");
-    XCTAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
-    XCTAssertFalse(cacheManager.revisionForIdentifierWasCalled, @"revisionForIdentifier was not called");
-    XCTAssertFalse(cacheManager.cacheDataForIdentifierWithRevisionErrorWasCalled, @"cacheDataForIdentifierWithRevisionError was not called");
-    XCTAssertTrue(cacheManager.cachedDataForIdentifierErrorWasCalled, @"cachedDataForIdentifierError was not called");
-    XCTAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
+    NSError *error = nil;
+    id value = [[testPromise cachedData] waitForRealization:&error];
+    XCTAssertNotNil(value, @"value missing");
+    XCTAssertNil(error, @"unexpected error");
 }
 
 #pragma mark -
 
 - (void)testPostProcessorChaining
 {
-    RKPostProcessorBlock postProcessor1 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    RKSimplePostProcessorBlock postProcessor1 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
         return [maybeData refineValue:^RKPossibility *(NSString *value) {
             NSString *newValue = [value stringByAppendingString:@" fizz"];
             return [[RKPossibility alloc] initWithValue:newValue];
         }];
     };
     
-    RKPostProcessorBlock postProcessor2 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    RKSimplePostProcessorBlock postProcessor2 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
         return [maybeData refineValue:^RKPossibility *(NSString *value) {
             NSString *newValue = [value stringByAppendingString:@"buzz"];
             return [[RKPossibility alloc] initWithValue:newValue];
         }];
     };
     
-    RKPostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
+    RKSimplePostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
     RKPossibility *result = postProcessor3([[RKPossibility alloc] initWithValue:@"it should equal"], nil);
     XCTAssertEqual(result.state, kRKPossibilityStateValue, @"Unexpected state");
     XCTAssertEqualObjects(result.value, @"it should equal fizzbuzz", @"Unexpected value");

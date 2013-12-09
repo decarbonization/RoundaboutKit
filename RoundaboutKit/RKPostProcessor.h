@@ -15,7 +15,7 @@
 ///Post processors specify their input and output types, and propagate their state
 ///through readwrite properties. Runtime type-checking can be performed by clients
 ///of the post-processor system.
-@protocol RKPostProcessor <NSObject>
+@protocol RKPostProcessor <NSObject, NSCopying>
 
 #pragma mark - Types
 

@@ -7,7 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RKURLRequestPromise.h"
+#import "RKPostProcessor.h"
+
+@protocol RKURLRequestPromiseCacheManager;
 
 ///The different possible types of POST/PUT body types.
 typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
@@ -26,28 +28,32 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///A factory is capable of dispensing properly formed route URLs, NSURLRequests, and RKURLRequestPromises.
 ///
 ///A request factory contains two cache managers. One used exclusively for GET requests (the read manager),
-///and one used for POST, PUT, and DELETE requests (the write manager). This is done with the belief that
+///and one used for POST, and PUT requests (the write manager). This is done with the belief that
 ///caching behaviour will likely vary in clients between reading and writing requests.
 ///
 ///RKRequestFactory is not intended to be subclassed.
 @interface RKRequestFactory : NSObject
 
-///Initialize the receiver with a given base URL.
+///Initialize the receiver with the objects required to operate.
 ///
-/// \param  baseURL             The base URL used to construct requests. Required.
-/// \param  readCacheManager    The cache manager to use for requests GET requests.
-/// \param  writeCacheManager   The cache manager to use for POST, PUT, and DELETE requests.
-/// \param  requestQueue        The queue to use for requests. Required.
-/// \param  postProcessor       The post processor to use. Optional.
+/// \param  baseURL             The base URL to combine with routes to construct requests. Required.
+/// \param  readCacheManager    The cache manager to use for GET requests. May be nil.
+/// \param  writeCacheManager   The cache manager to use for POST and PUT requests. May be nil.
+/// \param  requestQueue        The queue to use to execute requests. Required.
+/// \param  postProcessors      An array of post-processors to apply to each vended request. May be nil.
 ///
-/// \result A fully initialized request factory.
+/// \result A fully initialized request factory ready for use.
 ///
-///This is the designated initializer.
-- (id)initWithBaseURL:(NSURL *)baseURL
-     readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
-    writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
-         requestQueue:(NSOperationQueue *)requestQueue
-        postProcessor:(RKPostProcessorBlock)postProcessor;
+///This is the designated initializer
+- (instancetype)initWithBaseURL:(NSURL *)baseURL
+               readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
+              writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
+                   requestQueue:(NSOperationQueue *)requestQueue
+                 postProcessors:(NSArray *)postProcessors;
+
+///Cannot initialize a request factory without input objects.
+///Use `-[self initWithBaseURL:readCacheMaanger:writeCacheManager:requestQueue:postProcessors:]`.
+- (id)init UNAVAILABLE_ATTRIBUTE;
 
 #pragma mark - Properties
 
@@ -63,8 +69,8 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///The queue to use for requests.
 @property (readonly, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
 
-///The post processor block to use.
-@property (readonly, copy, RK_NONATOMIC_IOSONLY) RKPostProcessorBlock postProcessor;
+///The post processors to use for vended requests.
+@property (readonly, copy, RK_NONATOMIC_IOSONLY) NSArray *postProcessors;
 
 #pragma mark -
 
@@ -194,5 +200,31 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
                                         parameters:(NSDictionary *)parameters
                                               body:(id)body
                                           bodyType:(RKRequestFactoryBodyType)bodyType RK_REQUIRE_RESULT_USED;
+
+@end
+
+#pragma mark -
+
+///The deprecated legacy methods of RKRequestFactory
+///that will be removed in the near future.
+@interface RKRequestFactory (RKDeprecatedMethods)
+
+///Obsolete. Use `-[self initWithBaseURL:readCacheMaanger:writeCacheManager:requestQueue:postProcessors:]`.
+///
+///This method is deprecated and will be removed in the near future.
+- (id)initWithBaseURL:(NSURL *)baseURL
+     readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
+    writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
+         requestQueue:(NSOperationQueue *)requestQueue
+        postProcessor:(RKSimplePostProcessorBlock)postProcessor DEPRECATED_ATTRIBUTE;
+///The post processor block to use.
+///This is the legacy interface for post-processors.
+///Switch to using `self.postProcessors`.
+///
+///__Important:__ This property is provided as a compatibility shim,
+///and is only guaranteed to work if you use the legacy initializer
+///`-[self initWithBaseURL:readCacheMaanger:writeCacheManager:requestQueue:postProcessor:]`.
+///This property is deprecated and will be removed in the near future.
+@property (readonly, copy, RK_NONATOMIC_IOSONLY) RKSimplePostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
 
 @end

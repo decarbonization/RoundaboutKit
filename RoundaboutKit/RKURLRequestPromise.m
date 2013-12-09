@@ -29,8 +29,8 @@ static NSString *const kDefaultRevision = @"-1";
 NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey = @"RKPostProcessorBadValueStringRepresentationErrorUserInfoKey";
 NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSourceURLErrorUserInfoKey";
 
-RK_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProcessorBlock source,
-                                                               RKPostProcessorBlock refiner)
+RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
+                                                                     RKSimplePostProcessorBlock refiner)
 {
     NSCParameterAssert(source);
     NSCParameterAssert(refiner);
@@ -41,7 +41,7 @@ RK_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProcessorBl
     };
 }
 
-RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
         NSError *error = nil;
         id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -66,7 +66,7 @@ RKPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossib
     }];
 };
 
-RKPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKSimplePostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
 #if TARGET_OS_IPHONE
         UIImage *image = [[UIImage alloc] initWithData:data];
@@ -83,7 +83,7 @@ RKPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossi
     }];
 };
 
-RKPostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
         NSError *error = nil;
         id result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];
@@ -361,6 +361,26 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     return [self initWithRequest:request cacheManager:nil useCacheWhenOffline:NO requestQueue:requestQueue];
 }
 
+#pragma mark - Post-Processors
+
+@synthesize postProcessor = _postProcessor;
+- (void)setPostProcessor:(RKSimplePostProcessorBlock)postProcessor
+{
+    _postProcessor = postProcessor;
+    
+    [self removeAllPostProcessors];
+    [super addPostProcessors:@[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ]];
+}
+
+- (void)addPostProcessors:(NSArray *)processors
+{
+    if(_postProcessor != nil)
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Cannot use %s when an old-style post processor is set.", __PRETTY_FUNCTION__];
+    
+    [super addPostProcessors:processors];
+}
+
 #pragma mark - Identity
 
 - (NSString *)description
@@ -490,25 +510,19 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     return YES;
 }
 
-- (void)loadCachedDataWithCallbackQueue:(NSOperationQueue *)callbackQueue block:(RKURLRequestPromiseCacheLoadingBlock)block
+- (RKPromise *)cachedData
 {
-    NSParameterAssert(callbackQueue);
-    NSParameterAssert(block);
-    
     if(!self.cacheManager || self.cacheIdentifier == nil)
-        return;
+        return nil;
+    
+    RKPromise *cachedDataPromise = [RKPromise new];
+    [cachedDataPromise addPostProcessors:RKCollectionDeepCopy(self.postProcessors)];
     
     [self.requestQueue addOperationWithBlock:^{
         NSError *error = nil;
         NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
         if(data) {
-            RKPossibility *maybeValue = [[RKPossibility alloc] initWithValue:data];
-            if(self.postProcessor)
-                maybeValue = self.postProcessor(maybeValue, self);
-            
-            [callbackQueue addOperationWithBlock:^{
-                block(maybeValue);
-            }];
+            [cachedDataPromise accept:data];
         } else if(error) {
             NSDictionary *userInfo = @{
                 NSUnderlyingErrorKey: error,
@@ -518,22 +532,11 @@ static NSUInteger _NumberOfCompletedRequests = 0;
             NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
                                                           code:kRKURLRequestPromiseErrorCannotLoadCache
                                                       userInfo:userInfo];
-            [callbackQueue addOperationWithBlock:^{
-                block([[RKPossibility alloc] initWithError:highLevelError]);
-            }];
-        } else {
-            [callbackQueue addOperationWithBlock:^{
-                block([[RKPossibility alloc] initEmpty]);
-            }];
+            [cachedDataPromise reject:highLevelError];
         }
     }];
-}
-
-- (void)loadCachedDataWithBlock:(RKURLRequestPromiseCacheLoadingBlock)block
-{
-    NSParameterAssert(block);
     
-    [self loadCachedDataWithCallbackQueue:[NSOperationQueue currentQueue] block:block];
+    return cachedDataPromise;
 }
 
 #pragma mark - Invoking Callbacks
@@ -549,26 +552,13 @@ static NSUInteger _NumberOfCompletedRequests = 0;
     RKLogInfo(@"[DEBUG] %@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
 #endif /* RKURLRequestPromise_Option_LogResponses */
     
-    RKPossibility *maybeValue = nil;
-    if(_postProcessor) {
-        maybeValue = _postProcessor([[RKPossibility alloc] initWithValue:data], self);
-    }
-    
     //Post-processors can be long running.
     if(self.cancelled)
         return;
     
     RequestDidSucceed(self);
     
-    if(maybeValue) {
-        if(maybeValue.state == kRKPossibilityStateError) {
-            [self reject:maybeValue.error];
-        } else {
-            [self accept:maybeValue.value];
-        }
-    } else {
-        [self accept:data];
-    }
+    [self accept:data];
 }
 
 - (void)invokeFailureCallbackWithError:(NSError *)error

@@ -33,6 +33,13 @@
     return nil;
 }
 
+#pragma mark - <NSCopying>
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [[self.class alloc] initWithBlock:self.block];
+}
+
 #pragma mark - Types
 
 - (Class)inputValueType

@@ -11,21 +11,25 @@
 
 @interface RKRequestFactory ()
 
+#pragma mark - readwrite
+
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURL *baseURL;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> readCacheManager;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> writeCacheManager;
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
-@property (readwrite, copy, RK_NONATOMIC_IOSONLY) RKPostProcessorBlock postProcessor;
+@property (readwrite, copy, RK_NONATOMIC_IOSONLY) NSArray *postProcessors;
 
 @end
 
+#pragma mark -
+
 @implementation RKRequestFactory
 
-- (id)initWithBaseURL:(NSURL *)baseURL
-     readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
-    writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
-         requestQueue:(NSOperationQueue *)requestQueue
-        postProcessor:(RKPostProcessorBlock)postProcessor
+- (instancetype)initWithBaseURL:(NSURL *)baseURL
+               readCacheManager:(id<RKURLRequestPromiseCacheManager>)readCacheManager
+              writeCacheManager:(id<RKURLRequestPromiseCacheManager>)writeCacheManager
+                   requestQueue:(NSOperationQueue *)requestQueue
+                 postProcessors:(NSArray *)postProcessors
 {
     NSParameterAssert(baseURL);
     NSParameterAssert(requestQueue);
@@ -35,10 +39,16 @@
         self.readCacheManager = readCacheManager;
         self.writeCacheManager = writeCacheManager;
         self.requestQueue = requestQueue;
-        self.postProcessor = postProcessor;
+        self.postProcessors = postProcessors;
     }
     
     return self;
+}
+
+- (id)init
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
 }
 
 #pragma mark - Dispensing URLs
@@ -47,21 +57,13 @@
 {
     NSParameterAssert(path);
     
-    NSMutableString *urlString = [[self.baseURL absoluteString] mutableCopy];
-    if(![urlString hasSuffix:@"/"] && ![path hasPrefix:@"/"])
-        [urlString appendString:@"/"];
-    
-    if([urlString hasSuffix:@"/"] && [path hasPrefix:@"/"])
-        [urlString deleteCharactersInRange:NSMakeRange(urlString.length - 1, 1)];
-    
-    [urlString appendString:path];
-    
+    NSString *urlString = [path stringByStandardizingPath];
     if(parameters) {
         NSString *parameterString = RKDictionaryToURLParametersString(parameters);
-        [urlString appendFormat:@"?%@", parameterString];
+        urlString = [urlString stringByAppendingFormat:@"?%@", parameterString];
     }
     
-    return [NSURL URLWithString:urlString];
+    return [NSURL URLWithString:urlString relativeToURL:self.baseURL];
 }
 
 #pragma mark - Dispensing NSURLRequests
@@ -128,11 +130,16 @@
 
 - (RKURLRequestPromise *)requestPromiseWithRequest:(NSURLRequest *)request
 {
-    id <RKURLRequestPromiseCacheManager> cacheManager = [request.HTTPMethod isEqualToString:@"GET"]? self.readCacheManager : self.writeCacheManager;
+    id <RKURLRequestPromiseCacheManager> cacheManager = nil;
+    if([request.HTTPMethod isEqualToString:@"GET"])
+        cacheManager = self.readCacheManager;
+    else if(![request.HTTPMethod isEqualToString:@"DELETE"])
+        cacheManager = self.writeCacheManager;
+    
     RKURLRequestPromise *requestPromise = [[RKURLRequestPromise alloc] initWithRequest:request
                                                                           cacheManager:cacheManager
                                                                           requestQueue:self.requestQueue];
-    requestPromise.postProcessor = self.postProcessor;
+    [requestPromise addPostProcessors:RKCollectionDeepCopy(self.postProcessors)];
     requestPromise.authenticationHandler = self.authenticationHandler;
     return requestPromise;
 }
@@ -153,18 +160,62 @@
 
 - (RKURLRequestPromise *)POSTRequestPromiseWithPath:(NSString *)path
                                          parameters:(NSDictionary *)parameters
-                                            body:(id)body 
-                                        bodyType:(RKRequestFactoryBodyType)bodyType
+                                               body:(id)body
+                                           bodyType:(RKRequestFactoryBodyType)bodyType
 {
     return [self requestPromiseWithRequest:[self POSTRequestWithPath:path parameters:parameters body:body bodyType:bodyType]];
 }
 
 - (RKURLRequestPromise *)PUTRequestPromiseWithPath:(NSString *)path
                                         parameters:(NSDictionary *)parameters
-                                           body:(id)body 
-                                       bodyType:(RKRequestFactoryBodyType)bodyType
+                                              body:(id)body
+                                          bodyType:(RKRequestFactoryBodyType)bodyType
 {
     return [self requestPromiseWithRequest:[self PUTRequestWithPath:path parameters:parameters body:body bodyType:bodyType]];
+}
+
+@end
+
+#pragma mark -
+
+@implementation RKRequestFactory (RKDeprecatedMethods)
+
+- (id)initWithBaseURL:(NSURL *)baseURL
+     readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
+    writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
+         requestQueue:(NSOperationQueue *)requestQueue
+        postProcessor:(RKSimplePostProcessorBlock)postProcessor
+{
+    NSParameterAssert(baseURL);
+    NSParameterAssert(requestQueue);
+    
+    NSArray *postProcessors = nil;
+    if(postProcessor) {
+        postProcessors = @[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ];
+    }
+    
+    return [self initWithBaseURL:baseURL
+                readCacheManager:readCacheManager
+               writeCacheManager:writeCacheManager
+                    requestQueue:requestQueue
+                  postProcessors:postProcessors];
+}
+
+- (RKSimplePostProcessorBlock)postProcessor
+{
+    if(self.postProcessors.count == 0)
+        return nil;
+    
+    if(self.postProcessors.count != 1)
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"%s called when %@ has more than one post-processor object.", __PRETTY_FUNCTION__, self];
+    
+    id postProcessor = self.postProcessors.firstObject;
+    if(![postProcessor isKindOfClass:[RKSimplePostProcessor class]])
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"%s called when active post-processor is not an RKSimplePostProcessor.", __PRETTY_FUNCTION__];
+    
+    return [(RKSimplePostProcessor *)postProcessor block];
 }
 
 @end

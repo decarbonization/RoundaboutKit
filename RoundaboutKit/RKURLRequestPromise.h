@@ -10,6 +10,7 @@
 #define RKURLRequestPromise_h 1
 
 #import "RKPromise.h"
+#import "RKPostProcessor.h"
 
 @class RKPossibility;
 
@@ -132,18 +133,10 @@ typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 
 #pragma mark - RKPostProcessorBlock
 
-///The RKPostProcessorBlock functor encapsulates conversion of one type of data into another.
+///The older name for blocks of type `RKSimplePostProcessorBlock`.
 ///
-/// \param  maybeData   The possibility the post-processor should operate on. Required.
-/// \param  request     The request invoking the post-processor block. May be nil.
-///                     When this parameter is passed in cache from the cache preloading
-///                     methods, certain properties on `RKURLRequestPromise` will be nil.
-///                     Any tests done using these properties should be assumed to pass
-///                     if their value is nil so that post-processors behave as expected.
-///
-///Top level RKPostProcessorBlocks will typically be given an NSData object.
-///Blocks chained from this point will be given user-defined objects.
-typedef RKPossibility *(^RKPostProcessorBlock)(RKPossibility *maybeData, RKURLRequestPromise *request);
+/// \seealso(RKSimplePostProcessorBlock)
+typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
 
 ///Returns a new block that will be given the result of an earlier block.
 ///
@@ -152,8 +145,8 @@ typedef RKPossibility *(^RKPostProcessorBlock)(RKPossibility *maybeData, RKURLRe
 ///
 /// \result A new block that encapsulates the actions of invoking the source
 ///         block and then passing that result to the refiner.
-RK_EXTERN_OVERLOADABLE RKPostProcessorBlock RKPostProcessorBlockChain(RKPostProcessorBlock source,
-                                                                      RKPostProcessorBlock refiner);
+RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
+                                                                            RKSimplePostProcessorBlock refiner);
 
 ///The key used to embed the string representation of malformed data, if possible.
 RK_EXTERN NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey;
@@ -162,13 +155,13 @@ RK_EXTERN NSString *const RKPostProcessorBadValueStringRepresentationErrorUserIn
 RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
 
 ///A post-processor block that takes an NSData object and yields JSON objects.
-RK_EXTERN RKPostProcessorBlock const kRKJSONPostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock;
 
 ///A post-processor block that takes an NSData object and yields an NS/UIImage.
-RK_EXTERN RKPostProcessorBlock const kRKImagePostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKImagePostProcessorBlock;
 
 ///A post-processor block that takes an NSData object and yields a property list objects.
-RK_EXTERN RKPostProcessorBlock const kRKPropertyListPostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock;
 
 ///The RKURLRequestPreflightBlock functor encapsulates a series of actions that must be
 ///executed before a RKURLRequestPromise may be executed. This functor will be called
@@ -337,11 +330,20 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 #pragma mark -
 
 ///The post processor to invoke on the URL request promise.
+///This is the legacy interface for post-processors. Use
+///`-[RKPromise addPostProcessor:]` instead.
 ///
-///The post processor block will always be passed NSData objects.
-///The block will be invoked for both cache loads and remote data loads.
-///No assumptions should be made about environment in a post processor block.
-@property (copy) RKPostProcessorBlock postProcessor;
+///__Important:__ Starting in RK 2.1, setting this property
+///when a URL request promise has already been realized will
+///raise an exception. Additionally, this property is no
+///longer atomic.
+///
+///This property is mutually exclusive with the modern post-
+///processor system. Setting this property will wipe out
+///any post-processors attached to the promise, and attempting
+///to add a post-processor through `-[RKPromise addPostProcessor:]`
+///will raise if this property is not nil.
+@property (nonatomic, copy) RKSimplePostProcessorBlock postProcessor;
 
 ///The authentication handler of the request promise.
 @property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
@@ -375,32 +377,13 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 
 #pragma mark -
 
-///Loads any data cached under the identifier assigned to
-///the receiver using the receiver's cache manager object.
+///Returns a new promise for any cached data available for the request described by the receiver.
 ///
-/// \param  callbackQueue   The queue to invoke the given block on. Required.
-/// \param  block           The block to invoke when the loading operation has been completed. Required.
+/// \result A new promise object that will propagate any cached data available.
 ///
-///This method does nothing when the receiver has either no cacheIdentifier and/or cacheManager.
-///
-///The cached data will be passed through the receiver's post-processor, and may be
-///consumed in exactly the same manner as the `success` value from realizing the receiver.
-- (void)loadCachedDataWithCallbackQueue:(NSOperationQueue *)callbackQueue block:(RKURLRequestPromiseCacheLoadingBlock)block;
-
-///Loads any data cached under the identifier assigned to
-///the receiver using the receiver's cache manager object.
-///
-/// \param  block   The block to invoke when the loading operation has been completed. Required.
-///
-///This method does nothing when the receiver has either no cacheIdentifier and/or cacheManager.
-///
-///The cached data will be passed through the receiver's post-processor, and may be
-///consumed in exactly the same manner as the `success` value from realizing the receiver.
-///
-///The block is invoked on the same operation queue that this method was initially called on.
-///
-/// \seealso(-[self loadCachedDataWithCallbackQueue:block:])
-- (void)loadCachedDataWithBlock:(RKURLRequestPromiseCacheLoadingBlock)block;
+///The returned promise will use the same post-processors that
+///the receiver has at the time this method is invoked.
+- (RKPromise *)cachedData RK_REQUIRE_RESULT_USED;
 
 @end
 

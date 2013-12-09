@@ -159,7 +159,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 - (void)processValue:(id)value error:(NSError *)error
 {
     for (id <RKPostProcessor> postProcessor in _postProcessors) {
-        if(value && ![value isKindOfClass:[postProcessor inputValueType]])
+        if([postProcessor inputValueType] && ![value isKindOfClass:[postProcessor inputValueType]])
             [NSException raise:NSInvalidArgumentException format:@"Post-processor %@ given value of type %@, expected %@.", postProcessor, [value class], [postProcessor inputValueType]];
         
         [postProcessor processInputValue:value inputError:error context:self];
@@ -211,9 +211,9 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 
 #pragma mark - Processors
 
-- (void)addPostProcessor:(id <RKPostProcessor>)processor
+- (void)addPostProcessors:(NSArray *)processors
 {
-    NSParameterAssert(processor);
+    NSParameterAssert(processors);
     
     if(self.contents != nil)
         @throw [NSException exceptionWithName:NSInternalInconsistencyException
@@ -225,7 +225,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
         if(!_postProcessors)
             _postProcessors = [NSMutableArray new];
         
-        [_postProcessors addObject:processor];
+        [_postProcessors addObjectsFromArray:processors];
     }
     OSSpinLockUnlock(&_stateGuard);
 }
@@ -237,6 +237,11 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
         [_postProcessors removeAllObjects];
     }
     OSSpinLockUnlock(&_stateGuard);
+}
+
+- (NSArray *)postProcessors
+{
+    return [_postProcessors copy] ?: @[];
 }
 
 #pragma mark - Realizing

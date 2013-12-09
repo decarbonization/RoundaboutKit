@@ -134,6 +134,21 @@ id RKCollectionFindFirstMatch(id input, RKPredicateBlock predicate)
 	return nil;
 }
 
+#pragma mark - • Deep Copying
+
+NSArray *RKCollectionDeepCopy(id input)
+{
+    if(!input)
+        return nil;
+    
+    NSMutableArray *result = [NSMutableArray array];
+    
+    for (NSObject <NSCopying> *element in input)
+        [result addObject:[element copy]];
+    
+    return [result copy];
+}
+
 #pragma mark - Time Intervals
 
 NSTimeInterval const kRKTimeIntervalInfinite = INFINITY;

@@ -173,6 +173,17 @@ RK_EXTERN BOOL RKCollectionDoAllValuesMatch(id input, RKPredicateBlock predicate
 ///Returns the first object matching a given predicate in a given collection.
 RK_EXTERN id RKCollectionFindFirstMatch(id input, RKPredicateBlock predicate);
 
+#pragma mark - • Deep Copying
+
+///Returns a new array that contains a copy of each element in the given input.
+///
+/// \param  input   An object implementing <NSFastEnumeration> whose elements
+///                 are NSObjects implementing <NSCopying>. Optional.
+///
+/// \result A new array with copies of each element of the input.
+///
+RK_EXTERN NSArray *RKCollectionDeepCopy(id input);
+
 #pragma mark - Safe Casting
 
 ///Perform a cast with a runtime check.
