@@ -104,14 +104,13 @@ static BOOL gActivityLoggingEnabled = NO;
     
     if((self = [super init])) {
         self.request = request;
+        self.requestQueue = requestQueue;
+        
         self.cacheManager = cacheManager;
         if(useCacheWhenOffline)
             self.offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
         else
             self.offlineBehavior = RKURLRequestPromiseOfflineBehaviorFail;
-        
-        self.requestQueue = requestQueue;
-        
         self.cacheIdentifier = [request.URL absoluteString];
         
         self.connectivityManager = [RKConnectivityManager defaultInternetConnectivityManager];

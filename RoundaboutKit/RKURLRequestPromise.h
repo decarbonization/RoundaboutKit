@@ -136,6 +136,8 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 
 @end
 
+#pragma mark -
+
 @class RKConnectivityManager;
     
 ///The RKURLRequestPromise class encapsulates a network request. It connects
