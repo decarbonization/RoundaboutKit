@@ -46,14 +46,30 @@ static NSString *const kDefaultRevision = @"-1";
 #pragma mark -
 
 @implementation RKURLRequestPromise {
+    ///Whether or not the request started when its
+    ///connection manager reported being offline.
     BOOL _isInOfflineMode;
+    
+    
+    ///Buffer that temporarily stores all data loaded by the request. See `_loadedDataLock`.
     NSMutableData *_loadedData;
     
+    ///The lock used to synchronize access to the `_loadedData` ivar
+    ///between threads. It is possible for the request queue that the
+    ///promise executes on to allow for an arbitrary number of concurrent
+    ///operations, as such we have to synchronize access to the loaded
+    ///data buffer to prevent race conditions and crashes both when the
+    ///ivar is set, and when the data is mutated.
+    NSLock *_loadedDataLock;
+    
+    
+    ///The legacy post processor block. Used by the RKDeprecated category.
     RKSimplePostProcessorBlock _legacyPostProcessor;
 }
 
 #pragma mark - Logging
 
+///Whether or not activity logging is enabled.
 static BOOL gActivityLoggingEnabled = NO;
 
 + (void)enableActivityLogging
@@ -96,6 +112,9 @@ static BOOL gActivityLoggingEnabled = NO;
         self.cacheIdentifier = [request.URL absoluteString];
         
         self.connectivityManager = [RKConnectivityManager defaultInternetConnectivityManager];
+        
+        _loadedDataLock = [NSLock new];
+        _loadedDataLock.name = @"com.roundabout.rk.RKURLRequestPromise.loadedDataLock";
     }
     
     return self;
@@ -128,9 +147,9 @@ static BOOL gActivityLoggingEnabled = NO;
              @"Cannot realize a %@ more than once.", NSStringFromClass([self class]));
     
     [_requestQueue addOperationWithBlock:^{
-        @synchronized(self) {
-            _loadedData = [NSMutableData new];
-        }
+        [_loadedDataLock lock];
+        _loadedData = [NSMutableData new];
+        [_loadedDataLock unlock];
         
         _isInOfflineMode = !self.connectivityManager.isConnected;
         [[RKActivityManager sharedActivityManager] incrementActivityCount];
@@ -158,9 +177,9 @@ static BOOL gActivityLoggingEnabled = NO;
 {
     if(!self.cancelled && _connection) {
         [self.connection cancel];
-        @synchronized(self) {
-             _loadedData = nil;
-        }
+        [_loadedDataLock lock];
+        _loadedData = nil;
+        [_loadedDataLock unlock];
         
         if(gActivityLoggingEnabled)
             RKLogInfo(@"Outgoing request to <%@> cancelled", self.request.URL);
@@ -331,9 +350,9 @@ static BOOL gActivityLoggingEnabled = NO;
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    @synchronized(self) {
-        [_loadedData appendData:data];
-    }
+    [_loadedDataLock lock];
+    [_loadedData appendData:data];
+    [_loadedDataLock unlock];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -341,10 +360,10 @@ static BOOL gActivityLoggingEnabled = NO;
     if(self.cancelled)
         return;
     
-    __block NSData *loadedData = nil;
-    @synchronized(self) {
-        loadedData = _loadedData;
-    }
+    [_loadedDataLock lock];
+    NSData *loadedData = _loadedData;
+    _loadedData = nil;
+    [_loadedDataLock unlock];
     
     if(self.cacheManager) {
         NSString *cacheMarker = self.response.allHeaderFields[kETagHeaderKey] ?: self.response.allHeaderFields[kExpiresHeaderKey];
@@ -373,9 +392,6 @@ static BOOL gActivityLoggingEnabled = NO;
     [self acceptWithData:loadedData];
     
     _connection = nil;
-    @synchronized(self) {
-        _loadedData = nil;
-    }
 }
 
 #pragma mark -
