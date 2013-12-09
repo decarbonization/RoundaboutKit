@@ -9,7 +9,6 @@
 #import "RKURLRequestPromise.h"
 #import "RKConnectivityManager.h"
 #import "RKActivityManager.h"
-#import "RKPossibility.h"
 
 #if TARGET_OS_IPHONE
 #   import <UIKit/UIKit.h>
@@ -39,7 +38,7 @@ static NSString *const kDefaultRevision = @"-1";
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
 @property (copy, readwrite) NSHTTPURLResponse *response;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
-@property (readwrite, RK_NONATOMIC_IOSONLY) BOOL useCacheWhenOffline;
+@property (readwrite, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
 
 @end
 
@@ -95,10 +94,10 @@ static BOOL gActivityLoggingEnabled = NO;
     return nil;
 }
 
-- (id)initWithRequest:(NSURLRequest *)request
-         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
-  useCacheWhenOffline:(BOOL)useCacheWhenOffline
-         requestQueue:(NSOperationQueue *)requestQueue
+- (instancetype)initWithRequest:(NSURLRequest *)request
+                   cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+            useCacheWhenOffline:(BOOL)useCacheWhenOffline
+                   requestQueue:(NSOperationQueue *)requestQueue
 {
     NSParameterAssert(request);
     NSParameterAssert(requestQueue);
@@ -106,7 +105,11 @@ static BOOL gActivityLoggingEnabled = NO;
     if((self = [super init])) {
         self.request = request;
         self.cacheManager = cacheManager;
-        self.useCacheWhenOffline = useCacheWhenOffline;
+        if(useCacheWhenOffline)
+            self.offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
+        else
+            self.offlineBehavior = RKURLRequestPromiseOfflineBehaviorFail;
+        
         self.requestQueue = requestQueue;
         
         self.cacheIdentifier = [request.URL absoluteString];
@@ -120,14 +123,14 @@ static BOOL gActivityLoggingEnabled = NO;
     return self;
 }
 
-- (id)initWithRequest:(NSURLRequest *)request
-         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
-         requestQueue:(NSOperationQueue *)requestQueue
+- (instancetype)initWithRequest:(NSURLRequest *)request
+                   cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+                   requestQueue:(NSOperationQueue *)requestQueue
 {
     return [self initWithRequest:request cacheManager:cacheManager useCacheWhenOffline:YES requestQueue:requestQueue];
 }
 
-- (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue
+- (instancetype)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue
 {
     return [self initWithRequest:request cacheManager:nil useCacheWhenOffline:NO requestQueue:requestQueue];
 }
@@ -367,7 +370,7 @@ static BOOL gActivityLoggingEnabled = NO;
     
     if(self.cacheManager) {
         NSString *cacheMarker = self.response.allHeaderFields[kETagHeaderKey] ?: self.response.allHeaderFields[kExpiresHeaderKey];
-        if(!cacheMarker && self.useCacheWhenOffline)
+        if(!cacheMarker && self.offlineBehavior == RKURLRequestPromiseOfflineBehaviorUseCache)
             cacheMarker = kDefaultRevision;
         
         if(cacheMarker) {

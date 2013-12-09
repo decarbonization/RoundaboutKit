@@ -108,6 +108,17 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 
 @end
 
+///How an instance of RKURLRequestPromise should behave
+///when its connection reports being offline
+typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
+    ///The promise should fail with an error.
+    RKURLRequestPromiseOfflineBehaviorFail = 0,
+    
+    ///The promise should attempt to use any existing
+    ///persistent cache before resorting to failure.
+    RKURLRequestPromiseOfflineBehaviorUseCache = 1,
+};
+
 #pragma mark -
 
 @class RKURLRequestPromise;
@@ -148,13 +159,12 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 ///will result in a full request to the server.
 ///
 ///When server headers do not contain cache identification information, there are
-///two behaviors that can occur based on the value of the `self.useCacheWhenOffline`
-///property. These behaviors are:
+///multiple behaviors that can occur depending on the value of `self.offlineBehavior`.
 ///
-/// -   If YES, then the cache is unconditionally saved to the disc with
-///     an arbitrary revision associated with it. This enables the cached
-///     response to be used when there is no internet connection available.
-/// -   If NO, then the cache is completely ignored.
+/// -   `RKURLRequestPromiseOfflineBehaviorUseCache`: the cache is unconditionally
+///     saved to the disc with an arbitrary revision associated with it. This enables
+///     the cached response to be used when there is no internet connection available.
+/// -   `RKURLRequestPromiseOfflineBehaviorFail`: The cache is completely ignored.
 ///
 ///#Connectivity:
 ///
@@ -267,13 +277,12 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 
 #pragma mark -
 
-///Whether or not the request can use the cache when the internet connection is offline.
+///How the request promise should behave if its connectivity manager reports being offline.
 ///
-///If `.useCacheWhenOffline` is YES, and the internet connection is inactive, then the
-///cache will be loaded, and only the second part of the promise will be called back.
+///This property is ignored if `self.cacheManager` is nil.
 ///
-///This property is ignored if `.cacheManager` is nil.
-@property (readonly, RK_NONATOMIC_IOSONLY) BOOL useCacheWhenOffline;
+/// \seealso(RKURLRequestPromiseOfflineBehavior)
+@property (readonly, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
 
 ///Whether or not the request should cancel itself if it finds
 ///its cache is unchanged from the newly loaded remote data.
