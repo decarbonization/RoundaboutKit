@@ -362,11 +362,6 @@ static NSString *const kDefaultRevision = @"-1";
         loadedData = _loadedData;
     }
     
-#if RKURLRequestPromise_Option_MeasureResponseTimes
-    _CumulativeResponseTime += -[self.startDate timeIntervalSinceNow];
-    _NumberOfCompletedRequests++;
-#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
-    
     if(self.cacheManager) {
         NSString *cacheMarker = self.response.allHeaderFields[kETagHeaderKey] ?: self.response.allHeaderFields[kExpiresHeaderKey];
         if(!cacheMarker && self.useCacheWhenOffline)
