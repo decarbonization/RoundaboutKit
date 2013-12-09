@@ -36,16 +36,9 @@ static NSString *const kDefaultRevision = @"-1";
 
 #pragma mark - Readwrite Properties
 
-///Readwrite
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
-
-///Readwrite.
 @property (copy, readwrite) NSHTTPURLResponse *response;
-
-///Readwrite
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
-
-///Readwrite
 @property (readwrite, RK_NONATOMIC_IOSONLY) BOOL useCacheWhenOffline;
 
 @end
@@ -57,6 +50,20 @@ static NSString *const kDefaultRevision = @"-1";
     NSMutableData *_loadedData;
     
     RKSimplePostProcessorBlock _legacyPostProcessor;
+}
+
+#pragma mark - Logging
+
+static BOOL gActivityLoggingEnabled = NO;
+
++ (void)enableActivityLogging
+{
+    gActivityLoggingEnabled = YES;
+}
+
++ (void)disableActivityLogging
+{
+    gActivityLoggingEnabled = NO;
 }
 
 #pragma mark - Lifecycle
@@ -133,9 +140,6 @@ static NSString *const kDefaultRevision = @"-1";
                 [self loadCacheAndReportError:YES];
             }];
         } else {
-#if RKURLRequestPromise_Option_MeasureResponseTimes
-            self.startDate = [NSDate date];
-#endif /* #if RKURLRequestPromise_Option_MeasureResponseTimes */
             
             self.connection = [[NSURLConnection alloc] initWithRequest:self.request
                                                               delegate:self
@@ -145,9 +149,8 @@ static NSString *const kDefaultRevision = @"-1";
             [self.connection start];
         }
         
-#if RKURLRequestPromise_Option_LogRequests
-        RKLogInfo(@"Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
-#endif /* RKURLRequestPromise_Option_LogRequests */
+        if(gActivityLoggingEnabled)
+            RKLogInfo(@"Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
     }];
 }
 
@@ -159,9 +162,8 @@ static NSString *const kDefaultRevision = @"-1";
              _loadedData = nil;
         }
         
-#if RKURLRequestPromise_Option_LogRequests
-        RKLogInfo(@"Outgoing request to <%@> cancelled", self.request.URL);
-#endif /* RKURLRequestPromise_Option_LogRequests */
+        if(gActivityLoggingEnabled)
+            RKLogInfo(@"Outgoing request to <%@> cancelled", self.request.URL);
         
         [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
@@ -188,7 +190,7 @@ static NSString *const kDefaultRevision = @"-1";
     if(data) {
         self.isCacheLoaded = YES;
         
-        [self invokeSuccessCallbackWithData:data];
+        [self acceptWithData:data];
     } else {
         NSError *removeError = nil;
         BOOL removedCache = [self.cacheManager removeCacheForIdentifier:self.cacheIdentifier error:&removeError];
@@ -211,7 +213,7 @@ static NSString *const kDefaultRevision = @"-1";
             NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
                                                           code:kRKURLRequestPromiseErrorCannotLoadCache
                                                       userInfo:userInfo];
-            [self invokeFailureCallbackWithError:highLevelError];
+            [self rejectWithError:highLevelError];
             
             return NO;
         }
@@ -251,34 +253,27 @@ static NSString *const kDefaultRevision = @"-1";
 
 #pragma mark - Invoking Callbacks
 
-- (void)invokeSuccessCallbackWithData:(NSData *)data
+- (void)acceptWithData:(NSData *)data
 {
     if(self.cancelled)
         return;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
-#if RKURLRequestPromise_Option_LogResponses
-    RKLogInfo(@"%@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-#endif /* RKURLRequestPromise_Option_LogResponses */
-    
-    //Post-processors can be long running.
-    if(self.cancelled)
-        return;
+    if(gActivityLoggingEnabled)
+        RKLogInfo(@"%@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     
     [self accept:data];
 }
 
-- (void)invokeFailureCallbackWithError:(NSError *)error
+- (void)rejectWithError:(NSError *)error
 {
     if(self.cancelled)
         return;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
-#if RKURLRequestPromise_Option_LogErrors
-    RKLogInfo(@"Error for request to <%@>: %@", self.request.URL, error);
-#endif /* RKURLRequestPromise_Option_LogErrors */
+    RKLogError(@"Error for request to <%@>: %@", self.request.URL, error);
     
     [self reject:error];
 }
@@ -308,7 +303,7 @@ static NSString *const kDefaultRevision = @"-1";
         }
     }
     
-    [self invokeFailureCallbackWithError:error];
+    [self rejectWithError:error];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response
@@ -370,12 +365,12 @@ static NSString *const kDefaultRevision = @"-1";
                 NSError *highLevelError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
                                                               code:kRKURLRequestPromiseErrorCannotWriteCache
                                                           userInfo:userInfo];
-                [self invokeFailureCallbackWithError:highLevelError];
+                [self rejectWithError:highLevelError];
             }
         }
     }
     
-    [self invokeSuccessCallbackWithData:loadedData];
+    [self acceptWithData:loadedData];
     
     _connection = nil;
     @synchronized(self) {

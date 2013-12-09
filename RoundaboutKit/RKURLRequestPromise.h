@@ -125,31 +125,6 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 
 @end
 
-#pragma mark - Compile Time Options
-
-///Set to 1 to have all requests logged.
-///
-///##Important:
-///`RKGlobalLoggingTypesEnabled` must contain the flag `kRKLogTypeInfo`, or
-///setting this compile time flag to 1 will do nothing but add extra overhead.
-#define RKURLRequestPromise_Option_LogRequests          0
-
-///Set to 1 to have all request-responses logged.
-///
-///##Important:
-///`RKGlobalLoggingTypesEnabled` must contain the flag `kRKLogTypeInfo`, or
-///setting this compile time flag to 1 will do nothing but add extra overhead.
-#define RKURLRequestPromise_Option_LogResponses         0
-
-///Set to 1 to have RKURLRequestPromise errors logged.
-///
-///##Important:
-///`RKGlobalLoggingTypesEnabled` must contain the flag `kRKLogTypeInfo`, or
-///setting this compile time flag to 1 will do nothing but add extra overhead.
-#define RKURLRequestPromise_Option_LogErrors            0
-
-#pragma mark -
-
 @class RKConnectivityManager;
     
 ///The RKURLRequestPromise class encapsulates a network request. It connects
@@ -188,6 +163,21 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 ///change the connectivity manager used after a request promise has been
 ///created by mutating the `self.connectivityManager`.
 @interface RKURLRequestPromise : RKPromise
+
+#pragma mark - Logging
+
+///Enables logging of requests starting and completing.
+///
+///All loggings are run through `RKLogInfo`, as such,
+///the appropriate logging type must be enabled.
+///
+///Errors are always logged regardless of activity logging's state.
++ (void)enableActivityLogging;
+
+///Disables logging of requests starting and completing.
+///
+///Errors are always logged regardless of activity logging's state.
++ (void)disableActivityLogging;
 
 #pragma mark - Lifecycle
 
