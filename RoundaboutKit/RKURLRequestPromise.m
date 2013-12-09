@@ -24,90 +24,6 @@ static NSString *const kETagHeaderKey = @"Etag";
 static NSString *const kExpiresHeaderKey = @"Expires";
 static NSString *const kDefaultRevision = @"-1";
 
-#pragma mark - RKPostProcessorBlock
-
-NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey = @"RKPostProcessorBadValueStringRepresentationErrorUserInfoKey";
-NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSourceURLErrorUserInfoKey";
-
-RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
-                                                                     RKSimplePostProcessorBlock refiner)
-{
-    NSCParameterAssert(source);
-    NSCParameterAssert(refiner);
-    
-    return ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
-        RKPossibility *refinedMaybeData = source(maybeData, request);
-        return refiner(refinedMaybeData, request);
-    };
-}
-
-RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
-    return [maybeData refineValue:^RKPossibility *(NSData *data) {
-        NSError *error = nil;
-        id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        if(result) {
-            return [[RKPossibility alloc] initWithValue:result];
-        } else {
-            NSMutableDictionary *userInfoCopy = [[error userInfo] mutableCopy];
-            
-            NSString *stringRepresentation = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            if(stringRepresentation)
-                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = stringRepresentation;
-            else
-                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = @"(Malformed data)";
-            
-            if(request.request.URL)
-                userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = request.request.URL;
-            
-            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:error.domain
-                                                                            code:error.code
-                                                                        userInfo:userInfoCopy]];
-        }
-    }];
-};
-
-RKSimplePostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
-    return [maybeData refineValue:^RKPossibility *(NSData *data) {
-#if TARGET_OS_IPHONE
-        UIImage *image = [[UIImage alloc] initWithData:data];
-#else
-        NSImage *image = [[NSImage alloc] initWithData:data];
-#endif /* TARGET_OS_IPHONE */
-        if(image) {
-            return [[RKPossibility alloc] initWithValue:image];
-        } else {
-            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                                                            code:'!img'
-                                                                        userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}]];
-        }
-    }];
-};
-
-RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
-    return [maybeData refineValue:^RKPossibility *(NSData *data) {
-        NSError *error = nil;
-        id result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];
-        if(result) {
-            return [[RKPossibility alloc] initWithValue:result];
-        } else {
-            NSMutableDictionary *userInfoCopy = [[error userInfo] mutableCopy];
-            
-            NSString *stringRepresentation = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            if(stringRepresentation)
-                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = stringRepresentation;
-            else
-                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = @"(Malformed data)";
-            
-            if(request.request.URL)
-                userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = request.request.URL;
-            
-            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:error.domain
-                                                                            code:error.code
-                                                                        userInfo:userInfoCopy]];
-        }
-    }];
-};
-
 #if RKURLRequestPromise_Option_TrackActiveRequests
 #pragma mark - Tracking Active Requests
 
@@ -264,6 +180,8 @@ static NSUInteger _NumberOfCompletedRequests = 0;
 @implementation RKURLRequestPromise {
     BOOL _isInOfflineMode;
     NSMutableData *_loadedData;
+    
+    RKSimplePostProcessorBlock _legacyPostProcessor;
 }
 
 #pragma mark - Tracking Requests
@@ -359,26 +277,6 @@ static NSUInteger _NumberOfCompletedRequests = 0;
 - (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue
 {
     return [self initWithRequest:request cacheManager:nil useCacheWhenOffline:NO requestQueue:requestQueue];
-}
-
-#pragma mark - Post-Processors
-
-@synthesize postProcessor = _postProcessor;
-- (void)setPostProcessor:(RKSimplePostProcessorBlock)postProcessor
-{
-    _postProcessor = postProcessor;
-    
-    [self removeAllPostProcessors];
-    [super addPostProcessors:@[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ]];
-}
-
-- (void)addPostProcessors:(NSArray *)processors
-{
-    if(_postProcessor != nil)
-        [NSException raise:NSInternalInconsistencyException
-                    format:@"Cannot use %s when an old-style post processor is set.", __PRETTY_FUNCTION__];
-    
-    [super addPostProcessors:processors];
 }
 
 #pragma mark - Identity
@@ -692,6 +590,48 @@ static NSUInteger _NumberOfCompletedRequests = 0;
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
     [self.authenticationHandler request:self handleAuthenticationChallenge:challenge];
+}
+
+@end
+
+#pragma mark - Deprecated
+
+RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
+                                                                     RKSimplePostProcessorBlock refiner)
+{
+    NSCParameterAssert(source);
+    NSCParameterAssert(refiner);
+    
+    return ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+        RKPossibility *refinedMaybeData = source(maybeData, request);
+        return refiner(refinedMaybeData, request);
+    };
+}
+
+#pragma mark -
+
+@implementation RKURLRequestPromise (RKDeprecated)
+
+- (void)setPostProcessor:(RKSimplePostProcessorBlock)postProcessor
+{
+    _legacyPostProcessor = postProcessor;
+    
+    [self removeAllPostProcessors];
+    [super addPostProcessors:@[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ]];
+}
+
+- (RKSimplePostProcessorBlock)postProcessor
+{
+    return _legacyPostProcessor;
+}
+
+- (void)addPostProcessors:(NSArray *)processors
+{
+    if(_legacyPostProcessor != nil)
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Cannot use %s when an old-style post processor is set.", __PRETTY_FUNCTION__];
+    
+    [super addPostProcessors:processors];
 }
 
 @end

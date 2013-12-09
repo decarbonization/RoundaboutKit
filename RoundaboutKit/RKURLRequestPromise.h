@@ -29,13 +29,6 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 };
 
 
-///The callback block type expected in `-[RKURLRequestPromise loadCachedDataWithCallbackQueue:block:]`.
-///
-/// \param  maybeData   The cached data. The state of the possibility corresponds to the state of the cache. Required.
-///
-typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
-
-
 ///The RKURLRequestPromiseCacheManager protocol outlines the methods and behaviours
 ///necessary for an object to be used as a cache manager for the RKURLRequestPromise class.
 ///
@@ -132,36 +125,6 @@ typedef void(^RKURLRequestPromiseCacheLoadingBlock)(RKPossibility *maybeData);
 @end
 
 #pragma mark - RKPostProcessorBlock
-
-///The older name for blocks of type `RKSimplePostProcessorBlock`.
-///
-/// \seealso(RKSimplePostProcessorBlock)
-typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
-
-///Returns a new block that will be given the result of an earlier block.
-///
-/// \param  source  The first block that will be invoked. Required.
-/// \param  refiner The second block that will be invoked, given the result of `source`. Required.
-///
-/// \result A new block that encapsulates the actions of invoking the source
-///         block and then passing that result to the refiner.
-RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
-                                                                            RKSimplePostProcessorBlock refiner);
-
-///The key used to embed the string representation of malformed data, if possible.
-RK_EXTERN NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey;
-
-///The key used to embed the source URL of an error, if possible.
-RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
-
-///A post-processor block that takes an NSData object and yields JSON objects.
-RK_EXTERN RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock;
-
-///A post-processor block that takes an NSData object and yields an NS/UIImage.
-RK_EXTERN RKSimplePostProcessorBlock const kRKImagePostProcessorBlock;
-
-///A post-processor block that takes an NSData object and yields a property list objects.
-RK_EXTERN RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock;
 
 ///The RKURLRequestPreflightBlock functor encapsulates a series of actions that must be
 ///executed before a RKURLRequestPromise may be executed. This functor will be called
@@ -329,22 +292,6 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 
 #pragma mark -
 
-///The post processor to invoke on the URL request promise.
-///This is the legacy interface for post-processors. Use
-///`-[RKPromise addPostProcessor:]` instead.
-///
-///__Important:__ Starting in RK 2.1, setting this property
-///when a URL request promise has already been realized will
-///raise an exception. Additionally, this property is no
-///longer atomic.
-///
-///This property is mutually exclusive with the modern post-
-///processor system. Setting this property will wipe out
-///any post-processors attached to the promise, and attempting
-///to add a post-processor through `-[RKPromise addPostProcessor:]`
-///will raise if this property is not nil.
-@property (nonatomic, copy) RKSimplePostProcessorBlock postProcessor;
-
 ///The authentication handler of the request promise.
 @property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
 
@@ -384,6 +331,46 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 ///The returned promise will use the same post-processors that
 ///the receiver has at the time this method is invoked.
 - (RKPromise *)cachedData RK_REQUIRE_RESULT_USED;
+
+@end
+
+#pragma mark - Deprecated
+
+///The older name for blocks of type `RKSimplePostProcessorBlock`. Deprecated
+///
+/// \seealso(RKSimplePostProcessorBlock)
+typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
+
+///Returns a new block that will be given the result of an earlier block.
+///
+/// \param  source  The first block that will be invoked. Required.
+/// \param  refiner The second block that will be invoked, given the result of `source`. Required.
+///
+/// \result A new block that encapsulates the actions of invoking the source
+///         block and then passing that result to the refiner.
+///
+///This function is deprecated. Use an array of independent post-processors instead.
+RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
+                                                                            RKSimplePostProcessorBlock refiner) DEPRECATED_ATTRIBUTE;
+
+///The methods deprecated in RKURLRequestPromise slated for removal in the near future.
+@interface RKURLRequestPromise (RKDeprecated)
+
+///The post processor to invoke on the URL request promise.
+///This is the legacy interface for post-processors. Use
+///`-[RKPromise addPostProcessor:]` instead.
+///
+///__Important:__ Starting in RK 2.1, setting this property
+///when a URL request promise has already been realized will
+///raise an exception. Additionally, this property is no
+///longer atomic.
+///
+///This property is mutually exclusive with the modern post-
+///processor system. Setting this property will wipe out
+///any post-processors attached to the promise, and attempting
+///to add a post-processor through `-[RKPromise addPostProcessor:]`
+///will raise if this property is not nil.
+@property (nonatomic, copy) RKSimplePostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
 
 @end
 

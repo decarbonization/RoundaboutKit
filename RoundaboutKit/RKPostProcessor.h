@@ -6,7 +6,16 @@
 //  Copyright (c) 2013 Roundabout Software, LLC. All rights reserved.
 //
 
+#ifndef RKPostProcessor_h
+#define RKPostProcessor_h 1
+
 #import <Foundation/Foundation.h>
+
+///The key used to embed the string representation of malformed data, if possible.
+RK_EXTERN NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey;
+
+///The key used to embed the source URL of an error, if possible.
+RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
 
 ///An RKPostProcessor takes an input value and error, performs some work on it,
 ///and produces either an error or another object. They can be chained together
@@ -92,3 +101,14 @@ typedef RKPossibility *(^RKSimplePostProcessorBlock)(RKPossibility *maybeData, i
 @property (readonly, copy) RKSimplePostProcessorBlock block;
 
 @end
+
+///A simple post-processor block that takes an NSData object and yields JSON objects.
+RK_EXTERN RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock;
+
+///A simple post-processor block that takes an NSData object and yields an NS/UIImage.
+RK_EXTERN RKSimplePostProcessorBlock const kRKImagePostProcessorBlock;
+
+///A simple post-processor block that takes an NSData object and yields a property list objects.
+RK_EXTERN RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock;
+
+#endif /* RKPostProcessor_h */

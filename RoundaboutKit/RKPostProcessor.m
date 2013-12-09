@@ -9,6 +9,9 @@
 #import "RKPostProcessor.h"
 #import "RKPossibility.h"
 
+NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey = @"RKPostProcessorBadValueStringRepresentationErrorUserInfoKey";
+NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSourceURLErrorUserInfoKey";
+
 @implementation RKSimplePostProcessor
 
 @synthesize outputValue = _outputValue;
@@ -73,3 +76,71 @@
 }
 
 @end
+
+
+RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    return [maybeData refineValue:^RKPossibility *(NSData *data) {
+        NSError *error = nil;
+        id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        if(result) {
+            return [[RKPossibility alloc] initWithValue:result];
+        } else {
+            NSMutableDictionary *userInfoCopy = [[error userInfo] mutableCopy];
+            
+            NSString *stringRepresentation = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if(stringRepresentation)
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = stringRepresentation;
+            else
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = @"(Malformed data)";
+            
+            if(request.request.URL)
+                userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = request.request.URL;
+            
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:error.domain
+                                                                            code:error.code
+                                                                        userInfo:userInfoCopy]];
+        }
+    }];
+};
+
+RKSimplePostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    return [maybeData refineValue:^RKPossibility *(NSData *data) {
+#if TARGET_OS_IPHONE
+        UIImage *image = [[UIImage alloc] initWithData:data];
+#else
+        NSImage *image = [[NSImage alloc] initWithData:data];
+#endif /* TARGET_OS_IPHONE */
+        if(image) {
+            return [[RKPossibility alloc] initWithValue:image];
+        } else {
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:RKURLRequestPromiseErrorDomain
+                                                                            code:'!img'
+                                                                        userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}]];
+        }
+    }];
+};
+
+RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    return [maybeData refineValue:^RKPossibility *(NSData *data) {
+        NSError *error = nil;
+        id result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];
+        if(result) {
+            return [[RKPossibility alloc] initWithValue:result];
+        } else {
+            NSMutableDictionary *userInfoCopy = [[error userInfo] mutableCopy];
+            
+            NSString *stringRepresentation = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            if(stringRepresentation)
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = stringRepresentation;
+            else
+                userInfoCopy[RKPostProcessorBadValueStringRepresentationErrorUserInfoKey] = @"(Malformed data)";
+            
+            if(request.request.URL)
+                userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = request.request.URL;
+            
+            return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:error.domain
+                                                                            code:error.code
+                                                                        userInfo:userInfoCopy]];
+        }
+    }];
+};
