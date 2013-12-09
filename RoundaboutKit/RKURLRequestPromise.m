@@ -128,17 +128,6 @@ static NSString *const kDefaultRevision = @"-1";
         _isInOfflineMode = !self.connectivityManager.isConnected;
         [[RKActivityManager sharedActivityManager] incrementActivityCount];
         
-        if(_preflight) {
-            NSError *preflightError = nil;
-            NSURLRequest *newRequest = nil;
-            if((newRequest = _preflight(self.request, &preflightError))) {
-                self.request = newRequest;
-            } else {
-                [self invokeFailureCallbackWithError:preflightError];
-                return;
-            }
-        }
-        
         if(_isInOfflineMode) {
             [self.requestQueue addOperationWithBlock:^{
                 [self loadCacheAndReportError:YES];

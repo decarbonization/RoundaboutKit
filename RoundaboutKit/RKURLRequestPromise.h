@@ -17,9 +17,10 @@
 ///The error domain used by RKURLRequestPromise.
 RK_EXTERN NSString *const RKURLRequestPromiseErrorDomain;
 
-///The key used to embed the affected cache identifier into errors by RKURLRequestPromise.
+///The corresponding value is the cache identifier used by the original RKURLRequestPromise.
 RK_EXTERN NSString *const RKURLRequestPromiseCacheIdentifierErrorUserInfoKey;
 
+///The error codes that will be used in the `RKURLRequestPromiseErrorDomain`.
 NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
     ///The cache cannot be loaded.
     kRKURLRequestPromiseErrorCannotLoadCache = 'nrch',
@@ -124,18 +125,6 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 
 @end
 
-#pragma mark - RKPostProcessorBlock
-
-///The RKURLRequestPreflightBlock functor encapsulates a series of actions that must be
-///executed before a RKURLRequestPromise may be executed. This functor will be called
-///on the request promise's operation queue.
-///
-/// \param  request     The current request of the promise. Required
-/// \param  outError    On return, should contain an error describing any problems. Required
-///
-/// \result A NSURLRequest instance to use for the request-promise, or nil if an error occurs.
-typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSError **outError);
-
 #pragma mark - Compile Time Options
 
 ///Set to 1 to have all requests logged.
@@ -163,19 +152,41 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 
 @class RKConnectivityManager;
     
-///The RKURLRequestPromise class encapsulates a network request promise.
+///The RKURLRequestPromise class encapsulates a network request. It connects
+///with the `RKConnectivityManager` class, comfortably operates with the
+///`RKPostProcessor` mechanism from its parent class `RKPromise`, and contains
+///a customizable caching system in the form of classes implementing the
+///`<RKURLRequestPromiseCacheManager>` protocol.
 ///
-///This class uses Etags to track changes to remote response. When
-///server responses do not contain an Etag, then two behaviors can
-///occur based on the `.useCacheWhenOffline` property:
+///#Creation:
+///
+///It is possible to create instances of RKURLRequestPromise directly, however
+///it is recommended that all new code is written using `RKRequestFactory`.
+///
+///#Cache:
+///
+///RKURLRequestPromise will check headers of responses for an ETag, and if that
+///is not found, it will check for a Creation header. If one of said fields are
+///found, its value will be used as the revision for the cache manager. Currently
+///RKURLRequestPromise does not honor the "Cache-Control" header. __Important:__
+///the contents of the "Creation" header are treated as an opaque value, any change
+///will result in a full request to the server.
+///
+///When server headers do not contain cache identification information, there are
+///two behaviors that can occur based on the value of the `self.useCacheWhenOffline`
+///property. These behaviors are:
 ///
 /// -   If YES, then the cache is unconditionally saved to the disc with
-///     a garbage Etag associated with it. This enables the cached
-///     response to be used to speed up responses, and to be used when
-///     there is no internet connection available.
-/// -   If NO, then the cache is completely ignored. This is typically
-///     the intended behaviour of servers.
+///     an arbitrary revision associated with it. This enables the cached
+///     response to be used when there is no internet connection available.
+/// -   If NO, then the cache is completely ignored.
 ///
+///#Connectivity:
+///
+///By default, RKURLRequestPromise will check for connectivity through the
+///default internet connection `RKConnectivityManager`. It is possible to
+///change the connectivity manager used after a request promise has been
+///created by mutating the `self.connectivityManager`.
 @interface RKURLRequestPromise : RKPromise
 
 #pragma mark - Lifecycle
@@ -248,11 +259,6 @@ typedef NSURLRequest *(^RKURLRequestPreflightBlock)(NSURLRequest *request, NSErr
 
 #pragma mark -
 
-///The block to execute before the operation is started.
-@property (copy, RK_NONATOMIC_IOSONLY) RKURLRequestPreflightBlock preflight;
-
-#pragma mark -
-
 ///The authentication handler of the request promise.
 @property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
 
@@ -313,6 +319,8 @@ typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
 ///This function is deprecated. Use an array of independent post-processors instead.
 RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
                                                                             RKSimplePostProcessorBlock refiner) DEPRECATED_ATTRIBUTE;
+
+#pragma mark -
 
 ///The methods deprecated in RKURLRequestPromise slated for removal in the near future.
 @interface RKURLRequestPromise (RKDeprecated)
