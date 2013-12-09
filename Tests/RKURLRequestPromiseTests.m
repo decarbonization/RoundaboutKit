@@ -74,30 +74,6 @@
 
 #pragma mark -
 
-- (void)testPreflightAssumptions
-{
-    RKURLRequestPromise *testPromise = [self makePlainTextWithNoCacheRequest];
-    
-    __block BOOL hadRequest = NO;
-    __block BOOL hadOutError = NO;
-    __block BOOL hadSecondaryThread = NO;
-    testPromise.preflight = ^NSURLRequest *(NSURLRequest *request, NSError **outError) {
-        hadRequest = (request != nil);
-        hadOutError = (outError != NULL);
-        hadSecondaryThread = ![NSThread isMainThread];
-        
-        return request;
-    };
-    
-    NSError *error = nil;
-    NSData *result = [testPromise waitForRealization:&error];
-    XCTAssertNotNil(result, @"RKAwait unexpectedly failed");
-    
-    XCTAssertTrue(hadRequest, @"No request was passed to preflight");
-    XCTAssertTrue(hadOutError, @"No outError was passed to preflight");
-    XCTAssertTrue(hadSecondaryThread, @"Preflight was invoked from main thread");
-}
-
 - (void)testPostProcessorAssumptions
 {
     RKURLRequestPromise *testPromise = [self makePlainTextWithNoCacheRequest];
