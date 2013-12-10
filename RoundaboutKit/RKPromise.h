@@ -167,6 +167,24 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 
 @end
 
+#pragma mark -
+
+///The RKCancelable protocol describes an object that can be canceled.
+///Intended to be used with `RKPromise` subclasses.
+@protocol RKCancelable <NSObject>
+@required
+
+///Whether or not the object has been canceled.
+@property (readonly) BOOL canceled;
+
+///Cancels any activity in the receiver.
+///
+///It is safe to invoke this method from any thread,
+///and for it be called any number of times.
+- (IBAction)cancel:(id)sender;
+
+@end
+
 #if RoundaboutKit_EnableLegacyRealization
 
 #pragma mark - Singular Realization

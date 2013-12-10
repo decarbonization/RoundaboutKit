@@ -174,7 +174,7 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 ///default internet connection `RKConnectivityManager`. It is possible to
 ///change the connectivity manager used after a request promise has been
 ///created by mutating the `self.connectivityManager`.
-@interface RKURLRequestPromise : RKPromise
+@interface RKURLRequestPromise : RKPromise <RKCancelable>
 
 #pragma mark - Logging
 
@@ -263,14 +263,6 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 
 ///The authentication handler of the request promise.
 @property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
-
-#pragma mark - Canceling
-
-///Whether or not the abstract promise is cancelled.
-@property BOOL cancelled;
-
-///Cancel the receiver.
-- (IBAction)cancel:(id)sender;
 
 #pragma mark - Cache
 

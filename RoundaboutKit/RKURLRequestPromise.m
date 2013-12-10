@@ -175,20 +175,26 @@ static BOOL gActivityLoggingEnabled = NO;
     }];
 }
 
+#pragma mark - RKCancelable
+
+@synthesize canceled = _canceled;
+
 - (void)cancel:(id)sender
 {
-    if(!self.cancelled && _connection) {
+    if(!self.canceled && _connection) {
         [self.connection cancel];
         [_loadedDataLock lock];
         _loadedData = nil;
         [_loadedDataLock unlock];
         
         if(gActivityLoggingEnabled)
-            RKLogInfo(@"Outgoing request to <%@> cancelled", self.request.URL);
+            RKLogInfo(@"Outgoing request to <%@> canceled", self.request.URL);
         
         [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
-        self.cancelled = YES;
+        [self willChangeValueForKey:@"canceled"];
+        _canceled = YES;
+        [self didChangeValueForKey:@"canceled"];
     }
 }
 
@@ -199,7 +205,7 @@ static BOOL gActivityLoggingEnabled = NO;
     if(!self.cacheManager || self.cacheIdentifier == nil)
         return NO;
     
-    if(self.cancelled) {
+    if(self.canceled) {
         if(!_isInOfflineMode)
             [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
@@ -276,7 +282,7 @@ static BOOL gActivityLoggingEnabled = NO;
 
 - (void)acceptWithData:(NSData *)data
 {
-    if(self.cancelled)
+    if(self.canceled)
         return;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
@@ -289,7 +295,7 @@ static BOOL gActivityLoggingEnabled = NO;
 
 - (void)rejectWithError:(NSError *)error
 {
-    if(self.cancelled)
+    if(self.canceled)
         return;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
@@ -331,7 +337,7 @@ static BOOL gActivityLoggingEnabled = NO;
 {
     self.response = response;
     
-    if(!self.cacheManager || self.cancelled || self.cacheIdentifier == nil)
+    if(!self.cacheManager || self.canceled || self.cacheIdentifier == nil)
         return;
     
     NSString *cacheMarker = response.allHeaderFields[kETagHeaderKey] ?: response.allHeaderFields[kExpiresHeaderKey];
@@ -359,7 +365,7 @@ static BOOL gActivityLoggingEnabled = NO;
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    if(self.cancelled)
+    if(self.canceled)
         return;
     
     [_loadedDataLock lock];

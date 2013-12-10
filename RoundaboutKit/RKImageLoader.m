@@ -102,14 +102,14 @@
 
 #pragma mark - Image Loading
 
-- (void)loadImagePromise:(RKPromise *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
+- (void)loadImagePromise:(RKPromise <RKCancelable> *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
 {
     NSParameterAssert(imageView);
     
     imageView.image = placeholder;
     
     if(imagePromise && ![_knownInvalidCacheIdentifiers containsObject:imagePromise.cacheIdentifier]) {
-        [[self.imageMap objectForKey:imageView] cancel:nil];
+        [(RKPromise <RKCancelable> *)[self.imageMap objectForKey:imageView] cancel:nil];
         [self.imageMap removeObjectForKey:imageView];
         
         UIImage *existingImage = [self.inMemoryCache objectForKey:imagePromise.cacheIdentifier];
@@ -127,7 +127,7 @@
                              (__bridge const void *)imageView,
                              (__bridge const void *)imagePromise);
         
-        RKRealize(imagePromise, ^(UIImage *image) {
+        [imagePromise then:^(UIImage *image) {
             imageView.image = image;
             
             UITableViewCell *superCell = RK_TRY_CAST(UITableViewCell, imageView.superview.superview);
@@ -140,7 +140,7 @@
             
             if(completionHandler)
                 completionHandler(YES);
-        }, ^(NSError *error) {
+        } otherwise:^(NSError *error) {
             if(imagePromise.cacheIdentifier)
                 [self.knownInvalidCacheIdentifiers addObject:imagePromise.cacheIdentifier];
             [self.imageMap removeObjectForKey:imageView];
@@ -150,7 +150,7 @@
             
             if(completionHandler)
                 completionHandler(NO);
-        });
+        }];
     }
 }
 
@@ -177,7 +177,7 @@
 {
     NSParameterAssert(imageView);
     
-    [[self.imageMap objectForKey:imageView] cancel:nil];
+    [(RKPromise <RKCancelable> *)[self.imageMap objectForKey:imageView] cancel:nil];
     [self.imageMap removeObjectForKey:imageView];
 }
 
