@@ -39,7 +39,6 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 /// \param  baseURL             The base URL to combine with routes to construct requests. Required.
 /// \param  readCacheManager    The cache manager to use for GET requests. May be nil.
 /// \param  writeCacheManager   The cache manager to use for POST and PUT requests. May be nil.
-/// \param  requestQueue        The queue to use to execute requests. Required.
 /// \param  postProcessors      An array of post-processors to apply to each vended request. May be nil.
 ///
 /// \result A fully initialized request factory ready for use.
@@ -48,7 +47,6 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 - (instancetype)initWithBaseURL:(NSURL *)baseURL
                readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
               writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
-                   requestQueue:(NSOperationQueue *)requestQueue
                  postProcessors:(NSArray *)postProcessors;
 
 ///Cannot initialize a request factory without input objects.
@@ -77,6 +75,11 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///The authentication handler to use for requests.
 @property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
 
+///The stringifier to use when serializing dictionaries into URL parameter strings.
+///
+///Defaults to `kRKURLParameterStringifierDefault`. This property may not be nil.
+@property (copy, RK_NONATOMIC_IOSONLY) RKURLParameterStringifier URLParameterStringifier;
+
 #pragma mark - Dispensing URLs
 
 ///Returns a new URL constructed from the receiver's base URL,
@@ -88,7 +91,7 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///
 /// \result A newly constructed URL.
 ///
-/// \seealso(RKDictionaryToURLParametersString)
+/// \seealso(RKDictionaryToURLParametersString, self.URLParameterStringifier)
 - (NSURL *)URLWithPath:(NSString *)path parameters:(NSDictionary *)parameters;
 
 #pragma mark - Dispensing NSURLRequests
@@ -127,7 +130,7 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///
 /// \result A newly constructed URL request.
 ///
-/// \seealso(RKDictionaryToURLParametersString, RKRequestFactoryBodyType)
+/// \seealso(RKDictionaryToURLParametersString, RKRequestFactoryBodyType, self.URLParameterStringifier)
 - (NSURLRequest *)POSTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters body:(id)body bodyType:(RKRequestFactoryBodyType)bodyType;
 
 ///Returns a new PUT request with a given path and parameters.
@@ -140,7 +143,7 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///
 /// \result A newly constructed URL request.
 ///
-/// \seealso(RKDictionaryToURLParametersString, RKRequestFactoryBodyType)
+/// \seealso(RKDictionaryToURLParametersString, RKRequestFactoryBodyType, self.URLParameterStringifier)
 - (NSURLRequest *)PUTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters body:(id)body bodyType:(RKRequestFactoryBodyType)bodyType;
 
 #pragma mark - Dispensing RKURLRequestPromises

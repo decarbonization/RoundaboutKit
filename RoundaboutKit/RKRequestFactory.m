@@ -26,20 +26,18 @@
 @implementation RKRequestFactory
 
 - (instancetype)initWithBaseURL:(NSURL *)baseURL
-               readCacheManager:(id<RKURLRequestPromiseCacheManager>)readCacheManager
-              writeCacheManager:(id<RKURLRequestPromiseCacheManager>)writeCacheManager
-                   requestQueue:(NSOperationQueue *)requestQueue
+               readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
+              writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
                  postProcessors:(NSArray *)postProcessors
 {
     NSParameterAssert(baseURL);
-    NSParameterAssert(requestQueue);
     
     if((self = [super init])) {
         self.baseURL = baseURL;
         self.readCacheManager = readCacheManager;
         self.writeCacheManager = writeCacheManager;
-        self.requestQueue = requestQueue;
         self.postProcessors = postProcessors;
+        self.URLParameterStringifier = kRKURLParameterStringifierDefault;
     }
     
     return self;
@@ -95,7 +93,11 @@
         }
             
         case kRKRequestFactoryBodyTypeURLParameters: {
-            return [RKDictionaryToURLParametersString(body) dataUsingEncoding:NSUTF8StringEncoding];
+            if(self.URLParameterStringifier)
+                [NSException raise:NSInternalInconsistencyException
+                            format:@"Missing URLParameterStringifier."];
+            
+            return [RKDictionaryToURLParametersString(body, self.URLParameterStringifier) dataUsingEncoding:NSUTF8StringEncoding];
         }
             
         case kRKRequestFactoryBodyTypeJSON: {
@@ -131,14 +133,18 @@
 - (RKURLRequestPromise *)requestPromiseWithRequest:(NSURLRequest *)request
 {
     id <RKURLRequestPromiseCacheManager> cacheManager = nil;
-    if([request.HTTPMethod isEqualToString:@"GET"])
+    RKURLRequestPromiseOfflineBehavior offlineBehavior = RKURLRequestPromiseOfflineBehaviorFail;
+    if([request.HTTPMethod isEqualToString:@"GET"]) {
         cacheManager = self.readCacheManager;
-    else if(![request.HTTPMethod isEqualToString:@"DELETE"])
+        offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
+    } else if(![request.HTTPMethod isEqualToString:@"DELETE"]) {
         cacheManager = self.writeCacheManager;
+        offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
+    }
     
     RKURLRequestPromise *requestPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                          cacheManager:cacheManager
-                                                                          requestQueue:self.requestQueue];
+                                                                       offlineBehavior:offlineBehavior
+                                                                          cacheManager:cacheManager];
     [requestPromise addPostProcessors:RKCollectionDeepCopy(self.postProcessors)];
     requestPromise.authenticationHandler = self.authenticationHandler;
     return requestPromise;
@@ -194,11 +200,14 @@
         postProcessors = @[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ];
     }
     
-    return [self initWithBaseURL:baseURL
-                readCacheManager:readCacheManager
-               writeCacheManager:writeCacheManager
-                    requestQueue:requestQueue
-                  postProcessors:postProcessors];
+    if((self = [self initWithBaseURL:baseURL
+                    readCacheManager:readCacheManager
+                   writeCacheManager:writeCacheManager
+                      postProcessors:postProcessors])) {
+        self.requestQueue = requestQueue;
+    }
+    
+    return self;
 }
 
 - (RKSimplePostProcessorBlock)postProcessor
