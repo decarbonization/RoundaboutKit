@@ -60,10 +60,18 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 
 #pragma mark - Convenience
 
-///Returns a new promise object that has an accepted value.
+///Creates a new promise object, and calls `-[self accept:]` on it with a given value.
+///
+/// \param  The value to `accept` the promise with.
+///
+/// \result A new promise object that has already been realized.
 + (instancetype)acceptedPromiseWithValue:(id)value;
 
-///Returns a new promise object that has a rejected error.
+///Creates a new promise object, and calls `-[self reject:]` on it with a given error.
+///
+/// \param  The error to `reject` the promise with.
+///
+/// \result A new promise object that has already been realized.
 + (instancetype)rejectedPromiseWithError:(NSError *)error;
 
 #pragma mark - Plural
@@ -79,7 +87,7 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 
 #pragma mark - State
 
-///The name of the promise. Defaults to <anonymous>
+///The name of the promise. Defaults to "<anonymous>". Useful for debugging.
 @property (copy) NSString *promiseName;
 
 ///The cache identifier to use.
@@ -146,38 +154,26 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 
 #pragma mark -
 
-///Associate a success block and a failure block with the promise.
+///Associate a acceptance block and a rejection block with the
+///promise to be invoked when the promise is completed.
 ///
-/// \param  then        The block to invoke upon success. Required.
-/// \param  otherwise   The block to invoke upon failure. Required.
+/// \param  then        The block to invoke if the promise is accepted. Required.
+/// \param  otherwise   The block to invoke if the promise is rejected. Required.
 ///
 ///The blocks passed in will be invoked on the caller's operation queue.
 ///
 /// \seealso(-[self then:otherwise:onQueue:])
 - (void)then:(RKPromiseThenBlock)then otherwise:(RKPromiseErrorBlock)otherwise;
 
-///Associate a success block and a failure block with the promise.
+///Associate a acceptance block and a rejection block with the
+///promise to be invoked when the promise is completed.
 ///
 /// \param  then        The block to invoke upon success. Required.
 /// \param  otherwise   The block to invoke upon failure. Required.
 /// \param  queue       The queue to invoke the blocks on. Required.
 ///
-/// \seealso(-[self then:otherwise:onQueue:])
+/// \seealso(-[self then:otherwise:])
 - (void)then:(RKPromiseThenBlock)then otherwise:(RKPromiseErrorBlock)otherwise onQueue:(NSOperationQueue *)queue;
-
-#pragma mark -
-
-///Update a given key path on a given object when the receiver is accepted or rejected.
-///
-/// \param  keyPath     The key path to update on the object. Required.
-/// \param  object      The object to update. Required.
-/// \param  placeholder The placeholder object to use while waiting for realization.
-///                     If nil is specified for this parameter, the key path on object
-///                     will consequentially be set to nil.
-///
-///This is the preferred method for quick updates on an object. This method will
-///manage multiple promises being realized on a single view at the same time.
-- (void)updateKeyPath:(NSString *)keyPath forObject:(id)object withPlaceholder:(id)placeholder;
 
 #pragma mark -
 

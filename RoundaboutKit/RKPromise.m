@@ -9,10 +9,7 @@
 #import "RKPromise.h"
 
 #import <libkern/OSAtomic.h>
-#import <objc/runtime.h>
-#if TARGET_OS_IPHONE
-#   import <UIKit/UIKit.h>
-#endif /* TARGET_OS_IPHONE */
+#import <pthread.h>
 
 #import "RKQueueManager.h"
 #import "RKPossibility.h"
@@ -65,10 +62,19 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 
 @implementation RKPromise {
     ///The lock that regulates access to the promise's contents and state.
-    OSSpinLock _stateGuard;
+    pthread_mutex_t _stateGuard;
     
     ///Any post-processors associated with the promise. Lazily initialized.
     NSMutableArray *_postProcessors;
+}
+
+- (void)dealloc
+{
+    int mutexDestroyStatus = pthread_mutex_destroy(&_stateGuard);
+    if(mutexDestroyStatus != noErr) {
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Could not destroy state guard for promise. %d", mutexDestroyStatus];
+    }
 }
 
 - (instancetype)init
@@ -76,7 +82,12 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
     if((self = [super init])) {
         self.promiseName = @"<anonymous>";
         
-        _stateGuard = OS_SPINLOCK_INIT;
+        _stateGuard = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
+        int mutexInitStatus = pthread_mutex_init(&_stateGuard, NULL);
+        if(mutexInitStatus != noErr) {
+            [NSException raise:NSInternalInconsistencyException
+                        format:@"Could not create state guard for promise. %d", mutexInitStatus];
+        }
     }
     
     return self;
@@ -186,12 +197,12 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                        reason:@"Cannot accept a promise more than once"
                                      userInfo:nil];
     
-    OSSpinLockLock(&_stateGuard);
+    pthread_mutex_lock(&_stateGuard);
     {
         [self processValue:value error:nil];
         [self invoke];
     }
-    OSSpinLockUnlock(&_stateGuard);
+    pthread_mutex_unlock(&_stateGuard);
 }
 
 - (void)reject:(NSError *)error
@@ -201,12 +212,12 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                        reason:@"Cannot reject a promise more than once"
                                      userInfo:nil];
     
-    OSSpinLockLock(&_stateGuard);
+    pthread_mutex_lock(&_stateGuard);
     {
         [self processValue:nil error:error];
         [self invoke];
     }
-    OSSpinLockUnlock(&_stateGuard);
+    pthread_mutex_unlock(&_stateGuard);
 }
 
 #pragma mark - Processors
@@ -220,23 +231,23 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                        reason:@"Cannot add a post-processor to an already-realized promise."
                                      userInfo:nil];
     
-    OSSpinLockLock(&_stateGuard);
+    pthread_mutex_lock(&_stateGuard);
     {
         if(!_postProcessors)
             _postProcessors = [NSMutableArray new];
         
         [_postProcessors addObjectsFromArray:processors];
     }
-    OSSpinLockUnlock(&_stateGuard);
+    pthread_mutex_unlock(&_stateGuard);
 }
 
 - (void)removeAllPostProcessors
 {
-    OSSpinLockLock(&_stateGuard);
+    pthread_mutex_lock(&_stateGuard);
     {
         [_postProcessors removeAllObjects];
     }
-    OSSpinLockUnlock(&_stateGuard);
+    pthread_mutex_unlock(&_stateGuard);
 }
 
 - (NSArray *)postProcessors
@@ -310,7 +321,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                                      userInfo:nil];
     }
     
-    OSSpinLockLock(&_stateGuard);
+    pthread_mutex_lock(&_stateGuard);
     {
         self.thenBlock = then;
         self.otherwiseBlock = otherwise;
@@ -322,39 +333,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
             [self fire];
         }
     }
-    OSSpinLockUnlock(&_stateGuard);
-}
-
-#pragma mark -
-
-static const char *kCurrentPromiseAssociatedObjectKey = "com.roundabout.rk.promise.current-promise";
-
-- (void)updateKeyPath:(NSString *)keyPath forObject:(id)object withPlaceholder:(id)placeholder
-{
-    NSParameterAssert(keyPath);
-    NSParameterAssert(object);
-    
-    [object setValue:placeholder forKeyPath:keyPath];
-    objc_setAssociatedObject(object, kCurrentPromiseAssociatedObjectKey, self, OBJC_ASSOCIATION_ASSIGN);
-    
-    __block __typeof(self) me = self;
-    [self then:^(id value) {
-        if(me != objc_getAssociatedObject(object, kCurrentPromiseAssociatedObjectKey))
-            return;
-        
-        if(value) {
-            [object setValue:value forKeyPath:keyPath];
-            
-#if TARGET_OS_IPHONE
-            if([object isKindOfClass:[UIImageView class]] && [[[[object superview] superview] superview] isKindOfClass:[UITableViewCell class]])
-                [[[[object superview] superview] superview] setNeedsLayout];
-#endif /* TARGET_OS_IPHONE */
-        }
-        
-        objc_setAssociatedObject(object, kCurrentPromiseAssociatedObjectKey, nil, OBJC_ASSOCIATION_ASSIGN);
-    } otherwise:^(NSError *error) {
-        NSLog(@"Update failure for %@ on %@. %@", keyPath, object, error);
-    }];
+    pthread_mutex_unlock(&_stateGuard);
 }
 
 #pragma mark -
