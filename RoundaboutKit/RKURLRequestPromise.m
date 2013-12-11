@@ -64,6 +64,8 @@ static NSString *const kDefaultRevision = @"-1";
     
     ///The legacy post processor block. Used by the RKDeprecated category.
     RKSimplePostProcessorBlock _legacyPostProcessor;
+    
+    NSOperationQueue *_legacyRequestQueue;
 }
 
 #pragma mark - Logging
@@ -81,6 +83,21 @@ static BOOL gActivityLoggingEnabled = NO;
     gActivityLoggingEnabled = NO;
 }
 
+#pragma mark - Work Queue
+
++ (NSOperationQueue *)sharedWorkQueue
+{
+    static NSOperationQueue *sharedWorkQueue = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedWorkQueue = [NSOperationQueue new];
+        sharedWorkQueue.name = @"com.roundabout.rk.RKURLRequestPromise.sharedWorkQueue";
+        sharedWorkQueue.maxConcurrentOperationCount = 1;
+    });
+    
+    return sharedWorkQueue;
+}
+
 #pragma mark - Lifecycle
 
 - (void)dealloc
@@ -95,23 +112,21 @@ static BOOL gActivityLoggingEnabled = NO;
 }
 
 - (instancetype)initWithRequest:(NSURLRequest *)request
+                offlineBehavior:(RKURLRequestPromiseOfflineBehavior)offlineBehavior
                    cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
-            useCacheWhenOffline:(BOOL)useCacheWhenOffline
-                   requestQueue:(NSOperationQueue *)requestQueue
 {
     NSParameterAssert(request);
-    NSParameterAssert(requestQueue);
+    
+    if(offlineBehavior != RKURLRequestPromiseOfflineBehaviorFail && cacheManager != nil) {
+        [NSException raise:NSInvalidArgumentException
+                    format:@"Cannot use any offline behavior besides RKURLRequestPromiseOfflineBehaviorFail without providing a cache manager."];
+    }
     
     if((self = [super init])) {
         self.request = request;
-        self.requestQueue = requestQueue;
         
         self.cacheManager = cacheManager;
-        if(useCacheWhenOffline)
-            self.offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
-        else
-            self.offlineBehavior = RKURLRequestPromiseOfflineBehaviorFail;
-        self.cacheIdentifier = [request.URL absoluteString];
+        self.offlineBehavior = offlineBehavior;
         
         self.connectivityManager = [RKConnectivityManager defaultInternetConnectivityManager];
         
@@ -120,18 +135,6 @@ static BOOL gActivityLoggingEnabled = NO;
     }
     
     return self;
-}
-
-- (instancetype)initWithRequest:(NSURLRequest *)request
-                   cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
-                   requestQueue:(NSOperationQueue *)requestQueue
-{
-    return [self initWithRequest:request cacheManager:cacheManager useCacheWhenOffline:YES requestQueue:requestQueue];
-}
-
-- (instancetype)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue
-{
-    return [self initWithRequest:request cacheManager:nil useCacheWhenOffline:NO requestQueue:requestQueue];
 }
 
 #pragma mark - Identity
@@ -143,12 +146,18 @@ static BOOL gActivityLoggingEnabled = NO;
 
 #pragma mark - Realization
 
+- (NSOperationQueue *)workQueue
+{
+    return _legacyRequestQueue ?: self.class.sharedWorkQueue;
+}
+
 - (void)fire
 {
     NSAssert((self.connection == nil),
              @"Cannot realize a %@ more than once.", NSStringFromClass([self class]));
     
-    [_requestQueue addOperationWithBlock:^{
+    NSOperationQueue *workQueue = self.workQueue;
+    [workQueue addOperationWithBlock:^{
         [_loadedDataLock lock];
         _loadedData = [NSMutableData new];
         [_loadedDataLock unlock];
@@ -157,7 +166,7 @@ static BOOL gActivityLoggingEnabled = NO;
         [[RKActivityManager sharedActivityManager] incrementActivityCount];
         
         if(_isInOfflineMode) {
-            [self.requestQueue addOperationWithBlock:^{
+            [workQueue addOperationWithBlock:^{
                 [self loadCacheAndReportError:YES];
             }];
         } else {
@@ -166,7 +175,7 @@ static BOOL gActivityLoggingEnabled = NO;
                                                               delegate:self
                                                       startImmediately:NO];
             
-            [self.connection setDelegateQueue:self.requestQueue];
+            [self.connection setDelegateQueue:workQueue];
             [self.connection start];
         }
         
@@ -257,7 +266,7 @@ static BOOL gActivityLoggingEnabled = NO;
     RKPromise *cachedDataPromise = [RKPromise new];
     [cachedDataPromise addPostProcessors:RKCollectionDeepCopy(self.postProcessors)];
     
-    [self.requestQueue addOperationWithBlock:^{
+    [self.workQueue addOperationWithBlock:^{
         NSError *error = nil;
         NSData *data = [self.cacheManager cachedDataForIdentifier:self.cacheIdentifier error:&error];
         if(data) {
@@ -433,6 +442,53 @@ RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePos
 #pragma mark -
 
 @implementation RKURLRequestPromise (RKDeprecated)
+
+- (instancetype)initWithRequest:(NSURLRequest *)request
+                   cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+            useCacheWhenOffline:(BOOL)useCacheWhenOffline
+                   requestQueue:(NSOperationQueue *)requestQueue
+{
+    NSParameterAssert(request);
+    NSParameterAssert(requestQueue);
+    
+    RKURLRequestPromiseOfflineBehavior offlineBehavior;
+    if(useCacheWhenOffline)
+        offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
+    else
+        offlineBehavior = RKURLRequestPromiseOfflineBehaviorFail;
+    
+    if((self = [self initWithRequest:request
+                     offlineBehavior:offlineBehavior
+                        cacheManager:cacheManager])) {
+        _legacyRequestQueue = requestQueue;
+    }
+    
+    return self;
+}
+
+- (instancetype)initWithRequest:(NSURLRequest *)request
+                   cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+                   requestQueue:(NSOperationQueue *)requestQueue
+{
+    return [self initWithRequest:request cacheManager:cacheManager useCacheWhenOffline:YES requestQueue:requestQueue];
+}
+
+- (instancetype)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue
+{
+    return [self initWithRequest:request cacheManager:nil useCacheWhenOffline:NO requestQueue:requestQueue];
+}
+
+#pragma mark -
+
+- (void)setRequestQueue:(NSOperationQueue *)requestQueue
+{
+    _legacyRequestQueue = requestQueue;
+}
+
+- (NSOperationQueue *)requestQueue
+{
+    return _legacyRequestQueue;
+}
 
 - (void)setPostProcessor:(RKSimplePostProcessorBlock)postProcessor
 {

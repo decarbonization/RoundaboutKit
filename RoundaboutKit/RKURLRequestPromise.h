@@ -174,7 +174,13 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 ///default internet connection `RKConnectivityManager`. It is possible to
 ///change the connectivity manager used after a request promise has been
 ///created by mutating the `self.connectivityManager`.
-@interface RKURLRequestPromise : RKPromise <RKCancelable>
+///
+///#Realization:
+///
+///The RKURLRequestPromise class is lazy. It will not perform any work until
+///an attempt is made to observe its realization through one of the available
+///methods inherited from `RKPromise`.
+@interface RKURLRequestPromise : RKPromise <RKCancelable, RKLazy>
 
 #pragma mark - Logging
 
@@ -193,47 +199,21 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 
 #pragma mark - Lifecycle
 
-///Initialize the receiver with a given request.
+///Initialize the promise with a given URL request. Designated initializer.
 ///
-/// \param  request                 The request to execute. Required.
-/// \param  cacheManager            The cache manager to use. Optional.
-/// \param  useCacheWhenOffline     Whether or not to use the cache when the internet connectivity is offline.
-/// \param  requestQueue            The queue to execute the request in. Required.
+/// \param  request         The URL request to to run. Required.
+/// \param  offlineBehavior How the promise should behave when it detects that there is no connection.
+/// \param  cacheManager    The manager to read and write persistent cache to and from.
 ///
-/// \result A fully initialized request promise object.
+/// \result A fully initialized request-promise ready for use.
 ///
-///This is the designated initializer.
+///__Important:__ Unless a cache manager is provided, `offlineBehavior` must be
+///`RKURLRequestPromiseOfflineBehaviorFail` or an exception will be raised.
 ///
-///If `.useCacheWhenOffline` is YES, and the internet connection is inactive, then the
-///cache will be loaded, and only the second part of the promise will be called back.
-- (id)initWithRequest:(NSURLRequest *)request
-         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
-  useCacheWhenOffline:(BOOL)useCacheWhenOffline
-         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
-
-///Initialize the receiver with a given request.
-///
-/// \param  request                 The request to execute. Required.
-/// \param  cacheManager            The cache manager to use. Optional.
-/// \param  requestQueue            The queue to execute the request in. Required.
-///
-/// \result A fully initialized request promise object.
-///
-///This intiializer assumes you wish to use cache when in offline mode.
-- (id)initWithRequest:(NSURLRequest *)request
-         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
-         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
-
-///Initialize the receiver with a given request.
-///
-/// \param  request                 The request to execute. Required.
-/// \param  cacheManager            The cache manager to use. Optional.
-/// \param  requestQueue            The queue to execute the request in. Required.
-///
-/// \result A fully initialized request promise object.
-///
-///This intiializer assumes you do not want to use a cache manager.
-- (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED;
+///It is recommended to use `RKRequestFactory` instead of creating RKURLRequestPromises directly.
+- (instancetype)initWithRequest:(NSURLRequest *)request
+                offlineBehavior:(RKURLRequestPromiseOfflineBehavior)offlineBehavior
+                   cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager RK_REQUIRE_RESULT_USED;
 
 #pragma mark - Properties
 
@@ -254,11 +234,6 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 ///Post-processors should take this into account.
 @property (copy, readonly) NSHTTPURLResponse *response;
 
-///The queue that the request will be executed on.
-///
-///This queue should be concurrent.
-@property (RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
-
 #pragma mark -
 
 ///The authentication handler of the request promise.
@@ -272,8 +247,6 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 #pragma mark -
 
 ///How the request promise should behave if its connectivity manager reports being offline.
-///
-///This property is ignored if `self.cacheManager` is nil.
 ///
 /// \seealso(RKURLRequestPromiseOfflineBehavior)
 @property (readonly, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
@@ -317,6 +290,48 @@ RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSi
 
 ///The methods deprecated in RKURLRequestPromise slated for removal in the near future.
 @interface RKURLRequestPromise (RKDeprecated)
+
+///__Deprecated__. Use `[self initWithRequest:offlineBehavior:cacheManager:]` instead.
+///
+///Initialize the receiver with a given request.
+///
+/// \param  request                 The request to execute. Required.
+/// \param  cacheManager            The cache manager to use. Optional.
+/// \param  useCacheWhenOffline     Whether or not to use the cache when the internet connectivity is offline.
+/// \param  requestQueue            The queue to execute the request in. Required.
+///
+/// \result A fully initialized request promise object.
+///
+///If `.useCacheWhenOffline` is YES, and the internet connection is inactive, then the
+///cache will be loaded, and only the second part of the promise will be called back.
+///
+///__Important:__ Starting in RK 2.1, RKURLRequestPromise has a new designated initializer
+///that does not take an operation queue. This interface should be preferred as it allows
+///RKURLRequestPromise to respond better to changes in external conditions. This method
+///and its associated short hands will be removed in the future.
+- (id)initWithRequest:(NSURLRequest *)request
+         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+  useCacheWhenOffline:(BOOL)useCacheWhenOffline
+         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED DEPRECATED_ATTRIBUTE;
+
+///Deprecated. See `[self initWithRequest:offlineBehavior:cacheManager:]`.
+- (id)initWithRequest:(NSURLRequest *)request
+         cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
+         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED DEPRECATED_ATTRIBUTE;
+
+///Deprecated. See `[self initWithRequest:offlineBehavior:cacheManager:]`.
+- (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED DEPRECATED_ATTRIBUTE;
+
+#pragma mark -
+
+///_Deprecated._ The queue that all asynchronous work related to the networking request will be run on.
+///
+///Starting in RK 2.1, RKURLRequestPromise provides its own work queue.
+///This allows it to better adapt to changes in external conditions.
+///If a queue is provided through one of the legacy deprecated initializers,
+///it will be used over the new internal queue. Clients should migrate away
+///from relying on external queues as soon as possible.
+@property (RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue DEPRECATED_ATTRIBUTE;
 
 ///The post processor to invoke on the URL request promise.
 ///This is the legacy interface for post-processors. Use
