@@ -19,14 +19,14 @@
 static NSString *RKPromiseStateGetString(RKPromiseState state)
 {
     switch (state) {
-        case RKPromiseStateNotRealized:
-            return @"RKPromiseStateNotRealized";
+        case RKPromiseStateReady:
+            return @"RKPromiseStateReady";
             
-        case RKPromiseStateValue:
-            return @"RKPromiseStateValue";
+        case RKPromiseStateAcceptedWithValue:
+            return @"RKPromiseStateAcceptedWithValue";
             
-        case RKPromiseStateError:
-            return @"RKPromiseStateError";
+        case RKPromiseStateRejectedWithError:
+            return @"RKPromiseStateRejectedWithError";
     }
 }
 
@@ -48,10 +48,10 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 #pragma mark - Blocks
 
 ///The block to invoke upon success.
-@property (copy) RKPromiseThenBlock thenBlock;
+@property (copy) RKPromiseAcceptedNotificationBlock thenBlock;
 
 ///The block to invoke upon failure.
-@property (copy) RKPromiseErrorBlock otherwiseBlock;
+@property (copy) RKPromiseRejectedNotificationBlock otherwiseBlock;
 
 ///The queue to invoke the blocks on.
 @property NSOperationQueue *queue;
@@ -181,10 +181,10 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
     
     if(error) {
         self.contents = error;
-        self.state = RKPromiseStateError;
+        self.state = RKPromiseStateRejectedWithError;
     } else {
         self.contents = value;
-        self.state = RKPromiseStateValue;
+        self.state = RKPromiseStateAcceptedWithValue;
     }
 }
 
@@ -270,7 +270,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
         self.hasInvoked = YES;
         
         switch (self.state) {
-            case RKPromiseStateValue: {
+            case RKPromiseStateAcceptedWithValue: {
                 [self.queue addOperationWithBlock:^{
                     self.thenBlock(self.contents);
                     [self doneInvoking];
@@ -279,7 +279,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                 break;
             }
                 
-            case RKPromiseStateError: {
+            case RKPromiseStateRejectedWithError: {
                 [self.queue addOperationWithBlock:^{
                     self.otherwiseBlock(self.contents);
                     [self doneInvoking];
@@ -288,7 +288,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                 break;
             }
                 
-            case RKPromiseStateNotRealized: {
+            case RKPromiseStateReady: {
                 break;
             }
         }
@@ -304,12 +304,12 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 
 #pragma mark -
 
-- (void)then:(RKPromiseThenBlock)then otherwise:(RKPromiseErrorBlock)otherwise
+- (void)then:(RKPromiseAcceptedNotificationBlock)then otherwise:(RKPromiseRejectedNotificationBlock)otherwise
 {
     [self then:then otherwise:otherwise onQueue:[NSOperationQueue currentQueue]];
 }
 
-- (void)then:(RKPromiseThenBlock)then otherwise:(RKPromiseErrorBlock)otherwise onQueue:(NSOperationQueue *)queue
+- (void)then:(RKPromiseAcceptedNotificationBlock)then otherwise:(RKPromiseRejectedNotificationBlock)otherwise onQueue:(NSOperationQueue *)queue
 {
     NSParameterAssert(then);
     NSParameterAssert(otherwise);
@@ -326,8 +326,9 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
         self.thenBlock = then;
         self.otherwiseBlock = otherwise;
         self.queue = queue;
+        self.hasInvoked = YES;
         
-        if(self.state != RKPromiseStateNotRealized) {
+        if(self.state != RKPromiseStateReady) {
             [self invoke];
         } else {
             [self fire];

@@ -10,23 +10,29 @@
 
 @protocol RKPostProcessor;
 
-///The different states a promise can be in.
+///The different states a promise object can be in.
 typedef NS_ENUM(NSUInteger, RKPromiseState) {
-    ///The promise is not yet realized.
-    RKPromiseStateNotRealized = 0,
+    ///The promise has not yet been accepted or rejected.
+    RKPromiseStateReady = 0,
     
-    ///The promise has been realized with a value.
-    RKPromiseStateValue,
+    ///The promise has been accepted with a value.
+    RKPromiseStateAcceptedWithValue,
     
-    ///The promise has been realized with an error.
-    RKPromiseStateError,
+    ///The promise has been rejected with an error.
+    RKPromiseStateRejectedWithError,
 };
 
-///A then continuation block.
-typedef void(^RKPromiseThenBlock)(id);
+///An observer block that will be invoked when a promise is accepted with a value.
+///
+/// \param  value   The value the promise was accepted with. `nil` is a valid value.
+///
+typedef void(^RKPromiseAcceptedNotificationBlock)(id);
 
-///An error continuation block.
-typedef void(^RKPromiseErrorBlock)(NSError *error);
+///An observer block that will be invoked when a promise is rejected with an error.
+///
+/// \param  error   The error the promise was rejected with.
+///
+typedef void(^RKPromiseRejectedNotificationBlock)(NSError *error);
 
 #pragma mark -
 
@@ -145,11 +151,9 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 
 #pragma mark - Realizing
 
-///Overriden by subclasses that wish to perform work based on the promise being realized.
-///
-///The default implementation of this method does nothing.
-///
-///This method is only called if the promise has not already been realized.
+///Provided as a simple way for subclasses of RKPromise to conform to the
+///behavior described by the `<RKLazy>` protocol. The default implementation
+///does nothing.
 - (void)fire;
 
 #pragma mark -
@@ -163,7 +167,7 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 ///The blocks passed in will be invoked on the caller's operation queue.
 ///
 /// \seealso(-[self then:otherwise:onQueue:])
-- (void)then:(RKPromiseThenBlock)then otherwise:(RKPromiseErrorBlock)otherwise;
+- (void)then:(RKPromiseAcceptedNotificationBlock)then otherwise:(RKPromiseRejectedNotificationBlock)otherwise;
 
 ///Associate a acceptance block and a rejection block with the
 ///promise to be invoked when the promise is completed.
@@ -173,16 +177,17 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 /// \param  queue       The queue to invoke the blocks on. Required.
 ///
 /// \seealso(-[self then:otherwise:])
-- (void)then:(RKPromiseThenBlock)then otherwise:(RKPromiseErrorBlock)otherwise onQueue:(NSOperationQueue *)queue;
+- (void)then:(RKPromiseAcceptedNotificationBlock)then otherwise:(RKPromiseRejectedNotificationBlock)otherwise onQueue:(NSOperationQueue *)queue;
 
 #pragma mark -
 
-///Synchronously waits for the receiver to contain a value.
+///Blocks the calling thread until the receiver is either
+///accepted with a value, or rejected with an error.
 ///
-/// \param  outError    On return, pointer that contains an error object
-///                     describing any issues. Parameter may be ommitted.
+/// \param  outError    On return, pointer that contains an error object describing any issues.
 ///
-/// \result The result of realizing the promise.
+/// \result If the promise was accepted, the value that was accepted;
+///         if the promise was rejected, nil.
 ///
 - (id)waitForRealization:(NSError **)outError;
 
@@ -235,8 +240,8 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 ///
 ///If promise is nil, then this function does nothing.
 RK_INLINE RK_OVERLOADABLE void RKRealize(RKPromise *promise,
-							   RKPromiseThenBlock success,
-							   RKPromiseErrorBlock failure,
+							   RKPromiseAcceptedNotificationBlock success,
+							   RKPromiseRejectedNotificationBlock failure,
 							   NSOperationQueue *callbackQueue)
 {
 	if(!promise)
@@ -245,8 +250,8 @@ RK_INLINE RK_OVERLOADABLE void RKRealize(RKPromise *promise,
 	[promise then:success otherwise:failure onQueue:callbackQueue];
 }
 RK_INLINE RK_OVERLOADABLE void RKRealize(RKPromise *promise,
-                                         RKPromiseThenBlock success,
-                                         RKPromiseErrorBlock failure)
+                                         RKPromiseAcceptedNotificationBlock success,
+                                         RKPromiseRejectedNotificationBlock failure)
 {
 	RKRealize(promise, success, failure, [NSOperationQueue currentQueue]);
 }
