@@ -31,6 +31,31 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 #pragma mark -
 
 ///The RKPromise class encapsulates the common promise pattern.
+///
+///Promises provide a layer of abstraction between an asynchronous task
+///and a single observer wishing to know when the task has completed.
+///Promises are intended to replace methods that initiate asynchronous work
+///and take a callback block with a consistent, semi-composable pattern.
+///
+///Methods that initiate asynchronous tasks create and return a promise
+///object. The caller of the method can then observe when the task
+///completes either by waiting for it by blocking the current thread,
+///or by providing success and failure callbacks to the returned promise.
+///This process of waiting or attaching callbacks is called "Realization".
+///The asynchronous task started by the method will notify the observer by
+///either marking a promise as successful by having it "accept" a value,
+///or by marking it as failed by having it "reject" an NSError. The value
+///or error are then propagated back to the observer.
+///
+///RoundaboutKit offers a few additions on top of the basic promise pattern.
+///These additions are laziness described by `<RKLazy>`, and cancelability
+///as described by `<RKCancelable>`. A promise marked with `<RKLazy>` will
+///cause asynchronous work to be performed when the promise is realized.
+///A promise implementing the `<RKCancelable>` protocol has an additional
+///property and method that make it possible for an observer to cancel the
+///asynchronous task that created / is associated with the promise.
+///
+/// \seealso(<RKCancelable>, <RKLazy>, RKURLRequestPromise)
 @interface RKPromise : NSObject
 
 #pragma mark - Convenience
@@ -167,7 +192,7 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 
 @end
 
-#pragma mark -
+#pragma mark - Extensions
 
 ///The RKCancelable protocol describes an object that can be canceled.
 ///Intended to be used with `RKPromise` subclasses.
@@ -183,6 +208,18 @@ typedef void(^RKPromiseErrorBlock)(NSError *error);
 ///and for it be called any number of times.
 - (IBAction)cancel:(id)sender;
 
+@end
+
+#pragma mark -
+
+///The RKLazy protocol marks an object as deferring work necessary for
+///it to have a value. Intended to be used with `RKPromise` subclasses.
+///
+///__Important:__ the RKLazy protocol simply marks a behavior, it does not
+///directly prescribe a way for laziness to be implemented. The `RKPromise`
+///class provides a hook for laziness in the form of the `-[RKPromise fire]`
+///method. The `RKURLRequestPromise` class uses this method for its laziness.
+@protocol RKLazy <NSObject>
 @end
 
 #if RoundaboutKit_EnableLegacyRealization
