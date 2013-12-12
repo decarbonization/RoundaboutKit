@@ -11,15 +11,15 @@
 @protocol RKPostProcessor;
 
 ///The different states a promise object can be in.
-typedef NS_ENUM(NSUInteger, RKPromiseState) {
+typedef NS_ENUM(NSUInteger, kRKPromiseState) {
     ///The promise has not yet been accepted or rejected.
-    RKPromiseStateReady = 0,
+    kRKPromiseStateReady = 0,
     
     ///The promise has been accepted with a value.
-    RKPromiseStateAcceptedWithValue,
+    kRKPromiseStateAcceptedWithValue,
     
     ///The promise has been rejected with an error.
-    RKPromiseStateRejectedWithError,
+    kRKPromiseStateRejectedWithError,
 };
 
 ///An observer block that will be invoked when a promise is accepted with a value.
@@ -103,8 +103,8 @@ typedef void(^RKPromiseRejectedNotificationBlock)(NSError *error);
 
 ///The state of the promise.
 ///
-/// \seealso(RKPromiseState)
-@property (readonly) RKPromiseState state;
+/// \seealso(kRKPromiseState)
+@property (readonly) kRKPromiseState state;
 
 #pragma mark - Propagating Values
 

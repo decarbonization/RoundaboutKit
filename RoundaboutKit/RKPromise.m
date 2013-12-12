@@ -16,17 +16,17 @@
 #import "RKPostProcessor.h"
 
 ///Returns a string representation for a given state.
-static NSString *RKPromiseStateGetString(RKPromiseState state)
+static NSString *kRKPromiseStateGetString(kRKPromiseState state)
 {
     switch (state) {
-        case RKPromiseStateReady:
-            return @"RKPromiseStateReady";
+        case kRKPromiseStateReady:
+            return @"kRKPromiseStateReady";
             
-        case RKPromiseStateAcceptedWithValue:
-            return @"RKPromiseStateAcceptedWithValue";
+        case kRKPromiseStateAcceptedWithValue:
+            return @"kRKPromiseStateAcceptedWithValue";
             
-        case RKPromiseStateRejectedWithError:
-            return @"RKPromiseStateRejectedWithError";
+        case kRKPromiseStateRejectedWithError:
+            return @"kRKPromiseStateRejectedWithError";
     }
 }
 
@@ -37,7 +37,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 #pragma mark - State
 
 ///Readwrite.
-@property (readwrite) RKPromiseState state;
+@property (readwrite) kRKPromiseState state;
 
 ///The contents of the promise, as described by `self.state`.
 @property id contents;
@@ -151,7 +151,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@:%p %@, state => %@, contents => %@>", NSStringFromClass(self.class), self, self.promiseName, RKPromiseStateGetString(self.state), self.contents];
+    return [NSString stringWithFormat:@"<%@:%p %@, state => %@, contents => %@>", NSStringFromClass(self.class), self, self.promiseName, kRKPromiseStateGetString(self.state), self.contents];
 }
 
 #pragma mark - Propagating Values
@@ -181,10 +181,10 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
     
     if(error) {
         self.contents = error;
-        self.state = RKPromiseStateRejectedWithError;
+        self.state = kRKPromiseStateRejectedWithError;
     } else {
         self.contents = value;
-        self.state = RKPromiseStateAcceptedWithValue;
+        self.state = kRKPromiseStateAcceptedWithValue;
     }
 }
 
@@ -270,7 +270,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
         self.hasInvoked = YES;
         
         switch (self.state) {
-            case RKPromiseStateAcceptedWithValue: {
+            case kRKPromiseStateAcceptedWithValue: {
                 [self.queue addOperationWithBlock:^{
                     self.thenBlock(self.contents);
                     [self doneInvoking];
@@ -279,7 +279,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                 break;
             }
                 
-            case RKPromiseStateRejectedWithError: {
+            case kRKPromiseStateRejectedWithError: {
                 [self.queue addOperationWithBlock:^{
                     self.otherwiseBlock(self.contents);
                     [self doneInvoking];
@@ -288,7 +288,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
                 break;
             }
                 
-            case RKPromiseStateReady: {
+            case kRKPromiseStateReady: {
                 break;
             }
         }
@@ -328,7 +328,7 @@ static NSString *RKPromiseStateGetString(RKPromiseState state)
         self.queue = queue;
         self.hasInvoked = YES;
         
-        if(self.state != RKPromiseStateReady) {
+        if(self.state != kRKPromiseStateReady) {
             [self invoke];
         } else {
             [self fire];
