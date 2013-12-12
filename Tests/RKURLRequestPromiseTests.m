@@ -53,9 +53,8 @@
 {
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]];
     RKURLRequestPromise *testPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                       cacheManager:nil
-                                                                useCacheWhenOffline:NO
-                                                                       requestQueue:[RKQueueManager commonQueue]];
+                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorFail
+                                                                       cacheManager:nil];
     testPromise.connectivityManager = self.connectivityManager;
     return testPromise;
 }
@@ -114,9 +113,8 @@
     
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]];
     RKURLRequestPromise *testPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                       cacheManager:cacheManager
-                                                                useCacheWhenOffline:NO
-                                                                       requestQueue:[RKQueueManager commonQueue]];
+                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorFail
+                                                                       cacheManager:cacheManager];
     testPromise.cacheIdentifier = kCacheIdentifier;
     testPromise.connectivityManager = self.connectivityManager;
     
@@ -148,9 +146,8 @@
     
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]];
     RKURLRequestPromise *testPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                       cacheManager:cacheManager
-                                                                useCacheWhenOffline:NO
-                                                                       requestQueue:[RKQueueManager commonQueue]];
+                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorFail
+                                                                       cacheManager:cacheManager];
     testPromise.cacheIdentifier = kCacheIdentifier;
     testPromise.connectivityManager = self.connectivityManager;
     
@@ -184,9 +181,8 @@
     
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]];
     RKURLRequestPromise *testPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                       cacheManager:cacheManager
-                                                                useCacheWhenOffline:NO
-                                                                       requestQueue:[RKQueueManager commonQueue]];
+                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorFail
+                                                                       cacheManager:cacheManager];
     testPromise.cacheIdentifier = kCacheIdentifier;
     testPromise.connectivityManager = self.connectivityManager;
     
@@ -215,9 +211,8 @@
     
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]];
     RKURLRequestPromise *testPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                       cacheManager:cacheManager
-                                                                useCacheWhenOffline:NO
-                                                                       requestQueue:[RKQueueManager commonQueue]];
+                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorFail
+                                                                       cacheManager:cacheManager];
     testPromise.cacheIdentifier = kCacheIdentifier;
     testPromise.connectivityManager = self.connectivityManager;
     

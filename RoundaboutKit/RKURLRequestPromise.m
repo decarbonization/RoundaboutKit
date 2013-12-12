@@ -38,7 +38,7 @@ static NSString *const kDefaultRevision = @"-1";
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
 @property (copy, readwrite) NSHTTPURLResponse *response;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
-@property (readwrite, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
+@property (readwrite, RK_NONATOMIC_IOSONLY) kRKURLRequestPromiseOfflineBehavior offlineBehavior;
 
 @end
 
@@ -112,14 +112,14 @@ static BOOL gActivityLoggingEnabled = NO;
 }
 
 - (instancetype)initWithRequest:(NSURLRequest *)request
-                offlineBehavior:(RKURLRequestPromiseOfflineBehavior)offlineBehavior
+                offlineBehavior:(kRKURLRequestPromiseOfflineBehavior)offlineBehavior
                    cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
 {
     NSParameterAssert(request);
     
-    if(offlineBehavior != RKURLRequestPromiseOfflineBehaviorFail && cacheManager != nil) {
+    if(offlineBehavior != kRKURLRequestPromiseOfflineBehaviorFail && cacheManager != nil) {
         [NSException raise:NSInvalidArgumentException
-                    format:@"Cannot use any offline behavior besides RKURLRequestPromiseOfflineBehaviorFail without providing a cache manager."];
+                    format:@"Cannot use any offline behavior besides kRKURLRequestPromiseOfflineBehaviorFail without providing a cache manager."];
     }
     
     if((self = [super init])) {
@@ -384,7 +384,7 @@ static BOOL gActivityLoggingEnabled = NO;
     
     if(self.cacheManager) {
         NSString *cacheMarker = self.response.allHeaderFields[kETagHeaderKey] ?: self.response.allHeaderFields[kExpiresHeaderKey];
-        if(!cacheMarker && self.offlineBehavior == RKURLRequestPromiseOfflineBehaviorUseCache)
+        if(!cacheMarker && self.offlineBehavior == kRKURLRequestPromiseOfflineBehaviorUseCache)
             cacheMarker = kDefaultRevision;
         
         if(cacheMarker) {
@@ -451,11 +451,11 @@ RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePos
     NSParameterAssert(request);
     NSParameterAssert(requestQueue);
     
-    RKURLRequestPromiseOfflineBehavior offlineBehavior;
+    kRKURLRequestPromiseOfflineBehavior offlineBehavior;
     if(useCacheWhenOffline)
-        offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
+        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
     else
-        offlineBehavior = RKURLRequestPromiseOfflineBehaviorFail;
+        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
     
     if((self = [self initWithRequest:request
                      offlineBehavior:offlineBehavior

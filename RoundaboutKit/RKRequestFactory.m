@@ -133,13 +133,13 @@
 - (RKURLRequestPromise *)requestPromiseWithRequest:(NSURLRequest *)request
 {
     id <RKURLRequestPromiseCacheManager> cacheManager = nil;
-    RKURLRequestPromiseOfflineBehavior offlineBehavior = RKURLRequestPromiseOfflineBehaviorFail;
+    kRKURLRequestPromiseOfflineBehavior offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
     if([request.HTTPMethod isEqualToString:@"GET"]) {
         cacheManager = self.readCacheManager;
-        offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
+        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
     } else if(![request.HTTPMethod isEqualToString:@"DELETE"]) {
         cacheManager = self.writeCacheManager;
-        offlineBehavior = RKURLRequestPromiseOfflineBehaviorUseCache;
+        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
     }
     
     RKURLRequestPromise *requestPromise = [[RKURLRequestPromise alloc] initWithRequest:request

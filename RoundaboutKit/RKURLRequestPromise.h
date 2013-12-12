@@ -110,13 +110,13 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 
 ///How an instance of RKURLRequestPromise should behave
 ///when its connection reports being offline
-typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
+typedef NS_ENUM(NSUInteger, kRKURLRequestPromiseOfflineBehavior) {
     ///The promise should fail with an error.
-    RKURLRequestPromiseOfflineBehaviorFail = 0,
+    kRKURLRequestPromiseOfflineBehaviorFail = 0,
     
     ///The promise should attempt to use any existing
     ///persistent cache before resorting to failure.
-    RKURLRequestPromiseOfflineBehaviorUseCache = 1,
+    kRKURLRequestPromiseOfflineBehaviorUseCache = 1,
 };
 
 #pragma mark -
@@ -163,10 +163,10 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 ///When server headers do not contain cache identification information, there are
 ///multiple behaviors that can occur depending on the value of `self.offlineBehavior`.
 ///
-/// -   `RKURLRequestPromiseOfflineBehaviorUseCache`: the cache is unconditionally
+/// -   `kRKURLRequestPromiseOfflineBehaviorUseCache`: the cache is unconditionally
 ///     saved to the disc with an arbitrary revision associated with it. This enables
 ///     the cached response to be used when there is no internet connection available.
-/// -   `RKURLRequestPromiseOfflineBehaviorFail`: The cache is completely ignored.
+/// -   `kRKURLRequestPromiseOfflineBehaviorFail`: The cache is completely ignored.
 ///
 ///#Connectivity:
 ///
@@ -208,11 +208,11 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 /// \result A fully initialized request-promise ready for use.
 ///
 ///__Important:__ Unless a cache manager is provided, `offlineBehavior` must be
-///`RKURLRequestPromiseOfflineBehaviorFail` or an exception will be raised.
+///`kRKURLRequestPromiseOfflineBehaviorFail` or an exception will be raised.
 ///
 ///It is recommended to use `RKRequestFactory` instead of creating RKURLRequestPromises directly.
 - (instancetype)initWithRequest:(NSURLRequest *)request
-                offlineBehavior:(RKURLRequestPromiseOfflineBehavior)offlineBehavior
+                offlineBehavior:(kRKURLRequestPromiseOfflineBehavior)offlineBehavior
                    cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager RK_REQUIRE_RESULT_USED;
 
 #pragma mark - Properties
@@ -248,8 +248,8 @@ typedef NS_ENUM(NSUInteger, RKURLRequestPromiseOfflineBehavior) {
 
 ///How the request promise should behave if its connectivity manager reports being offline.
 ///
-/// \seealso(RKURLRequestPromiseOfflineBehavior)
-@property (readonly, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
+/// \seealso(kRKURLRequestPromiseOfflineBehavior)
+@property (readonly, RK_NONATOMIC_IOSONLY) kRKURLRequestPromiseOfflineBehavior offlineBehavior;
 
 ///Whether or not the request should cancel itself if it finds
 ///its cache is unchanged from the newly loaded remote data.
