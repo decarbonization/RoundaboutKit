@@ -117,7 +117,7 @@ static BOOL gActivityLoggingEnabled = NO;
 {
     NSParameterAssert(request);
     
-    if(offlineBehavior != kRKURLRequestPromiseOfflineBehaviorFail && cacheManager != nil) {
+    if(offlineBehavior != kRKURLRequestPromiseOfflineBehaviorFail && cacheManager == nil) {
         [NSException raise:NSInvalidArgumentException
                     format:@"Cannot use any offline behavior besides kRKURLRequestPromiseOfflineBehaviorFail without providing a cache manager."];
     }

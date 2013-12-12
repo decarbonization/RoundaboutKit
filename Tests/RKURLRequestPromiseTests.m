@@ -197,6 +197,33 @@
     XCTAssertEqual(error.code, kRKURLRequestPromiseErrorCannotLoadCache, @"Error has wrong code");
 }
 
+- (void)testCacheManagerAssumptionsAboutOfflineSuccess
+{
+    NSString *const kCacheIdentifier = PLAIN_TEXT_URL_STRING;
+    
+    NSDictionary *items = @{
+        kCacheIdentifier: @{
+            kRKMockURLRequestPromiseCacheManagerItemRevisionKey: @"SomeOtherArbitraryValue",
+            kRKMockURLRequestPromiseCacheManagerItemDataKey: [@"This string should not be propagated" dataUsingEncoding:NSUTF8StringEncoding],
+        },
+    };
+    RKMockURLRequestPromiseCacheManager *cacheManager = [[RKMockURLRequestPromiseCacheManager alloc] initWithItems:items];
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]];
+    RKURLRequestPromise *testPromise = [[RKURLRequestPromise alloc] initWithRequest:request
+                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorUseCache
+                                                                       cacheManager:cacheManager];
+    testPromise.cacheIdentifier = kCacheIdentifier;
+    testPromise.connectivityManager = [[RKConnectivityManager alloc] initWithHostName:PLAIN_TEXT_URL_STRING];
+    
+    NSError *error = nil;
+    NSData *result = [testPromise waitForRealization:&error];
+    XCTAssertNotNil(result, @"Success value is missing");
+    XCTAssertNil(error, @"RKAwait unexpectedly errored");
+    XCTAssertFalse(cacheManager.removeCacheForIdentifierErrorWasCalled, @"removeCacheForIdentifierErrorWasCalled was called");
+    XCTAssertFalse(cacheManager.wasCalledFromMainThread, @"Cache manager was called from main thread");
+}
+
 - (void)testCacheManagerPreloading
 {
     NSString *const kCacheIdentifier = PLAIN_TEXT_URL_STRING;
