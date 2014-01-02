@@ -12,8 +12,7 @@
 
 #import "RKURLRequestPromise.h"
 #import "RKFileSystemCacheManager.h"
-
-#import "RKQueueManager.h"
+#import "RKPostProcessor.h"
 
 #define xCGSizeGetArea(size) (size.width * size.height)
 
@@ -160,10 +159,10 @@
     
     NSURLRequest *imageURLRequest = [NSURLRequest requestWithURL:url];
     RKURLRequestPromise *imagePromise = [[RKURLRequestPromise alloc] initWithRequest:imageURLRequest
-                                                                        cacheManager:self.cacheManager
-                                                                 useCacheWhenOffline:YES
-                                                                        requestQueue:[RKQueueManager commonQueue]];
-    imagePromise.postProcessor = kRKImagePostProcessorBlock;
+                                                                     offlineBehavior:kRKURLRequestPromiseOfflineBehaviorUseCache
+                                                                        cacheManager:self.cacheManager];
+    RKSimplePostProcessor *imagePostProcessor = [[RKSimplePostProcessor alloc] initWithBlock:kRKImagePostProcessorBlock];
+    [imagePromise addPostProcessors:@[ imagePostProcessor ]];
     
     [self loadImagePromise:imagePromise placeholder:placeholder intoView:imageView completionHandler:completionHandler];
 }
