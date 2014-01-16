@@ -9,7 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "RKPostProcessor.h"
 
-@protocol RKURLRequestPromiseCacheManager;
+@protocol RKURLRequestPromiseCacheManager, RKURLRequestAuthenticationHandler;
+@class RKURLRequestPromise;
 
 ///The different possible types of POST/PUT body types.
 typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {

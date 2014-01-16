@@ -8,6 +8,11 @@
 
 #import "RKPostProcessor.h"
 #import "RKPossibility.h"
+#import "RKURLRequestPromise.h"
+
+#if TARGET_OS_IPHONE
+#   import <UIKit/UIKit.h>
+#endif /* TARGET_OS_IPHONE */
 
 NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey = @"RKPostProcessorBadValueStringRepresentationErrorUserInfoKey";
 NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSourceURLErrorUserInfoKey";
