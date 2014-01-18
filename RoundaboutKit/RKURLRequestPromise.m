@@ -156,7 +156,7 @@ static BOOL gActivityLoggingEnabled = NO;
     if(!self.connectivityManager) {
         [self.workQueue addOperationWithBlock:^{
             [self rejectWithError:[NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                                      code:paramErr
+                                                      code:-50 /* paramErr */
                                                   userInfo:@{NSLocalizedDescriptionKey: @"Cannot realize an RKURLRequestPromise with a nil connectivity manager."}]];
         }];
         
