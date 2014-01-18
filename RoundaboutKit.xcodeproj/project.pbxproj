@@ -27,7 +27,7 @@
 		8B75845D1792114B00D45F54 /* RKDefaultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7584481792114B00D45F54 /* RKDefaultsTests.m */; };
 		8B75845E1792114B00D45F54 /* RKFileSystemCacheManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B75844A1792114B00D45F54 /* RKFileSystemCacheManagerTests.m */; };
 		8B75845F1792114B00D45F54 /* RKMockPromise.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B75844C1792114B00D45F54 /* RKMockPromise.m */; };
-		8B7584601792114B00D45F54 /* RKMockURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B75844E1792114B00D45F54 /* RKMockURLProtocol.m */; };
+		8B7584601792114B00D45F54 /* RKTestURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B75844E1792114B00D45F54 /* RKTestURLProtocol.m */; };
 		8B7584611792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7584501792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m */; };
 		8B7584621792114B00D45F54 /* RKPossibilityTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7584521792114B00D45F54 /* RKPossibilityTests.m */; };
 		8B7584631792114B00D45F54 /* RKPreludeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7584541792114B00D45F54 /* RKPreludeTests.m */; };
@@ -165,8 +165,8 @@
 		8B75844A1792114B00D45F54 /* RKFileSystemCacheManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKFileSystemCacheManagerTests.m; sourceTree = "<group>"; };
 		8B75844B1792114B00D45F54 /* RKMockPromise.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockPromise.h; sourceTree = "<group>"; };
 		8B75844C1792114B00D45F54 /* RKMockPromise.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockPromise.m; sourceTree = "<group>"; };
-		8B75844D1792114B00D45F54 /* RKMockURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockURLProtocol.h; sourceTree = "<group>"; };
-		8B75844E1792114B00D45F54 /* RKMockURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockURLProtocol.m; sourceTree = "<group>"; };
+		8B75844D1792114B00D45F54 /* RKTestURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKTestURLProtocol.h; sourceTree = "<group>"; };
+		8B75844E1792114B00D45F54 /* RKTestURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKTestURLProtocol.m; sourceTree = "<group>"; };
 		8B75844F1792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKMockURLRequestPromiseCacheManager.h; sourceTree = "<group>"; };
 		8B7584501792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKMockURLRequestPromiseCacheManager.m; sourceTree = "<group>"; };
 		8B7584521792114B00D45F54 /* RKPossibilityTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPossibilityTests.m; sourceTree = "<group>"; };
@@ -285,8 +285,6 @@
 		8B7583E317920EAC00D45F54 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				8BCC9ACB18639CE500AA6EDF /* RKRequestParameters.h */,
-				8BCC9ACC18639CE500AA6EDF /* RKRequestParameters.m */,
 				8B7583D317920E9A00D45F54 /* RKRequestFactory.h */,
 				8B7583D417920E9A00D45F54 /* RKRequestFactory.m */,
 				8B7583D517920E9A00D45F54 /* RKURLRequestPromise.h */,
@@ -351,7 +349,6 @@
 				8B7584561792114B00D45F54 /* RKPromiseTests.m */,
 				8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */,
 				8B7D8E4C1852B11700215AE5 /* RKPostProcessorTests.m */,
-				8BCC9AD01863A9A200AA6EDF /* RKRequestParametersTests.m */,
 				8B758434179210F300D45F54 /* Supporting Files */,
 			);
 			path = Tests;
@@ -373,8 +370,8 @@
 			children = (
 				8B75844B1792114B00D45F54 /* RKMockPromise.h */,
 				8B75844C1792114B00D45F54 /* RKMockPromise.m */,
-				8B75844D1792114B00D45F54 /* RKMockURLProtocol.h */,
-				8B75844E1792114B00D45F54 /* RKMockURLProtocol.m */,
+				8B75844D1792114B00D45F54 /* RKTestURLProtocol.h */,
+				8B75844E1792114B00D45F54 /* RKTestURLProtocol.m */,
 				8B75844F1792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.h */,
 				8B7584501792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m */,
 				8B7584591792114B00D45F54 /* RunLoopHelper.h */,
@@ -540,7 +537,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B7583D817920E9A00D45F54 /* RKActivityManager.m in Sources */,
-				8BCC9ACE18639CE500AA6EDF /* RKRequestParameters.m in Sources */,
 				8B7583E217920E9A00D45F54 /* RKURLRequestPromise.m in Sources */,
 				8B7583DA17920E9A00D45F54 /* RKDefaults.m in Sources */,
 				8B7583DF17920E9A00D45F54 /* RKPromise.m in Sources */,
@@ -561,7 +557,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B7584641792114B00D45F54 /* RKPromiseTests.m in Sources */,
-				8BCC9AD11863A9A200AA6EDF /* RKRequestParametersTests.m in Sources */,
 				8B75845B1792114B00D45F54 /* RKActivityManagerTests.m in Sources */,
 				8B7584621792114B00D45F54 /* RKPossibilityTests.m in Sources */,
 				8B75845E1792114B00D45F54 /* RKFileSystemCacheManagerTests.m in Sources */,
@@ -569,7 +564,7 @@
 				8B7584631792114B00D45F54 /* RKPreludeTests.m in Sources */,
 				8B75845F1792114B00D45F54 /* RKMockPromise.m in Sources */,
 				8B7584651792114B00D45F54 /* RKURLRequestPromiseTests.m in Sources */,
-				8B7584601792114B00D45F54 /* RKMockURLProtocol.m in Sources */,
+				8B7584601792114B00D45F54 /* RKTestURLProtocol.m in Sources */,
 				8B75845D1792114B00D45F54 /* RKDefaultsTests.m in Sources */,
 				8B7584611792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m in Sources */,
 				8B7D8E4D1852B11700215AE5 /* RKPostProcessorTests.m in Sources */,
@@ -591,7 +586,6 @@
 				8BE8072D179218DA00DFEC35 /* RKConnectivityManager.m in Sources */,
 				8BE8072E179218DA00DFEC35 /* RKActivityManager.m in Sources */,
 				8BE8072F179218DA00DFEC35 /* RKDefaults.m in Sources */,
-				8BCC9ACF18639CE500AA6EDF /* RKRequestParameters.m in Sources */,
 				8B7D8E4B1852977500215AE5 /* RKPostProcessor.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "RKMockURLProtocol.h"
+#import "RKTestURLProtocol.h"
 #import "RKMockURLRequestPromiseCacheManager.h"
 
 #define PLAIN_TEXT_URL_STRING   @"http://test/plaintext"
@@ -22,29 +22,25 @@
 
 @implementation RKURLRequestPromiseTests
 
-- (void)registerPredeterminedResponses
-{
-    [RKMockURLProtocol on:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]
-               withMethod:@"GET"
-          yieldStatusCode:200
-                  headers:@{@"Content-Type": @"plain-text;charset=utf-8", @"Etag": @"SomeArbitraryValue", @"Status": @"200"}
-                     data:[PLAIN_TEXT_STRING dataUsingEncoding:NSUTF8StringEncoding]];
-}
-
 - (void)setUp
 {
     [super setUp];
     
     self.connectivityManager = [[RKConnectivityManager alloc] initWithHostName:@"localhost"];
+    [RKTestURLProtocol setup];
     
-    [self registerPredeterminedResponses];
+    RKURLRequestStub *stub = [RKTestURLProtocol stubGetRequestToURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]
+                                                        withHeaders:nil];
+    [stub andReturnString:PLAIN_TEXT_STRING
+              withHeaders:@{@"Etag": @"SomeArbitraryValue"}
+            andStatusCode:200];
 }
 
 - (void)tearDown
 {
     [super tearDown];
     
-    [RKMockURLProtocol removeAllRoutes];
+    [RKTestURLProtocol teardown];
 }
 
 #pragma mark -
