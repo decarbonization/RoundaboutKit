@@ -153,8 +153,15 @@ static BOOL gActivityLoggingEnabled = NO;
 
 - (void)fire
 {
-    NSAssert((self.connection == nil),
-             @"Cannot realize a %@ more than once.", NSStringFromClass([self class]));
+    if(!self.connectivityManager) {
+        [self.workQueue addOperationWithBlock:^{
+            [self rejectWithError:[NSError errorWithDomain:RKURLRequestPromiseErrorDomain
+                                                      code:paramErr
+                                                  userInfo:@{NSLocalizedDescriptionKey: @"Cannot realize an RKURLRequestPromise with a nil connectivity manager."}]];
+        }];
+        
+        return;
+    }
     
     NSOperationQueue *workQueue = self.workQueue;
     [workQueue addOperationWithBlock:^{

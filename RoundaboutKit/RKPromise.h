@@ -154,6 +154,11 @@ typedef void(^RKPromiseRejectedNotificationBlock)(NSError *error);
 ///Provided as a simple way for subclasses of RKPromise to conform to the
 ///behavior described by the `<RKLazy>` protocol. The default implementation
 ///does nothing.
+///
+///__Important:__ Implementations of the `-[RKPromise fire]` method cannot
+///raise exceptions without leaving the locking of the containing promise
+///in an inconsistent state. This can result in the promise failing to
+///deallocate. Any exception raised in `-[RKPromise fire]` will be fatal.
 - (void)fire;
 
 #pragma mark -

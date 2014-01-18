@@ -309,4 +309,17 @@
     XCTAssertNotNil(badResult.error, @"Missing error");
 }
 
+#pragma mark -
+
+- (void)testStateConsistencyGuards
+{
+    RKURLRequestPromise *request = [self makePlainTextWithNoCacheRequest];
+    request.connectivityManager = nil;
+    
+    NSError *error = nil;
+    id result = [request waitForRealization:&error];
+    XCTAssertNil(result, @"Unexpected result.");
+    XCTAssertNotNil(error, @"Expected error.");
+}
+
 @end
