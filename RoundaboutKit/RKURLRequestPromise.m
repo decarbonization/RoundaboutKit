@@ -124,6 +124,7 @@ static BOOL gActivityLoggingEnabled = NO;
     
     if((self = [super init])) {
         self.request = request;
+        self.cacheIdentifier = [request.URL absoluteString];
         
         self.cacheManager = cacheManager;
         self.offlineBehavior = offlineBehavior;
