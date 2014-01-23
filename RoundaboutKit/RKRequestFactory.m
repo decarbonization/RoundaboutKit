@@ -93,7 +93,7 @@
         }
             
         case kRKRequestFactoryBodyTypeURLParameters: {
-            if(self.URLParameterStringifier)
+            if(!self.URLParameterStringifier)
                 [NSException raise:NSInternalInconsistencyException
                             format:@"Missing URLParameterStringifier."];
             
