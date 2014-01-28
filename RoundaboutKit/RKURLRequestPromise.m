@@ -145,6 +145,16 @@ static BOOL gActivityLoggingEnabled = NO;
     return [NSString stringWithFormat:@"<%@:%p %@ to %@>", NSStringFromClass([self class]), self, self.request.HTTPMethod, self.request.URL];
 }
 
+#pragma mark - Properties
+
+- (void)setConnectivityManager:(RKConnectivityManager *)connectivityManager
+{
+    if(!connectivityManager)
+        [NSException raise:NSInvalidArgumentException format:@"Cannot assign a nil connectivity manager to RKURLRequestPromise instance."];
+    
+    _connectivityManager = connectivityManager;
+}
+
 #pragma mark - Realization
 
 - (NSOperationQueue *)workQueue
@@ -154,16 +164,6 @@ static BOOL gActivityLoggingEnabled = NO;
 
 - (void)fire
 {
-    if(!self.connectivityManager) {
-        [self.workQueue addOperationWithBlock:^{
-            [self rejectWithError:[NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                                      code:-50 /* paramErr */
-                                                  userInfo:@{NSLocalizedDescriptionKey: @"Cannot realize an RKURLRequestPromise with a nil connectivity manager."}]];
-        }];
-        
-        return;
-    }
-    
     NSOperationQueue *workQueue = self.workQueue;
     [workQueue addOperationWithBlock:^{
         [_loadedDataLock lock];

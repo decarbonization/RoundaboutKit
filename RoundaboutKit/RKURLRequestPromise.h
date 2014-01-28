@@ -221,7 +221,8 @@ typedef NS_ENUM(NSUInteger, kRKURLRequestPromiseOfflineBehavior) {
 ///
 ///Defaults to `+[RKConnectivityManager defaultInternetConnectivityManager]`.
 ///This property is primarily provided for the purposes of testing.
-@property (RK_NONATOMIC_IOSONLY) RKConnectivityManager *connectivityManager;
+///Assigning nil to this property will raise an exception.
+@property (nonatomic) RKConnectivityManager *connectivityManager;
 
 ///The URL request.
 @property (readonly, RK_NONATOMIC_IOSONLY) NSURLRequest *request;

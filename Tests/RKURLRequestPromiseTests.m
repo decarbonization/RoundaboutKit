@@ -314,12 +314,7 @@
 - (void)testStateConsistencyGuards
 {
     RKURLRequestPromise *request = [self makePlainTextWithNoCacheRequest];
-    request.connectivityManager = nil;
-    
-    NSError *error = nil;
-    id result = [request waitForRealization:&error];
-    XCTAssertNil(result, @"Unexpected result.");
-    XCTAssertNotNil(error, @"Expected error.");
+    XCTAssertThrows([request setConnectivityManager:nil], @"expected `-setConnectivityManager:` to throw.");
 }
 
 @end
