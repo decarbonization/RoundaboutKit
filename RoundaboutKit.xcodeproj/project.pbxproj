@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B4803F5189861E8008ECE64 /* RKCorePostProcessors.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B4803F6189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
+		8B4803F7189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
+		8B4803F91898632F008ECE64 /* RKCorePostProcessorsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */; };
+		8B4803FA18986340008ECE64 /* RKCorePostProcessors.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */; };
 		8B75839C17920E7200D45F54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B75839B17920E7200D45F54 /* Foundation.framework */; };
 		8B7583D817920E9A00D45F54 /* RKActivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7583C217920E9A00D45F54 /* RKActivityManager.m */; };
 		8B7583D917920E9A00D45F54 /* RKConnectivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7583C417920E9A00D45F54 /* RKConnectivityManager.m */; };
@@ -101,6 +106,7 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+				8B4803FA18986340008ECE64 /* RKCorePostProcessors.h in CopyFiles */,
 				8B91A3E9187628D000C87D47 /* RoundaboutKit.h in CopyFiles */,
 				8B91A3EA187628D000C87D47 /* RKPrelude.h in CopyFiles */,
 				8B91A3EB187628D000C87D47 /* RKPossibility.h in CopyFiles */,
@@ -121,6 +127,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKCorePostProcessors.h; sourceTree = "<group>"; };
+		8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKCorePostProcessors.m; sourceTree = "<group>"; };
+		8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKCorePostProcessorsTests.m; sourceTree = "<group>"; };
 		8B75839817920E7200D45F54 /* libRoundaboutKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRoundaboutKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B75839B17920E7200D45F54 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8B75839F17920E7200D45F54 /* RoundaboutKit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RoundaboutKit-Prefix.pch"; sourceTree = "<group>"; };
@@ -310,6 +319,8 @@
 				8B7583D217920E9A00D45F54 /* RKQueueManager.m */,
 				8B7D8E471852977500215AE5 /* RKPostProcessor.h */,
 				8B7D8E481852977500215AE5 /* RKPostProcessor.m */,
+				8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */,
+				8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */,
 			);
 			name = Asynchrony;
 			sourceTree = "<group>";
@@ -349,6 +360,7 @@
 				8B7584561792114B00D45F54 /* RKPromiseTests.m */,
 				8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */,
 				8B7D8E4C1852B11700215AE5 /* RKPostProcessorTests.m */,
+				8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */,
 				8B758434179210F300D45F54 /* Supporting Files */,
 			);
 			path = Tests;
@@ -406,6 +418,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8B4803F5189861E8008ECE64 /* RKCorePostProcessors.h in Headers */,
 				8BE8071B179218D000DFEC35 /* RoundaboutKit.h in Headers */,
 				8BE8071C179218D000DFEC35 /* RKPrelude.h in Headers */,
 				8B7D8E491852977500215AE5 /* RKPostProcessor.h in Headers */,
@@ -540,6 +553,7 @@
 				8B7583E217920E9A00D45F54 /* RKURLRequestPromise.m in Sources */,
 				8B7583DA17920E9A00D45F54 /* RKDefaults.m in Sources */,
 				8B7583DF17920E9A00D45F54 /* RKPromise.m in Sources */,
+				8B4803F6189861E8008ECE64 /* RKCorePostProcessors.m in Sources */,
 				8B7583DD17920E9A00D45F54 /* RKPossibility.m in Sources */,
 				8B7583DB17920E9A00D45F54 /* RKFileSystemCacheManager.m in Sources */,
 				8B7583E117920E9A00D45F54 /* RKRequestFactory.m in Sources */,
@@ -564,6 +578,7 @@
 				8B7584631792114B00D45F54 /* RKPreludeTests.m in Sources */,
 				8B75845F1792114B00D45F54 /* RKMockPromise.m in Sources */,
 				8B7584651792114B00D45F54 /* RKURLRequestPromiseTests.m in Sources */,
+				8B4803F91898632F008ECE64 /* RKCorePostProcessorsTests.m in Sources */,
 				8B7584601792114B00D45F54 /* RKTestURLProtocol.m in Sources */,
 				8B75845D1792114B00D45F54 /* RKDefaultsTests.m in Sources */,
 				8B7584611792114B00D45F54 /* RKMockURLRequestPromiseCacheManager.m in Sources */,
@@ -583,6 +598,7 @@
 				8BE8072B179218DA00DFEC35 /* RKURLRequestPromise.m in Sources */,
 				8B91A3FC1876291200C87D47 /* RKPersister.m in Sources */,
 				8BE8072C179218DA00DFEC35 /* RKFileSystemCacheManager.m in Sources */,
+				8B4803F7189861E8008ECE64 /* RKCorePostProcessors.m in Sources */,
 				8BE8072D179218DA00DFEC35 /* RKConnectivityManager.m in Sources */,
 				8BE8072E179218DA00DFEC35 /* RKActivityManager.m in Sources */,
 				8BE8072F179218DA00DFEC35 /* RKDefaults.m in Sources */,
