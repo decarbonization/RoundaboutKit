@@ -7,6 +7,7 @@
 //
 
 #import "RKTestURLProtocol.h"
+#import <libkern/OSAtomic.h>
 
 NSString *const RKRequestNotAllowedException = @"RKRequestNotAllowedException";
 NSString *const RKAffectedRequestUserInfoKey = @"RKAffectedRequestUserInfoKey";
@@ -64,7 +65,7 @@ static NSString *gHTTPVersionString = @"HTTP/1.1";
     if(!jsonData) {
         @throw [NSException exceptionWithName:NSInternalInconsistencyException
                                        reason:@"Could not create JSON data from object."
-                                     userInfo:@{NSUnderlyingErrorKey: error, NSAffectedObjectsErrorKey: @[jsonObject]}];
+                                     userInfo:@{NSUnderlyingErrorKey: error, @"RKAffectedObjectsErrorKey": @[jsonObject]}];
     }
     
     NSMutableDictionary *extendedHeaders = [NSMutableDictionary dictionary];
@@ -83,7 +84,7 @@ static NSString *gHTTPVersionString = @"HTTP/1.1";
     if(!plistData) {
         @throw [NSException exceptionWithName:NSInternalInconsistencyException
                                        reason:@"Could not create property list data from object."
-                                     userInfo:@{NSUnderlyingErrorKey: error, NSAffectedObjectsErrorKey: @[plistObject]}];
+                                     userInfo:@{NSUnderlyingErrorKey: error, @"RKAffectedObjectsErrorKey": @[plistObject]}];
     }
     
     NSMutableDictionary *extendedHeaders = [NSMutableDictionary dictionary];
@@ -231,7 +232,7 @@ static int32_t gActiveCount = 0;
     return RKCollectionFindFirstMatch(self.stubs, ^BOOL(RKURLRequestStub *stub) {
         BOOL URLsAreEqual = [stub.URL isEqual:request.URL];
         BOOL headersAreEqual = ((stub.HTTPHeaders == request.allHTTPHeaderFields) ||
-                                [stub.HTTPHeaders isEqual:request.allHTTPHeaderFields]);
+                                [stub.HTTPHeaders ?: @{} isEqual:request.allHTTPHeaderFields ?: @{}]);
         BOOL methodsAreEqual = ((stub.HTTPMethod == request.HTTPMethod) ||
                                 [stub.HTTPMethod isEqual:request.HTTPMethod]);
         BOOL bodiesAreEqual = ((stub.HTTPBody == request.HTTPBody) ||
