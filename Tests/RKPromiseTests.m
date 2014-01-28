@@ -120,6 +120,28 @@
     XCTAssertEqualObjects(results, (@[ @0, @1, @2, @3, @4 ]), @"RKRealizePromises yielded wrong value");
 }
 
+#pragma mark -
+
+- (void)testExceptionSafety
+{
+    RKLegacyPostProcessor *throwingPostProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+        [NSException raise:NSInternalInconsistencyException format:@"Just not gonna work."];
+        return nil;
+    }];
+    
+    dispatch_block_t test = ^{
+        //This test is encapsulated in a block because if RKPromise is not
+        //property exception safe, the internal mutex teardown in -[RKPromise dealloc]
+        //will raise an exception indicating an internal deadlock. As such, the
+        //only way to test this in ARC is to tie the promise's lifecycle to a scope.
+        RKPromise *testPromise = [RKPromise new];
+        [testPromise addPostProcessors:@[ throwingPostProcessor ]];
+        XCTAssertThrows([testPromise accept:@"does not matter"], @"expected exception");
+    };
+    
+    XCTAssertNoThrow(test(), @"unexpected exception");
+}
+
 #pragma mark - Test Await
 
 - (void)testSuccessAwait

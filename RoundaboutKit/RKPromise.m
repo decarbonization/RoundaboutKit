@@ -30,6 +30,24 @@ static NSString *kRKPromiseStateGetString(kRKPromiseState state)
     }
 }
 
+///Locks a given pthread mutex and applies a block, wrapped in a @try...@finally
+///statement so that the mutex is always unlocked, regardless of exceptions being
+///thrown. Time trials indicated that this was still substantially faster than
+///using @synchronized on an iPhone 5s and a Retina MacBook Pro 2012.
+RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
+{
+    if(!mutex || !block)
+        return;
+    
+    @try {
+        pthread_mutex_lock(mutex);
+        
+        block();
+    } @finally {
+        pthread_mutex_unlock(mutex);
+    }
+}
+
 #pragma mark -
 
 @interface RKPromise ()
@@ -197,12 +215,10 @@ static NSString *kRKPromiseStateGetString(kRKPromiseState state)
                                        reason:@"Cannot accept a promise more than once"
                                      userInfo:nil];
     
-    pthread_mutex_lock(&_stateGuard);
-    {
+    with_locked_state(&_stateGuard, ^{
         [self processValue:value error:nil];
         [self invoke];
-    }
-    pthread_mutex_unlock(&_stateGuard);
+    });
 }
 
 - (void)reject:(NSError *)error
@@ -212,12 +228,10 @@ static NSString *kRKPromiseStateGetString(kRKPromiseState state)
                                        reason:@"Cannot reject a promise more than once"
                                      userInfo:nil];
     
-    pthread_mutex_lock(&_stateGuard);
-    {
+    with_locked_state(&_stateGuard, ^{
         [self processValue:nil error:error];
         [self invoke];
-    }
-    pthread_mutex_unlock(&_stateGuard);
+    });
 }
 
 #pragma mark - Processors
@@ -231,23 +245,19 @@ static NSString *kRKPromiseStateGetString(kRKPromiseState state)
                                        reason:@"Cannot add a post-processor to an already-realized promise."
                                      userInfo:nil];
     
-    pthread_mutex_lock(&_stateGuard);
-    {
+    with_locked_state(&_stateGuard, ^{
         if(!_postProcessors)
             _postProcessors = [NSMutableArray new];
         
         [_postProcessors addObjectsFromArray:processors];
-    }
-    pthread_mutex_unlock(&_stateGuard);
+    });
 }
 
 - (void)removeAllPostProcessors
 {
-    pthread_mutex_lock(&_stateGuard);
-    {
+    with_locked_state(&_stateGuard, ^{
         [_postProcessors removeAllObjects];
-    }
-    pthread_mutex_unlock(&_stateGuard);
+    });
 }
 
 - (NSArray *)postProcessors
@@ -321,8 +331,7 @@ static NSString *kRKPromiseStateGetString(kRKPromiseState state)
                                      userInfo:nil];
     }
     
-    pthread_mutex_lock(&_stateGuard);
-    {
+    with_locked_state(&_stateGuard, ^{
         self.thenBlock = then;
         self.otherwiseBlock = otherwise;
         self.queue = queue;
@@ -333,8 +342,7 @@ static NSString *kRKPromiseStateGetString(kRKPromiseState state)
         } else {
             [self fire];
         }
-    }
-    pthread_mutex_unlock(&_stateGuard);
+    });
 }
 
 #pragma mark -
