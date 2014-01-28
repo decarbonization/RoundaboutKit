@@ -30,7 +30,7 @@
 
 - (void)testValue
 {
-    RKSimplePostProcessor *valueProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKLegacyPostProcessor *valueProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         XCTAssertNotNil(context, @"context missing");
         XCTAssertEqual(maybeData.state, kRKPossibilityStateValue, @"wrong possibility state");
         
@@ -48,7 +48,7 @@
 
 - (void)testError
 {
-    RKSimplePostProcessor *errorProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKLegacyPostProcessor *errorProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         XCTAssertNotNil(context, @"context missing");
         XCTAssertEqual(maybeData.state, kRKPossibilityStateValue, @"wrong possibility state");
         

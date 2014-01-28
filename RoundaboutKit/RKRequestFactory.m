@@ -190,14 +190,14 @@
      readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
     writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
          requestQueue:(NSOperationQueue *)requestQueue
-        postProcessor:(RKSimplePostProcessorBlock)postProcessor
+        postProcessor:(RKLegacyPostProcessorBlock)postProcessor
 {
     NSParameterAssert(baseURL);
     NSParameterAssert(requestQueue);
     
     NSArray *postProcessors = nil;
     if(postProcessor) {
-        postProcessors = @[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ];
+        postProcessors = @[ [[RKLegacyPostProcessor alloc] initWithBlock:postProcessor] ];
     }
     
     if((self = [self initWithBaseURL:baseURL
@@ -210,7 +210,7 @@
     return self;
 }
 
-- (RKSimplePostProcessorBlock)postProcessor
+- (RKLegacyPostProcessorBlock)postProcessor
 {
     if(self.postProcessors.count == 0)
         return nil;
@@ -220,11 +220,11 @@
                     format:@"%s called when %@ has more than one post-processor object.", __PRETTY_FUNCTION__, self];
     
     id postProcessor = self.postProcessors.firstObject;
-    if(![postProcessor isKindOfClass:[RKSimplePostProcessor class]])
+    if(![postProcessor isKindOfClass:[RKLegacyPostProcessor class]])
         [NSException raise:NSInternalInconsistencyException
                     format:@"%s called when active post-processor is not an RKSimplePostProcessor.", __PRETTY_FUNCTION__];
     
-    return [(RKSimplePostProcessor *)postProcessor block];
+    return [(RKLegacyPostProcessor *)postProcessor block];
 }
 
 @end

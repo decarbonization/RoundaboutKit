@@ -63,7 +63,7 @@ static NSString *const kDefaultRevision = @"-1";
     
     
     ///The legacy post processor block. Used by the RKDeprecated category.
-    RKSimplePostProcessorBlock _legacyPostProcessor;
+    RKLegacyPostProcessorBlock _legacyPostProcessor;
     
     NSOperationQueue *_legacyRequestQueue;
 }
@@ -435,8 +435,8 @@ static BOOL gActivityLoggingEnabled = NO;
 
 #pragma mark - Deprecated
 
-RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
-                                                                     RKSimplePostProcessorBlock refiner)
+RK_OVERLOADABLE RKLegacyPostProcessorBlock RKPostProcessorBlockChain(RKLegacyPostProcessorBlock source,
+                                                                     RKLegacyPostProcessorBlock refiner)
 {
     NSCParameterAssert(source);
     NSCParameterAssert(refiner);
@@ -498,15 +498,15 @@ RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePos
     return _legacyRequestQueue;
 }
 
-- (void)setPostProcessor:(RKSimplePostProcessorBlock)postProcessor
+- (void)setPostProcessor:(RKLegacyPostProcessorBlock)postProcessor
 {
     _legacyPostProcessor = postProcessor;
     
     [self removeAllPostProcessors];
-    [super addPostProcessors:@[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ]];
+    [super addPostProcessors:@[ [[RKLegacyPostProcessor alloc] initWithBlock:postProcessor] ]];
 }
 
-- (RKSimplePostProcessorBlock)postProcessor
+- (RKLegacyPostProcessorBlock)postProcessor
 {
     return _legacyPostProcessor;
 }

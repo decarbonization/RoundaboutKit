@@ -169,8 +169,8 @@ static NSString *kRKPromiseStateGetString(kRKPromiseState state)
 ///`_stateGuard` is locked.
 - (void)processValue:(id)value error:(NSError *)error
 {
-    for (id <RKPostProcessor> postProcessor in _postProcessors) {
-        if([postProcessor inputValueType] && ![value isKindOfClass:[postProcessor inputValueType]])
+    for (RKPostProcessor *postProcessor in _postProcessors) {
+        if([postProcessor inputValueType] && value && ![value isKindOfClass:[postProcessor inputValueType]])
             [NSException raise:NSInvalidArgumentException format:@"Post-processor %@ given value of type %@, expected %@.", postProcessor, [value class], [postProcessor inputValueType]];
         
         [postProcessor processInputValue:value inputError:error context:self];

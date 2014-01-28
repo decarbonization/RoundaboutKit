@@ -270,10 +270,10 @@ typedef NS_ENUM(NSUInteger, kRKURLRequestPromiseOfflineBehavior) {
 
 #pragma mark - Deprecated
 
-///The older name for blocks of type `RKSimplePostProcessorBlock`. Deprecated
+///The older name for blocks of type `RKLegacyPostProcessorBlock`. Deprecated
 ///
-/// \seealso(RKSimplePostProcessorBlock)
-typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
+/// \seealso(RKLegacyPostProcessorBlock)
+typedef RKLegacyPostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
 
 ///Returns a new block that will be given the result of an earlier block.
 ///
@@ -284,8 +284,8 @@ typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
 ///         block and then passing that result to the refiner.
 ///
 ///This function is deprecated. Use an array of independent post-processors instead.
-RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
-                                                                            RKSimplePostProcessorBlock refiner) DEPRECATED_ATTRIBUTE;
+RK_EXTERN_OVERLOADABLE RKLegacyPostProcessorBlock RKPostProcessorBlockChain(RKLegacyPostProcessorBlock source,
+                                                                            RKLegacyPostProcessorBlock refiner) DEPRECATED_ATTRIBUTE;
 
 #pragma mark -
 
@@ -348,7 +348,7 @@ RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSi
 ///any post-processors attached to the promise, and attempting
 ///to add a post-processor through `-[RKPromise addPostProcessor:]`
 ///will raise if this property is not nil.
-@property (nonatomic, copy) RKSimplePostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
+@property (nonatomic, copy) RKLegacyPostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
 
 @end
 

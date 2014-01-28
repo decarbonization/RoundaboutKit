@@ -17,14 +17,44 @@
 NSString *const RKPostProcessorBadValueStringRepresentationErrorUserInfoKey = @"RKPostProcessorBadValueStringRepresentationErrorUserInfoKey";
 NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSourceURLErrorUserInfoKey";
 
-@implementation RKSimplePostProcessor
+@implementation RKPostProcessor
 
-@synthesize outputValue = _outputValue;
-@synthesize outputError = _outputError;
+#pragma mark - <NSCopying>
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [self.class new];
+}
+
+#pragma mark - Types
+
+- (Class)inputValueType
+{
+    return Nil; //anything
+}
+
+- (Class)outputValueType
+{
+    return Nil; //anything
+}
+
+#pragma mark - Processing
+
+- (void)processInputValue:(id)value inputError:(NSError *)error context:(id)context
+{
+    self.outputValue = value;
+    self.outputError = error;
+}
+
+@end
+
+#pragma mark -
+
+@implementation RKLegacyPostProcessor
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithBlock:(RKSimplePostProcessorBlock)block
+- (instancetype)initWithBlock:(RKLegacyPostProcessorBlock)block
 {
     NSParameterAssert(block);
     
@@ -83,7 +113,7 @@ NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSour
 @end
 
 
-RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKLegacyPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
         NSError *error = nil;
         id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -108,7 +138,7 @@ RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RK
     }];
 };
 
-RKSimplePostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKLegacyPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
 #if TARGET_OS_IPHONE
         UIImage *image = [[UIImage alloc] initWithData:data];
@@ -125,7 +155,7 @@ RKSimplePostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(R
     }];
 };
 
-RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKLegacyPostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
         NSError *error = nil;
         id result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];

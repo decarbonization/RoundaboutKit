@@ -148,7 +148,7 @@
 
 - (void)testSuccessPostProcessor
 {
-    RKSimplePostProcessor *goodProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKLegacyPostProcessor *goodProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         return [maybeData refineValue:^RKPossibility *(NSString *string) {
             return [[RKPossibility alloc] initWithValue:[string stringByAppendingString:@"foo"]];
         }];
@@ -167,7 +167,7 @@
 
 - (void)testFailurePostProcessor
 {
-    RKSimplePostProcessor *badProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKLegacyPostProcessor *badProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         return [maybeData refineValue:^RKPossibility *(NSString *string) {
             return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:@"SillyErrorDomain"
                                                                             code:'dumb'
