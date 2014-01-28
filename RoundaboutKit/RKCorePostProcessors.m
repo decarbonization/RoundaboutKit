@@ -8,6 +8,9 @@
 
 #import "RKCorePostProcessors.h"
 
+#import <UIKit/UIKit.h>
+#import "RKURLRequestPromise.h"
+
 @implementation RKJSONPostProcessor
 
 - (Class)inputValueType
