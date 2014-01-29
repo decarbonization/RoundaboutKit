@@ -26,9 +26,18 @@
     [super tearDown];
 }
 
-- (void)testExample
+#pragma mark -
+
+- (void)testOnlineConnection
 {
-    XCTFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+    RKConnectivityManager *manager = [[RKConnectivityManager alloc] initWithHostName:@"localhost"];
+    XCTAssertEqual(manager.isConnected, YES, @"expected YES");
+}
+
+- (void)testOfflineConnection
+{
+    RKConnectivityManager *manager = [[RKConnectivityManager alloc] initWithHostName:@"this host will never be valid"];
+    XCTAssertEqual(manager.isConnected, NO, @"expected NO");
 }
 
 @end
