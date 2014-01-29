@@ -8,9 +8,6 @@
 
 #import "RKQueueManager.h"
 
-///The maximum number of queues to keep around at once.
-static NSUInteger const kCacheLimit = 10;
-
 @implementation RKQueueManager
 
 + (NSCache *)queueCache
@@ -20,13 +17,21 @@ static NSUInteger const kCacheLimit = 10;
     dispatch_once(&onceToken, ^{
         queueCache = [NSCache new];
         queueCache.name = @"com.roundabout.rk.queueManager.queueCache";
-        queueCache.countLimit = kCacheLimit;
     });
     
     return queueCache;
 }
 
-+ (NSOperationQueue *)queueNamed:(NSString *)queueName
++ (void)setSharedQueue:(NSOperationQueue *)queue withName:(NSString *)queueName
+{
+    NSParameterAssert(queue);
+    NSParameterAssert(queueName);
+    
+    NSCache *queueCache = [self queueCache];
+    [queueCache setObject:queue forKey:queueName];
+}
+
++ (NSOperationQueue *)sharedQueueWithName:(NSString *)queueName
 {
     NSParameterAssert(queueName);
     
@@ -36,14 +41,16 @@ static NSUInteger const kCacheLimit = 10;
     if(!queue) {
         queue = [NSOperationQueue new];
         queue.name = queueName;
+        
+        [queueCache setObject:queue forKey:queueName];
     }
     
     return queue;
 }
 
-+ (NSOperationQueue *)commonQueue
++ (NSOperationQueue *)commonWorkQueue
 {
-    return [self queueNamed:@"com.roundabout.rk.queueManager.commonQueue"];
+    return [self sharedQueueWithName:@"com.roundabout.rk.queueManager.commonWorkQueue"];
 }
 
 @end

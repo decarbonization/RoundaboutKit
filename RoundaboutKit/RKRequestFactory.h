@@ -65,9 +65,6 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///The cache manager to use for POST, PUT, and DELETE requests.
 @property (readonly, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> writeCacheManager;
 
-///The queue to use for requests.
-@property (readonly, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
-
 ///The post processors to use for vended requests.
 @property (readonly, copy, RK_NONATOMIC_IOSONLY) NSArray *postProcessors;
 
@@ -230,5 +227,8 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///`-[self initWithBaseURL:readCacheMaanger:writeCacheManager:requestQueue:postProcessor:]`.
 ///This property is deprecated and will be removed in the near future.
 @property (readonly, copy, RK_NONATOMIC_IOSONLY) RKSimplePostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
+
+///The queue to use for requests.
+@property (readonly, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue DEPRECATED_ATTRIBUTE;
 
 @end

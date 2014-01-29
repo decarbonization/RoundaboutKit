@@ -9,7 +9,9 @@
 #import "RKRequestFactory.h"
 #import "RKURLRequestPromise.h"
 
-@interface RKRequestFactory ()
+@interface RKRequestFactory () {
+    NSOperationQueue *_legacyRequestQueue;
+}
 
 #pragma mark - readwrite
 
@@ -225,6 +227,17 @@
                     format:@"%s called when active post-processor is not an RKSimplePostProcessor.", __PRETTY_FUNCTION__];
     
     return [(RKSimplePostProcessor *)postProcessor block];
+}
+
+
+- (void)setRequestQueue:(NSOperationQueue *)requestQueue
+{
+    _legacyRequestQueue = requestQueue;
+}
+
+- (NSOperationQueue *)requestQueue
+{
+    return _legacyRequestQueue;
 }
 
 @end

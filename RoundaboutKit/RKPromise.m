@@ -374,7 +374,7 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
         resultError = error;
         
         dispatch_semaphore_signal(semaphore);
-    } onQueue:[RKQueueManager queueNamed:@"com.roundabout.rk.RKPromise.await-queue"]];
+    } onQueue:[RKQueueManager sharedQueueWithName:@"com.roundabout.rk.RKPromise.await-queue"]];
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
     
     if(outError) *outError = resultError;
