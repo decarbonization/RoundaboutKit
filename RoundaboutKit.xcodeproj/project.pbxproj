@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B39B34E1899A47E0013F0FD /* RKQueueManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B34D1899A47E0013F0FD /* RKQueueManagerTests.m */; };
+		8B39B3501899A5BA0013F0FD /* RKRequestFactoryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B34F1899A5BA0013F0FD /* RKRequestFactoryTests.m */; };
+		8B39B3541899A5F80013F0FD /* RKImageLoaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B3531899A5F80013F0FD /* RKImageLoaderTests.m */; };
+		8B39B3561899A6070013F0FD /* RKConnectivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B3551899A6070013F0FD /* RKConnectivityManagerTests.m */; };
+		8B39B3591899A6240013F0FD /* RKPersisterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B3581899A6240013F0FD /* RKPersisterTests.m */; };
 		8B4803F5189861E8008ECE64 /* RKCorePostProcessors.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B4803F6189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
 		8B4803F7189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
@@ -127,6 +132,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8B39B34D1899A47E0013F0FD /* RKQueueManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKQueueManagerTests.m; sourceTree = "<group>"; };
+		8B39B34F1899A5BA0013F0FD /* RKRequestFactoryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKRequestFactoryTests.m; sourceTree = "<group>"; };
+		8B39B3531899A5F80013F0FD /* RKImageLoaderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKImageLoaderTests.m; sourceTree = "<group>"; };
+		8B39B3551899A6070013F0FD /* RKConnectivityManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKConnectivityManagerTests.m; sourceTree = "<group>"; };
+		8B39B3581899A6240013F0FD /* RKPersisterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPersisterTests.m; sourceTree = "<group>"; };
 		8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKCorePostProcessors.h; sourceTree = "<group>"; };
 		8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKCorePostProcessors.m; sourceTree = "<group>"; };
 		8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKCorePostProcessorsTests.m; sourceTree = "<group>"; };
@@ -231,6 +241,40 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8B39B3511899A5D30013F0FD /* Asynchrony */ = {
+			isa = PBXGroup;
+			children = (
+				8B7584521792114B00D45F54 /* RKPossibilityTests.m */,
+				8B7584561792114B00D45F54 /* RKPromiseTests.m */,
+				8B7D8E4C1852B11700215AE5 /* RKSimplePostProcessorTests.m */,
+				8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */,
+				8B39B34D1899A47E0013F0FD /* RKQueueManagerTests.m */,
+			);
+			name = Asynchrony;
+			sourceTree = "<group>";
+		};
+		8B39B3521899A5ED0013F0FD /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				8B39B34F1899A5BA0013F0FD /* RKRequestFactoryTests.m */,
+				8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */,
+				8B75844A1792114B00D45F54 /* RKFileSystemCacheManagerTests.m */,
+				8B39B3531899A5F80013F0FD /* RKImageLoaderTests.m */,
+				8B39B3551899A6070013F0FD /* RKConnectivityManagerTests.m */,
+			);
+			name = Networking;
+			sourceTree = "<group>";
+		};
+		8B39B3571899A6120013F0FD /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				8B39B3581899A6240013F0FD /* RKPersisterTests.m */,
+				8B7584441792114B00D45F54 /* RKActivityManagerTests.m */,
+				8B7584481792114B00D45F54 /* RKDefaultsTests.m */,
+			);
+			name = Utilities;
+			sourceTree = "<group>";
+		};
 		8B75838F17920E7200D45F54 = {
 			isa = PBXGroup;
 			children = (
@@ -352,15 +396,10 @@
 			isa = PBXGroup;
 			children = (
 				8B7584671792115600D45F54 /* Helpers */,
-				8B7584441792114B00D45F54 /* RKActivityManagerTests.m */,
-				8B7584481792114B00D45F54 /* RKDefaultsTests.m */,
-				8B75844A1792114B00D45F54 /* RKFileSystemCacheManagerTests.m */,
-				8B7584521792114B00D45F54 /* RKPossibilityTests.m */,
 				8B7584541792114B00D45F54 /* RKPreludeTests.m */,
-				8B7584561792114B00D45F54 /* RKPromiseTests.m */,
-				8B7584581792114B00D45F54 /* RKURLRequestPromiseTests.m */,
-				8B7D8E4C1852B11700215AE5 /* RKSimplePostProcessorTests.m */,
-				8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */,
+				8B39B3511899A5D30013F0FD /* Asynchrony */,
+				8B39B3521899A5ED0013F0FD /* Networking */,
+				8B39B3571899A6120013F0FD /* Utilities */,
 				8B758434179210F300D45F54 /* Supporting Files */,
 			);
 			path = Tests;
@@ -572,12 +611,17 @@
 			files = (
 				8B7584641792114B00D45F54 /* RKPromiseTests.m in Sources */,
 				8B75845B1792114B00D45F54 /* RKActivityManagerTests.m in Sources */,
+				8B39B3591899A6240013F0FD /* RKPersisterTests.m in Sources */,
 				8B7584621792114B00D45F54 /* RKPossibilityTests.m in Sources */,
 				8B75845E1792114B00D45F54 /* RKFileSystemCacheManagerTests.m in Sources */,
 				8B7584661792114B00D45F54 /* RunLoopHelper.m in Sources */,
 				8B7584631792114B00D45F54 /* RKPreludeTests.m in Sources */,
+				8B39B3501899A5BA0013F0FD /* RKRequestFactoryTests.m in Sources */,
 				8B75845F1792114B00D45F54 /* RKMockPromise.m in Sources */,
 				8B7584651792114B00D45F54 /* RKURLRequestPromiseTests.m in Sources */,
+				8B39B3541899A5F80013F0FD /* RKImageLoaderTests.m in Sources */,
+				8B39B3561899A6070013F0FD /* RKConnectivityManagerTests.m in Sources */,
+				8B39B34E1899A47E0013F0FD /* RKQueueManagerTests.m in Sources */,
 				8B4803F91898632F008ECE64 /* RKCorePostProcessorsTests.m in Sources */,
 				8B7584601792114B00D45F54 /* RKTestURLProtocol.m in Sources */,
 				8B75845D1792114B00D45F54 /* RKDefaultsTests.m in Sources */,

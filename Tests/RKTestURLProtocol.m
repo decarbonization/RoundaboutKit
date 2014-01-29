@@ -266,7 +266,7 @@ static int32_t gActiveCount = 0;
 - (void)startLoading
 {
     RKURLRequestStub *requestStub = [[self class] stubForRequest:self.request];
-    [[RKQueueManager commonQueue] addOperationWithBlock:^{
+    [[RKQueueManager commonWorkQueue] addOperationWithBlock:^{
         NSHTTPURLResponse *response = requestStub.response;
         if(self.canceled)
             return;
