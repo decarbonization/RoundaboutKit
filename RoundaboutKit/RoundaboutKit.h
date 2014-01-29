@@ -39,7 +39,4 @@
 #import "RKPossibility.h"
 #import "RKActivityManager.h"
 #import "RKPersister.h"
-
-#if TARGET_OS_IPHONE
-#   import "RKImageLoader.h"
-#endif /* TARGET_OS_IPHONE */
+#import "RKImageLoader.h"

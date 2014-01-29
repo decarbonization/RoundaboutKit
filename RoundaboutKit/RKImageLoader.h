@@ -7,8 +7,18 @@
 //
 
 #if TARGET_OS_IPHONE
+#   import <UIKit/UIKit.h>
 
-#import <UIKit/UIKit.h>
+@compatibility_alias RKImageType UIImage;
+@compatibility_alias RKImageViewType UIImageView;
+
+#else
+#   import <AppKit/AppKit.h>
+
+@compatibility_alias RKImageType NSImage;
+@compatibility_alias RKImageViewType NSImageView;
+
+#endif /* TARGET_OS_IPHONE */
 
 @protocol RKCancelable;
 @class RKFileSystemCacheManager, RKPromise;
@@ -51,7 +61,7 @@ typedef void(^RKImageLoaderCompletionHandler)(BOOL wasSuccessful);
 ///If `imagePromise` is nil, this method simply sets `imageView`'s `image` to `placeholder`.
 ///
 ///This is the primitive loading method of RKImageLoader.
-- (void)loadImagePromise:(RKPromise <RKCancelable> *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler;
+- (void)loadImagePromise:(RKPromise <RKCancelable> *)imagePromise placeholder:(RKImageType *)placeholder intoView:(RKImageViewType *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler;
 
 ///Asynchronously load an image at a given URL into a specified image view.
 ///
@@ -61,14 +71,12 @@ typedef void(^RKImageLoaderCompletionHandler)(BOOL wasSuccessful);
 /// \param  completionHandler   The completion handler to invoke when the image is loaded.
 ///
 ///If `url` is nil, this method simply sets `imageView`'s `image` to `placeholder`.
-- (void)loadImageAtURL:(NSURL *)url placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler;
+- (void)loadImageAtURL:(NSURL *)url placeholder:(RKImageType *)placeholder intoView:(RKImageViewType *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler;
 
 /// \seealso(-[self loadImageAtURL:placeholder:intoView:completionHandler:)
-- (void)loadImageAtURL:(NSURL *)url placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView;
+- (void)loadImageAtURL:(NSURL *)url placeholder:(RKImageType *)placeholder intoView:(RKImageViewType *)imageView;
 
 ///Stops all asynchronous image loads currently being executed for a specified image view.
-- (void)stopLoadingImagesForView:(UIImageView *)imageView;
+- (void)stopLoadingImagesForView:(RKImageViewType *)imageView;
 
 @end
-
-#endif /* TARGET_OS_IPHONE */

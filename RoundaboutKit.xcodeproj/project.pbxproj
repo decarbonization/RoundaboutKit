@@ -12,6 +12,8 @@
 		8B39B3541899A5F80013F0FD /* RKImageLoaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B3531899A5F80013F0FD /* RKImageLoaderTests.m */; };
 		8B39B3561899A6070013F0FD /* RKConnectivityManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B3551899A6070013F0FD /* RKConnectivityManagerTests.m */; };
 		8B39B3591899A6240013F0FD /* RKPersisterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B3581899A6240013F0FD /* RKPersisterTests.m */; };
+		8B39B35B1899B72F0013F0FD /* RKImageLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7583CA17920E9A00D45F54 /* RKImageLoader.m */; };
+		8B39B35C1899B7320013F0FD /* RKImageLoader.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B7583C917920E9A00D45F54 /* RKImageLoader.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B4803F5189861E8008ECE64 /* RKCorePostProcessors.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B4803F6189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
 		8B4803F7189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
@@ -461,6 +463,7 @@
 				8BE8071B179218D000DFEC35 /* RoundaboutKit.h in Headers */,
 				8BE8071C179218D000DFEC35 /* RKPrelude.h in Headers */,
 				8B7D8E491852977500215AE5 /* RKPostProcessor.h in Headers */,
+				8B39B35C1899B7320013F0FD /* RKImageLoader.h in Headers */,
 				8BE8071D179218D000DFEC35 /* RKPossibility.h in Headers */,
 				8BE8071E179218D000DFEC35 /* RKPromise.h in Headers */,
 				8BE8071F179218D000DFEC35 /* RKQueueManager.h in Headers */,
@@ -635,6 +638,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8BE80726179218DA00DFEC35 /* RKPrelude.m in Sources */,
+				8B39B35B1899B72F0013F0FD /* RKImageLoader.m in Sources */,
 				8BE80727179218DA00DFEC35 /* RKPossibility.m in Sources */,
 				8BE80728179218DA00DFEC35 /* RKPromise.m in Sources */,
 				8BE80729179218DA00DFEC35 /* RKQueueManager.m in Sources */,

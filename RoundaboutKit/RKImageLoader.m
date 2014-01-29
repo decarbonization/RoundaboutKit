@@ -6,8 +6,6 @@
 //  Copyright (c) 2013 Live Nation Labs. All rights reserved.
 //
 
-#if TARGET_OS_IPHONE
-
 #import "RKImageLoader.h"
 
 #import "RKURLRequestPromise.h"
@@ -20,7 +18,7 @@
 
 ///The map that contains the loaded images.
 ///
-///nocopy NSURL => UIImage.
+///nocopy NSURL => RKImageType.
 @property (nonatomic) NSMutableDictionary *imageMap;
 
 ///The in-memory cache for the image loader.
@@ -61,12 +59,18 @@
         self.knownInvalidCacheIdentifiers = [NSMutableSet set];
         
         self.maximumCacheCount = 8;
+#if TARGET_OS_IPHONE
         self.maximumCacheableSize = [UIScreen mainScreen].bounds.size;
+#else
+        self.maximumCacheableSize = CGSizeMake(512.0, 512.0);
+#endif /* TARGET_OS_IPHONE */
         
+#if TARGET_OS_IPHONE
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(applicationDidReceiveMemoryWarning:)
                                                      name:UIApplicationDidReceiveMemoryWarningNotification
                                                    object:nil];
+#endif /* TARGET_OS_IPHONE */
     }
     
     return self;
@@ -74,10 +78,12 @@
 
 #pragma mark - Notifications
 
+#if TARGET_OS_IPHONE
 - (void)applicationDidReceiveMemoryWarning:(NSNotification *)notification
 {
     [self.inMemoryCache removeAllObjects];
 }
+#endif /* TARGET_OS_IPHONE */
 
 #pragma mark - Properties
 
@@ -101,7 +107,7 @@
 
 #pragma mark - Image Loading
 
-- (void)loadImagePromise:(RKPromise <RKCancelable> *)imagePromise placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
+- (void)loadImagePromise:(RKPromise <RKCancelable> *)imagePromise placeholder:(RKImageType *)placeholder intoView:(RKImageViewType *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
 {
     NSParameterAssert(imageView);
     
@@ -111,7 +117,7 @@
         [(RKPromise <RKCancelable> *)[self.imageMap objectForKey:imageView] cancel:nil];
         [self.imageMap removeObjectForKey:imageView];
         
-        UIImage *existingImage = [self.inMemoryCache objectForKey:imagePromise.cacheIdentifier];
+        RKImageType *existingImage = [self.inMemoryCache objectForKey:imagePromise.cacheIdentifier];
         if(existingImage) {
             imageView.image = existingImage;
             
@@ -126,11 +132,13 @@
                              (__bridge const void *)imageView,
                              (__bridge const void *)imagePromise);
         
-        [imagePromise then:^(UIImage *image) {
+        [imagePromise then:^(RKImageType *image) {
             imageView.image = image;
             
+#if TARGET_OS_IPHONE
             UITableViewCell *superCell = RK_TRY_CAST(UITableViewCell, imageView.superview.superview);
             [superCell setNeedsLayout];
+#endif /* TARGET_OS_IPHONE */
             
             if(xCGSizeGetArea(image.size) < xCGSizeGetArea(_maximumCacheableSize))
                 [self.inMemoryCache setObject:image forKey:imagePromise.cacheIdentifier cost:image.size.width + image.size.height];
@@ -153,7 +161,7 @@
     }
 }
 
-- (void)loadImageAtURL:(NSURL *)url placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
+- (void)loadImageAtURL:(NSURL *)url placeholder:(RKImageType *)placeholder intoView:(RKImageViewType *)imageView completionHandler:(RKImageLoaderCompletionHandler)completionHandler
 {
     NSParameterAssert(imageView);
     
@@ -166,12 +174,12 @@
     [self loadImagePromise:imagePromise placeholder:placeholder intoView:imageView completionHandler:completionHandler];
 }
 
-- (void)loadImageAtURL:(NSURL *)url placeholder:(UIImage *)placeholder intoView:(UIImageView *)imageView
+- (void)loadImageAtURL:(NSURL *)url placeholder:(RKImageType *)placeholder intoView:(RKImageViewType *)imageView
 {
     [self loadImageAtURL:url placeholder:placeholder intoView:imageView completionHandler:nil];
 }
 
-- (void)stopLoadingImagesForView:(UIImageView *)imageView
+- (void)stopLoadingImagesForView:(RKImageViewType *)imageView
 {
     NSParameterAssert(imageView);
     
@@ -180,5 +188,3 @@
 }
 
 @end
-
-#endif /* TARGET_OS_IPHONE */
