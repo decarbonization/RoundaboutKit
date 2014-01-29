@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface RKURLRequestStub : NSObject
+@interface RKTestURLRequestStub : NSObject
 
 #pragma mark - HTTP Version
 
@@ -51,15 +51,15 @@
 
 #pragma mark - Stubbing Requests
 
-+ (void)addStub:(RKURLRequestStub *)request;
-+ (void)removeStub:(RKURLRequestStub *)request;
++ (void)addStub:(RKTestURLRequestStub *)request;
++ (void)removeStub:(RKTestURLRequestStub *)request;
 + (NSArray *)stubs;
 
 #pragma mark -
 
-+ (RKURLRequestStub *)stubGetRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers;
-+ (RKURLRequestStub *)stubDeleteRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers;
-+ (RKURLRequestStub *)stubPostRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body;
-+ (RKURLRequestStub *)stubPutRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body;
++ (RKTestURLRequestStub *)stubGetRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers;
++ (RKTestURLRequestStub *)stubDeleteRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers;
++ (RKTestURLRequestStub *)stubPostRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body;
++ (RKTestURLRequestStub *)stubPutRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body;
 
 @end

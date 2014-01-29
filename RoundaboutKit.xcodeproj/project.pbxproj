@@ -139,12 +139,6 @@
 		8B39B3531899A5F80013F0FD /* RKImageLoaderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKImageLoaderTests.m; sourceTree = "<group>"; };
 		8B39B3551899A6070013F0FD /* RKConnectivityManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKConnectivityManagerTests.m; sourceTree = "<group>"; };
 		8B39B3581899A6240013F0FD /* RKPersisterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPersisterTests.m; sourceTree = "<group>"; };
-		8B39B3671899BF3D0013F0FD /* RKTesting-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RKTesting-Prefix.pch"; sourceTree = "<group>"; };
-		8B39B3681899BF3D0013F0FD /* RKTesting.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RKTesting.h; sourceTree = "<group>"; };
-		8B39B36A1899BF3D0013F0FD /* RKTesting.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RKTesting.m; sourceTree = "<group>"; };
-		8B39B3791899BF3E0013F0FD /* RKTestingTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RKTestingTests-Info.plist"; sourceTree = "<group>"; };
-		8B39B37B1899BF3E0013F0FD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		8B39B37D1899BF3E0013F0FD /* RKTestingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RKTestingTests.m; sourceTree = "<group>"; };
 		8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKCorePostProcessors.h; sourceTree = "<group>"; };
 		8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKCorePostProcessors.m; sourceTree = "<group>"; };
 		8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKCorePostProcessorsTests.m; sourceTree = "<group>"; };
@@ -283,50 +277,12 @@
 			name = Utilities;
 			sourceTree = "<group>";
 		};
-		8B39B3651899BF3D0013F0FD /* RKTesting */ = {
-			isa = PBXGroup;
-			children = (
-				8B39B3681899BF3D0013F0FD /* RKTesting.h */,
-				8B39B36A1899BF3D0013F0FD /* RKTesting.m */,
-				8B39B3661899BF3D0013F0FD /* Supporting Files */,
-			);
-			path = RKTesting;
-			sourceTree = "<group>";
-		};
-		8B39B3661899BF3D0013F0FD /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				8B39B3671899BF3D0013F0FD /* RKTesting-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		8B39B3771899BF3E0013F0FD /* RKTestingTests */ = {
-			isa = PBXGroup;
-			children = (
-				8B39B37D1899BF3E0013F0FD /* RKTestingTests.m */,
-				8B39B3781899BF3E0013F0FD /* Supporting Files */,
-			);
-			path = RKTestingTests;
-			sourceTree = "<group>";
-		};
-		8B39B3781899BF3E0013F0FD /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				8B39B3791899BF3E0013F0FD /* RKTestingTests-Info.plist */,
-				8B39B37A1899BF3E0013F0FD /* InfoPlist.strings */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		8B75838F17920E7200D45F54 = {
 			isa = PBXGroup;
 			children = (
 				8B75839D17920E7200D45F54 /* RoundaboutKit */,
 				8BE806F81792189300DFEC35 /* Mac */,
 				8B758433179210F300D45F54 /* Tests */,
-				8B39B3651899BF3D0013F0FD /* RKTesting */,
-				8B39B3771899BF3E0013F0FD /* RKTestingTests */,
 				8B75839A17920E7200D45F54 /* Frameworks */,
 				8B75839917920E7200D45F54 /* Products */,
 			);
@@ -710,14 +666,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		8B39B37A1899BF3E0013F0FD /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				8B39B37B1899BF3E0013F0FD /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		8B758436179210F300D45F54 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (

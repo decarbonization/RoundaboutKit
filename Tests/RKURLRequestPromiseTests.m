@@ -29,7 +29,7 @@
     self.connectivityManager = [[RKConnectivityManager alloc] initWithHostName:@"localhost"];
     [RKTestURLProtocol setup];
     
-    RKURLRequestStub *stub = [RKTestURLProtocol stubGetRequestToURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]
+    RKTestURLRequestStub *stub = [RKTestURLProtocol stubGetRequestToURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]
                                                         withHeaders:nil];
     [stub andReturnString:PLAIN_TEXT_STRING
               withHeaders:@{@"Etag": @"SomeArbitraryValue"}

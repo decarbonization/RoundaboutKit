@@ -12,7 +12,7 @@
 NSString *const RKRequestNotAllowedException = @"RKRequestNotAllowedException";
 NSString *const RKAffectedRequestUserInfoKey = @"RKAffectedRequestUserInfoKey";
 
-@implementation RKURLRequestStub
+@implementation RKTestURLRequestStub
 
 static NSString *gHTTPVersionString = @"HTTP/1.1";
 + (void)setHTTPVersionString:(NSString *)versionString
@@ -155,7 +155,7 @@ static int32_t gActiveCount = 0;
 
 #pragma mark - Stubbing Requests
 
-+ (void)addStub:(RKURLRequestStub *)request
++ (void)addStub:(RKTestURLRequestStub *)request
 {
     NSParameterAssert(request);
     
@@ -164,7 +164,7 @@ static int32_t gActiveCount = 0;
     }
 }
 
-+ (void)removeStub:(RKURLRequestStub *)request
++ (void)removeStub:(RKTestURLRequestStub *)request
 {
     NSParameterAssert(request);
     
@@ -182,7 +182,7 @@ static int32_t gActiveCount = 0;
 
 #pragma mark -
 
-+ (RKURLRequestStub *)stubRequestToURL:(NSURL *)url withMethod:(NSString *)method headers:(NSDictionary *)headers andBody:(NSData *)body
++ (RKTestURLRequestStub *)stubRequestToURL:(NSURL *)url withMethod:(NSString *)method headers:(NSDictionary *)headers andBody:(NSData *)body
 {
     NSParameterAssert(url);
     NSParameterAssert(method);
@@ -191,7 +191,7 @@ static int32_t gActiveCount = 0;
         [NSException raise:NSInternalInconsistencyException format:@"Cannot stub requests without activating RKTestURLProtocol first."];
     }
     
-    RKURLRequestStub *stub = [RKURLRequestStub new];
+    RKTestURLRequestStub *stub = [RKTestURLRequestStub new];
     
     stub.URL = url;
     stub.HTTPMethod = method;
@@ -203,23 +203,23 @@ static int32_t gActiveCount = 0;
     return stub;
 }
 
-+ (RKURLRequestStub *)stubGetRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers
++ (RKTestURLRequestStub *)stubGetRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers
 {
     return [self stubRequestToURL:url withMethod:@"GET" headers:headers andBody:nil];
 }
 
-+ (RKURLRequestStub *)stubDeleteRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers
++ (RKTestURLRequestStub *)stubDeleteRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers
 {
     return [self stubRequestToURL:url withMethod:@"DELETE" headers:headers andBody:nil];
 }
 
-+ (RKURLRequestStub *)stubPostRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body
++ (RKTestURLRequestStub *)stubPostRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body
 {
     NSParameterAssert(body);
     return [self stubRequestToURL:url withMethod:@"POST" headers:headers andBody:body];
 }
 
-+ (RKURLRequestStub *)stubPutRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body
++ (RKTestURLRequestStub *)stubPutRequestToURL:(NSURL *)url withHeaders:(NSDictionary *)headers andBody:(NSData *)body
 {
     NSParameterAssert(body);
     return [self stubRequestToURL:url withMethod:@"POST" headers:headers andBody:body];
@@ -227,9 +227,9 @@ static int32_t gActiveCount = 0;
 
 #pragma mark - Internal
 
-+ (RKURLRequestStub *)stubForRequest:(NSURLRequest *)request
++ (RKTestURLRequestStub *)stubForRequest:(NSURLRequest *)request
 {
-    return RKCollectionFindFirstMatch(self.stubs, ^BOOL(RKURLRequestStub *stub) {
+    return RKCollectionFindFirstMatch(self.stubs, ^BOOL(RKTestURLRequestStub *stub) {
         BOOL URLsAreEqual = [stub.URL isEqual:request.URL];
         BOOL headersAreEqual = ((stub.HTTPHeaders == request.allHTTPHeaderFields) ||
                                 [stub.HTTPHeaders ?: @{} isEqual:request.allHTTPHeaderFields ?: @{}]);
@@ -265,7 +265,7 @@ static int32_t gActiveCount = 0;
 
 - (void)startLoading
 {
-    RKURLRequestStub *requestStub = [[self class] stubForRequest:self.request];
+    RKTestURLRequestStub *requestStub = [[self class] stubForRequest:self.request];
     [[RKQueueManager commonWorkQueue] addOperationWithBlock:^{
         NSHTTPURLResponse *response = requestStub.response;
         if(self.canceled)
