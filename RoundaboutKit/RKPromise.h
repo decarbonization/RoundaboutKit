@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol RKPostProcessor;
+@class RKPostProcessor;
 
 ///The different states a promise object can be in.
 typedef NS_ENUM(NSUInteger, kRKPromiseState) {
@@ -126,12 +126,11 @@ typedef void(^RKPromiseRejectedNotificationBlock)(NSError *error);
 
 #pragma mark - Processors
 
-///Adds an array of post-processors to execute when a promise is either
-///accepted with a value, or rejected with an error. Post processors
-///are executed in the order in which they are added to a promise.
-///Refined values from post-processors are propagated downwards. That is
-///to say, if you start with a post-processor that converts raw data into
-///JSON objects, the next post-processor will receive those JSON objects.
+///Adds an array of post-processors to execute when a promise is accepted
+///with a value. Post processors are executed in the order in which they
+///are added to a promise. Refined values from post-processors are propagated
+///downwards. That is to say, if you start with a post-processor that converts raw
+///data into JSON objects, the next post-processor will receive those JSON objects.
 ///
 /// \param  processors  An array of `RKPostProcessor` objects. Required.
 ///
@@ -143,8 +142,10 @@ typedef void(^RKPromiseRejectedNotificationBlock)(NSError *error);
 ///__Important:__ post processors are run on the thread that the promise is accepted/rejected from.
 - (void)addPostProcessors:(NSArray *)processors;
 
-///Removes all of the post-processors of the promise.
-- (void)removeAllPostProcessors;
+///Shortcut for `-[promise addPostProcessors:@[ postProcessor ]]`.
+///
+/// \seealso(-[self addPostProcessors:])
+- (void)addPostProcessor:(RKPostProcessor *)postProcessor;
 
 ///Returns the post-processors of the promise.
 @property (nonatomic, copy) NSArray *postProcessors;

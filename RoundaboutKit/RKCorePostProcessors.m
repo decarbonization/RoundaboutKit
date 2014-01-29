@@ -161,3 +161,32 @@
 }
 
 @end
+
+#pragma mark -
+
+@implementation RKSingleValuePostProcessor
+
+- (instancetype)initWithObject:(id)object
+{
+    if((self = [super init])) {
+        _object = object;
+    }
+    
+    return self;
+}
+
+#pragma mark -
+
+- (Class)inputValueType
+{
+    return Nil;
+}
+
+#pragma mark -
+
+- (id)processValue:(id)value error:(NSError *__autoreleasing *)outError withContext:(id)context
+{
+    return _object;
+}
+
+@end

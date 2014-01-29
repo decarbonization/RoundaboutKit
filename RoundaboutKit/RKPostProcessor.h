@@ -99,12 +99,12 @@ typedef RKPossibility *(^RKSimplePostProcessorBlock)(RKPossibility *maybeData, i
 @end
 
 ///A simple post-processor block that takes an NSData object and yields JSON objects.
-RK_EXTERN RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock DEPRECATED_ATTRIBUTE;
 
 ///A simple post-processor block that takes an NSData object and yields an NS/UIImage.
-RK_EXTERN RKSimplePostProcessorBlock const kRKImagePostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKImagePostProcessorBlock DEPRECATED_ATTRIBUTE;
 
 ///A simple post-processor block that takes an NSData object and yields a property list objects.
-RK_EXTERN RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock DEPRECATED_ATTRIBUTE;
 
 #endif /* RKPostProcessor_h */

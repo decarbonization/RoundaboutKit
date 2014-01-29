@@ -252,16 +252,11 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
     });
 }
 
-- (void)removeAllPostProcessors
+- (void)addPostProcessor:(RKPostProcessor *)postProcessor
 {
-    if(self.contents != nil)
-        @throw [NSException exceptionWithName:NSInternalInconsistencyException
-                                       reason:@"Cannot remove post-processors from an already-realized promise."
-                                     userInfo:nil];
+    NSParameterAssert(postProcessor);
     
-    with_locked_state(&_stateGuard, ^{
-        [_postProcessors removeAllObjects];
-    });
+    [self addPostProcessors:@[ postProcessor ]];
 }
 
 - (void)setPostProcessors:(NSArray *)postProcessors

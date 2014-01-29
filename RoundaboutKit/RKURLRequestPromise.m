@@ -510,8 +510,7 @@ RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePos
 {
     _legacyPostProcessor = postProcessor;
     
-    [self removeAllPostProcessors];
-    [super addPostProcessors:@[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ]];
+    [super setPostProcessors:@[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ]];
 }
 
 - (RKSimplePostProcessorBlock)postProcessor

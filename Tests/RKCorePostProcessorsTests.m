@@ -96,4 +96,17 @@
     XCTAssertNil(image, @"unexpected value");
 }
 
+- (void)testSingleValuePostProcessor
+{
+    id singleValue = [NSNull null];
+    RKSingleValuePostProcessor *postProcessor = [[RKSingleValuePostProcessor alloc] initWithObject:singleValue];
+    
+    NSError *error = nil;
+    id result = [postProcessor processValue:@"does not matter" error:&error withContext:nil];
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(result, @"expected result");
+    XCTAssertEqual(singleValue, result, @"unexpected pointer inequality");
+    XCTAssertEqualObjects(singleValue, result, @"unexpected object inequality");
+}
+
 @end

@@ -35,3 +35,18 @@
 + (instancetype)sharedPostProcessor;
 
 @end
+
+#pragma mark -
+
+///Consumes any object, and yields an object specified upon initialization.
+@interface RKSingleValuePostProcessor : RKPostProcessor
+
+///Initialize the receiver with an object to return when
+///the receiver is called upon to process a value.
+- (instancetype)initWithObject:(id)object;
+
+#pragma mark -
+
+@property (nonatomic, readonly) id object;
+
+@end

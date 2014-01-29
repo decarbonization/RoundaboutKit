@@ -247,6 +247,17 @@
 
 #pragma mark -
 
+- (void)testStateConsistencyGuards
+{
+    RKURLRequestPromise *request = [self makePlainTextWithNoCacheRequest];
+    XCTAssertThrows([request setConnectivityManager:nil], @"expected `-setConnectivityManager:` to throw.");
+}
+
+#pragma mark - Legacy Post-Processors
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 - (void)testPostProcessorChaining
 {
     RKSimplePostProcessorBlock postProcessor1 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
@@ -263,10 +274,7 @@
         }];
     };
     
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     RKSimplePostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
-#pragma clang diagnostic pop
     RKPossibility *result = postProcessor3([[RKPossibility alloc] initWithValue:@"it should equal"], nil);
     XCTAssertEqual(result.state, kRKPossibilityStateValue, @"Unexpected state");
     XCTAssertEqualObjects(result.value, @"it should equal fizzbuzz", @"Unexpected value");
@@ -309,12 +317,6 @@
     XCTAssertNotNil(badResult.error, @"Missing error");
 }
 
-#pragma mark -
-
-- (void)testStateConsistencyGuards
-{
-    RKURLRequestPromise *request = [self makePlainTextWithNoCacheRequest];
-    XCTAssertThrows([request setConnectivityManager:nil], @"expected `-setConnectivityManager:` to throw.");
-}
+#pragma clang diagnostic pop
 
 @end
