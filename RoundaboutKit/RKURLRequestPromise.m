@@ -280,7 +280,7 @@ static BOOL gActivityLoggingEnabled = NO;
         return nil;
     
     RKPromise *cachedDataPromise = [RKPromise new];
-    [cachedDataPromise addPostProcessors:RKCollectionDeepCopy(self.postProcessors)];
+    [cachedDataPromise addPostProcessors:self.postProcessors];
     
     [self.workQueue addOperationWithBlock:^{
         NSError *error = nil;

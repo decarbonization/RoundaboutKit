@@ -18,7 +18,6 @@
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURL *baseURL;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> readCacheManager;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> writeCacheManager;
-@property (readwrite, RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue;
 @property (readwrite, copy, RK_NONATOMIC_IOSONLY) NSArray *postProcessors;
 
 @end
@@ -59,7 +58,7 @@
     
     NSString *urlString = [path stringByStandardizingPath];
     if(parameters) {
-        NSString *parameterString = RKDictionaryToURLParametersString(parameters);
+        NSString *parameterString = RKDictionaryToURLParametersString(parameters, self.URLParameterStringifier);
         urlString = [urlString stringByAppendingFormat:@"?%@", parameterString];
     }
     
@@ -147,7 +146,7 @@
     RKURLRequestPromise *requestPromise = [[RKURLRequestPromise alloc] initWithRequest:request
                                                                        offlineBehavior:offlineBehavior
                                                                           cacheManager:cacheManager];
-    [requestPromise addPostProcessors:RKCollectionDeepCopy(self.postProcessors)];
+    [requestPromise addPostProcessors:self.postProcessors];
     requestPromise.authenticationHandler = self.authenticationHandler;
     return requestPromise;
 }
