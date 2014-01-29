@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "RunLoopHelper.h"
+#import "RKRunLoopTestHelper.h"
 
 static NSTimeInterval const kRunLoopDuration = 1.0;
 
@@ -55,7 +55,7 @@ static NSTimeInterval const kRunLoopDuration = 1.0;
     }];
     
     [self.persister reloadContentsAsynchronously];
-    [RunLoopHelper runFor:kRunLoopDuration];
+    [RKRunLoopTestHelper runFor:kRunLoopDuration];
     
     XCTAssertTrue(loadedNotificationDelivered, @"loaded notification was not delievered");
     XCTAssertNil(self.persister.lastModified, @"unexpected last modified date");
@@ -70,7 +70,7 @@ static NSTimeInterval const kRunLoopDuration = 1.0;
     }];
     
     [self.persister reloadContentsAsynchronously];
-    [RunLoopHelper runFor:kRunLoopDuration];
+    [RKRunLoopTestHelper runFor:kRunLoopDuration];
     
     XCTAssertTrue(loadedNotificationDelivered, @"loaded notification was not delievered");
     XCTAssertEqualObjects(self.persister.lastModified, [NSDate dateWithTimeIntervalSince1970:0], @"unexpected last modified date");
@@ -95,7 +95,7 @@ static NSTimeInterval const kRunLoopDuration = 1.0;
     [self.persister setContents:@"¡hola, mundo!" saveCompletionHandler:^(BOOL success, NSError *error) {
         didSave = success;
     }];
-    [RunLoopHelper runFor:kRunLoopDuration];
+    [RKRunLoopTestHelper runFor:kRunLoopDuration];
     
     XCTAssertTrue(saveNotificationDelivered, @"expected save notification");
     XCTAssertFalse(saveDidFailNotificationDelivered, @"unexpected save did fail notification");

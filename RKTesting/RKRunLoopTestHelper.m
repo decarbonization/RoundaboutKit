@@ -6,9 +6,9 @@
 //
 //
 
-#import "RunLoopHelper.h"
+#import "RKRunLoopTestHelper.h"
 
-@implementation RunLoopHelper
+@implementation RKRunLoopTestHelper
 
 + (void)runFor:(NSTimeInterval)seconds
 {

@@ -55,7 +55,7 @@
                      completionHandler:^(BOOL wasSuccessful) {
                          success = wasSuccessful;
                      }];
-    [RunLoopHelper runFor:0.5];
+    [RKRunLoopTestHelper runFor:0.5];
     
     XCTAssertTrue(success, @"expected success");
     XCTAssertNotNil([imageView image], @"expected image");
@@ -72,7 +72,7 @@
                      completionHandler:^(BOOL wasSuccessful) {
                          success = wasSuccessful;
                      }];
-    [RunLoopHelper runFor:0.5];
+    [RKRunLoopTestHelper runFor:0.5];
     
     XCTAssertTrue(success, @"expected success");
     XCTAssertNotNil([imageView image], @"expected image");
@@ -85,7 +85,7 @@
                      completionHandler:^(BOOL wasSuccessful) {
                          success = wasSuccessful;
                      }];
-    [RunLoopHelper runFor:0.5];
+    [RKRunLoopTestHelper runFor:0.5];
     
     XCTAssertTrue(success, @"expected success");
     XCTAssertNotNil([imageView image], @"expected image");
@@ -107,7 +107,7 @@
                          wasCalled = wasSuccessful;
                      }];
     [self.imageLoader stopLoadingImagesForView:imageView];
-    [RunLoopHelper runFor:0.7];
+    [RKRunLoopTestHelper runFor:0.7];
     
     
     XCTAssertFalse(wasCalled, @"unexpected call through");

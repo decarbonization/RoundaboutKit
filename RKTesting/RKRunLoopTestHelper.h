@@ -10,7 +10,7 @@
 
 ///The RunLoopHelper class contains methods to assist in tests
 ///which require the main runloop to be running to complete.
-@interface RunLoopHelper : NSObject
+@interface RKRunLoopTestHelper : NSObject
 
 ///Runs the main run loop for n seconds.
 ///

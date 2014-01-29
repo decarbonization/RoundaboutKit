@@ -59,7 +59,7 @@
         succeeded = NO;
     }];
     
-    [RunLoopHelper runFor:DEFAULT_TIMEOUT];
+    [RKRunLoopTestHelper runFor:DEFAULT_TIMEOUT];
     
     XCTAssertTrue(finished, @"RKRealize timed out generating value.");
     XCTAssertTrue(succeeded, @"RKRealize failed to generate value.");
@@ -84,7 +84,7 @@
         outError = error;
     }];
     
-    [RunLoopHelper runFor:DEFAULT_TIMEOUT];
+    [RKRunLoopTestHelper runFor:DEFAULT_TIMEOUT];
     
     XCTAssertTrue(finished, @"RKRealize timed out generating error.");
     XCTAssertTrue(failed, @"RKRealize failed to generate error.");
@@ -113,7 +113,7 @@
         //Do nothing
     }];
     
-    BOOL finishedNaturally = [RunLoopHelper runUntil:^BOOL{ return (results != nil); } orSecondsHasElapsed:1.0];
+    BOOL finishedNaturally = [RKRunLoopTestHelper runUntil:^BOOL{ return (results != nil); } orSecondsHasElapsed:1.0];
     
     XCTAssertTrue(finishedNaturally, @"realize timed out");
     XCTAssertTrue(finished, @"RKRealizePromises timed out");
