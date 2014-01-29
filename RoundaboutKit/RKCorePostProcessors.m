@@ -8,7 +8,12 @@
 
 #import "RKCorePostProcessors.h"
 
-#import <UIKit/UIKit.h>
+#if TARGET_OS_IPHONE
+#   import <UIKit/UIKit.h>
+#else
+#   import <AppKit/AppKit.h>
+#endif /* TARGET_OS_IPHONE */
+
 #import "RKURLRequestPromise.h"
 
 @implementation RKJSONPostProcessor

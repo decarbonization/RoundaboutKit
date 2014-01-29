@@ -133,7 +133,7 @@
 - (RKURLRequestPromise *)requestPromiseWithRequest:(NSURLRequest *)request
 {
     id <RKURLRequestPromiseCacheManager> cacheManager = nil;
-    kRKURLRequestPromiseOfflineBehavior offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
+    RKURLRequestPromiseOfflineBehavior offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
     if([request.HTTPMethod isEqualToString:@"GET"] && self.readCacheManager != nil) {
         cacheManager = self.readCacheManager;
         offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
@@ -190,14 +190,14 @@
      readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
     writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
          requestQueue:(NSOperationQueue *)requestQueue
-        postProcessor:(RKLegacyPostProcessorBlock)postProcessor
+        postProcessor:(RKSimplePostProcessorBlock)postProcessor
 {
     NSParameterAssert(baseURL);
     NSParameterAssert(requestQueue);
     
     NSArray *postProcessors = nil;
     if(postProcessor) {
-        postProcessors = @[ [[RKLegacyPostProcessor alloc] initWithBlock:postProcessor] ];
+        postProcessors = @[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ];
     }
     
     if((self = [self initWithBaseURL:baseURL
@@ -210,7 +210,7 @@
     return self;
 }
 
-- (RKLegacyPostProcessorBlock)postProcessor
+- (RKSimplePostProcessorBlock)postProcessor
 {
     if(self.postProcessors.count == 0)
         return nil;
@@ -220,11 +220,11 @@
                     format:@"%s called when %@ has more than one post-processor object.", __PRETTY_FUNCTION__, self];
     
     id postProcessor = self.postProcessors.firstObject;
-    if(![postProcessor isKindOfClass:[RKLegacyPostProcessor class]])
+    if(![postProcessor isKindOfClass:[RKSimplePostProcessor class]])
         [NSException raise:NSInternalInconsistencyException
                     format:@"%s called when active post-processor is not an RKSimplePostProcessor.", __PRETTY_FUNCTION__];
     
-    return [(RKLegacyPostProcessor *)postProcessor block];
+    return [(RKSimplePostProcessor *)postProcessor block];
 }
 
 @end

@@ -161,7 +161,7 @@
     RKURLRequestPromise *imagePromise = [[RKURLRequestPromise alloc] initWithRequest:imageURLRequest
                                                                      offlineBehavior:kRKURLRequestPromiseOfflineBehaviorUseCache
                                                                         cacheManager:self.cacheManager];
-    RKLegacyPostProcessor *imagePostProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:kRKImagePostProcessorBlock];
+    RKSimplePostProcessor *imagePostProcessor = [[RKSimplePostProcessor alloc] initWithBlock:kRKImagePostProcessorBlock];
     [imagePromise addPostProcessors:@[ imagePostProcessor ]];
     
     [self loadImagePromise:imagePromise placeholder:placeholder intoView:imageView completionHandler:completionHandler];

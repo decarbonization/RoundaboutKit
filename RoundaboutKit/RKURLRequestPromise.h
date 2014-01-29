@@ -110,13 +110,18 @@ NS_ENUM(NSInteger, RKURLRequestPromiseErrors) {
 
 ///How an instance of RKURLRequestPromise should behave
 ///when its connection reports being offline
-typedef NS_ENUM(NSUInteger, kRKURLRequestPromiseOfflineBehavior) {
+typedef NS_ENUM(NSInteger, RKURLRequestPromiseOfflineBehavior) {
     ///The promise should fail with an error.
     kRKURLRequestPromiseOfflineBehaviorFail = 0,
     
     ///The promise should attempt to use any existing
     ///persistent cache before resorting to failure.
     kRKURLRequestPromiseOfflineBehaviorUseCache = 1,
+    
+    
+    
+    ///Chooses the best cache behavior based on if a cache manager was provided.
+    kRKURLRequestPromiseOfflineBehaviorAutomatic = -1,
 };
 
 #pragma mark -
@@ -212,7 +217,7 @@ typedef NS_ENUM(NSUInteger, kRKURLRequestPromiseOfflineBehavior) {
 ///
 ///It is recommended to use `RKRequestFactory` instead of creating RKURLRequestPromises directly.
 - (instancetype)initWithRequest:(NSURLRequest *)request
-                offlineBehavior:(kRKURLRequestPromiseOfflineBehavior)offlineBehavior
+                offlineBehavior:(RKURLRequestPromiseOfflineBehavior)offlineBehavior
                    cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager RK_REQUIRE_RESULT_USED;
 
 #pragma mark - Properties
@@ -250,7 +255,7 @@ typedef NS_ENUM(NSUInteger, kRKURLRequestPromiseOfflineBehavior) {
 ///How the request promise should behave if its connectivity manager reports being offline.
 ///
 /// \seealso(kRKURLRequestPromiseOfflineBehavior)
-@property (readonly, RK_NONATOMIC_IOSONLY) kRKURLRequestPromiseOfflineBehavior offlineBehavior;
+@property (readonly, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
 
 ///Whether or not the request should cancel itself if it finds
 ///its cache is unchanged from the newly loaded remote data.
@@ -270,10 +275,10 @@ typedef NS_ENUM(NSUInteger, kRKURLRequestPromiseOfflineBehavior) {
 
 #pragma mark - Deprecated
 
-///The older name for blocks of type `RKLegacyPostProcessorBlock`. Deprecated
+///The older name for blocks of type `RKSimplePostProcessorBlock`. Deprecated
 ///
-/// \seealso(RKLegacyPostProcessorBlock)
-typedef RKLegacyPostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
+/// \seealso(RKSimplePostProcessorBlock)
+typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
 
 ///Returns a new block that will be given the result of an earlier block.
 ///
@@ -284,8 +289,8 @@ typedef RKLegacyPostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
 ///         block and then passing that result to the refiner.
 ///
 ///This function is deprecated. Use an array of independent post-processors instead.
-RK_EXTERN_OVERLOADABLE RKLegacyPostProcessorBlock RKPostProcessorBlockChain(RKLegacyPostProcessorBlock source,
-                                                                            RKLegacyPostProcessorBlock refiner) DEPRECATED_ATTRIBUTE;
+RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
+                                                                            RKSimplePostProcessorBlock refiner) DEPRECATED_ATTRIBUTE;
 
 #pragma mark -
 
@@ -348,7 +353,7 @@ RK_EXTERN_OVERLOADABLE RKLegacyPostProcessorBlock RKPostProcessorBlockChain(RKLe
 ///any post-processors attached to the promise, and attempting
 ///to add a post-processor through `-[RKPromise addPostProcessor:]`
 ///will raise if this property is not nil.
-@property (nonatomic, copy) RKLegacyPostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
+@property (nonatomic, copy) RKSimplePostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
 
 @end
 

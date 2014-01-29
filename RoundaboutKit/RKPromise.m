@@ -255,8 +255,28 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
 
 - (void)removeAllPostProcessors
 {
+    if(self.contents != nil)
+        @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                       reason:@"Cannot remove post-processors from an already-realized promise."
+                                     userInfo:nil];
+    
     with_locked_state(&_stateGuard, ^{
         [_postProcessors removeAllObjects];
+    });
+}
+
+- (void)setPostProcessors:(NSArray *)postProcessors
+{
+    if(self.contents != nil)
+        @throw [NSException exceptionWithName:NSInternalInconsistencyException
+                                       reason:@"Cannot set post-processors on an already-realized promise."
+                                     userInfo:nil];
+    
+    with_locked_state(&_stateGuard, ^{
+        if(!_postProcessors)
+            _postProcessors = [NSMutableArray new];
+        
+        [_postProcessors setArray:postProcessors];
     });
 }
 

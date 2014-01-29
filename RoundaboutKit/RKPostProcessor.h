@@ -70,7 +70,7 @@ RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
 
 @class RKPossibility;
 
-///The RKLegacyPostProcessorBlock type describes implementations for the
+///The RKSimplePostProcessorBlock type describes implementations for the
 ///`RKSimplePostProcessor` class. It takes a possibility and context object,
 ///and returns a new possibilty,
 ///
@@ -80,13 +80,12 @@ RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
 /// \result A new possibility object describing the result of processing the input data.
 ///
 /// \seealso(RKSimplePostProcessor, <RKPostProcessor>)
-typedef RKPossibility *(^RKLegacyPostProcessorBlock)(RKPossibility *maybeData, id context);
+typedef RKPossibility *(^RKSimplePostProcessorBlock)(RKPossibility *maybeData, id context);
 
-///The RKLegacyPostProcessor class implements a simple, weakly typed, block-based
-///implementation of the `<RKPostProcessor>` protocol. It is designed to provide
-///source-level backwards compatibility with the old `RKURLRequestPromise` post-
-///processor implementation.
-@interface RKLegacyPostProcessor : RKPostProcessor
+///The RKSimplePostProcessor class implements a simple, weakly typed, block-based
+///implementation of RKPostProcessor. It is designed to provide source-level backwards
+///compatibility with the old `RKURLRequestPromise` post- processor implementation.
+@interface RKSimplePostProcessor : RKPostProcessor
 
 ///Initialize the receiver with an implementation block.
 ///
@@ -94,23 +93,23 @@ typedef RKPossibility *(^RKLegacyPostProcessorBlock)(RKPossibility *maybeData, i
 ///
 /// \result A fully initialized simple post processor object.
 ///
-/// \seealso(RKLegacyPostProcessorBlock)
-- (instancetype)initWithBlock:(RKLegacyPostProcessorBlock)block;
+/// \seealso(RKSimplePostProcessorBlock)
+- (instancetype)initWithBlock:(RKSimplePostProcessorBlock)block;
 
 #pragma mark - Properties
 
 ///The implementation block.
-@property (readonly, copy) RKLegacyPostProcessorBlock block;
+@property (readonly, copy) RKSimplePostProcessorBlock block;
 
 @end
 
 ///A simple post-processor block that takes an NSData object and yields JSON objects.
-RK_EXTERN RKLegacyPostProcessorBlock const kRKJSONPostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock;
 
 ///A simple post-processor block that takes an NSData object and yields an NS/UIImage.
-RK_EXTERN RKLegacyPostProcessorBlock const kRKImagePostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKImagePostProcessorBlock;
 
 ///A simple post-processor block that takes an NSData object and yields a property list objects.
-RK_EXTERN RKLegacyPostProcessorBlock const kRKPropertyListPostProcessorBlock;
+RK_EXTERN RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock;
 
 #endif /* RKPostProcessor_h */

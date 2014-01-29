@@ -220,7 +220,7 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
      readCacheManager:(id <RKURLRequestPromiseCacheManager>)readCacheManager
     writeCacheManager:(id <RKURLRequestPromiseCacheManager>)writeCacheManager
          requestQueue:(NSOperationQueue *)requestQueue
-        postProcessor:(RKLegacyPostProcessorBlock)postProcessor DEPRECATED_ATTRIBUTE;
+        postProcessor:(RKSimplePostProcessorBlock)postProcessor DEPRECATED_ATTRIBUTE;
 ///The post processor block to use.
 ///This is the legacy interface for post-processors.
 ///Switch to using `self.postProcessors`.
@@ -229,6 +229,6 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///and is only guaranteed to work if you use the legacy initializer
 ///`-[self initWithBaseURL:readCacheMaanger:writeCacheManager:requestQueue:postProcessor:]`.
 ///This property is deprecated and will be removed in the near future.
-@property (readonly, copy, RK_NONATOMIC_IOSONLY) RKLegacyPostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
+@property (readonly, copy, RK_NONATOMIC_IOSONLY) RKSimplePostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
 
 @end

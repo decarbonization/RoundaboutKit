@@ -50,11 +50,11 @@ NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSour
 
 #pragma mark -
 
-@implementation RKLegacyPostProcessor
+@implementation RKSimplePostProcessor
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithBlock:(RKLegacyPostProcessorBlock)block
+- (instancetype)initWithBlock:(RKSimplePostProcessorBlock)block
 {
     NSParameterAssert(block);
     
@@ -113,7 +113,7 @@ NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSour
 @end
 
 
-RKLegacyPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKSimplePostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
         NSError *error = nil;
         id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -138,7 +138,7 @@ RKLegacyPostProcessorBlock const kRKJSONPostProcessorBlock = ^RKPossibility *(RK
     }];
 };
 
-RKLegacyPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKSimplePostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
 #if TARGET_OS_IPHONE
         UIImage *image = [[UIImage alloc] initWithData:data];
@@ -155,7 +155,7 @@ RKLegacyPostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(R
     }];
 };
 
-RKLegacyPostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+RKSimplePostProcessorBlock const kRKPropertyListPostProcessorBlock = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
     return [maybeData refineValue:^RKPossibility *(NSData *data) {
         NSError *error = nil;
         id result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&error];

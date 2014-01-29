@@ -133,7 +133,7 @@ typedef void(^RKPromiseRejectedNotificationBlock)(NSError *error);
 ///to say, if you start with a post-processor that converts raw data into
 ///JSON objects, the next post-processor will receive those JSON objects.
 ///
-/// \param  processors  An array of objects implementing `<RKPostProcessor>`. Required.
+/// \param  processors  An array of `RKPostProcessor` objects. Required.
 ///
 ///Post-processors may only be added to a promise before it is accepted/rejected.
 ///Attempting to do so after will result in an exception being raised. As such,
@@ -147,7 +147,7 @@ typedef void(^RKPromiseRejectedNotificationBlock)(NSError *error);
 - (void)removeAllPostProcessors;
 
 ///Returns the post-processors of the promise.
-@property (nonatomic, readonly, copy) NSArray *postProcessors;
+@property (nonatomic, copy) NSArray *postProcessors;
 
 #pragma mark - Realizing
 

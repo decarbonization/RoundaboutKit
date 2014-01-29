@@ -38,7 +38,7 @@ static NSString *const kDefaultRevision = @"-1";
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
 @property (copy, readwrite) NSHTTPURLResponse *response;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
-@property (readwrite, RK_NONATOMIC_IOSONLY) kRKURLRequestPromiseOfflineBehavior offlineBehavior;
+@property (readwrite, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
 
 @end
 
@@ -63,7 +63,7 @@ static NSString *const kDefaultRevision = @"-1";
     
     
     ///The legacy post processor block. Used by the RKDeprecated category.
-    RKLegacyPostProcessorBlock _legacyPostProcessor;
+    RKSimplePostProcessorBlock _legacyPostProcessor;
     
     NSOperationQueue *_legacyRequestQueue;
 }
@@ -112,22 +112,30 @@ static BOOL gActivityLoggingEnabled = NO;
 }
 
 - (instancetype)initWithRequest:(NSURLRequest *)request
-                offlineBehavior:(kRKURLRequestPromiseOfflineBehavior)offlineBehavior
+                offlineBehavior:(RKURLRequestPromiseOfflineBehavior)offlineBehavior
                    cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
 {
     NSParameterAssert(request);
-    
-    if(offlineBehavior != kRKURLRequestPromiseOfflineBehaviorFail && cacheManager == nil) {
-        [NSException raise:NSInvalidArgumentException
-                    format:@"Cannot use any offline behavior besides kRKURLRequestPromiseOfflineBehaviorFail without providing a cache manager."];
-    }
     
     if((self = [super init])) {
         self.request = request;
         self.cacheIdentifier = [request.URL absoluteString];
         
         self.cacheManager = cacheManager;
-        self.offlineBehavior = offlineBehavior;
+        
+        if(offlineBehavior == kRKURLRequestPromiseOfflineBehaviorAutomatic) {
+            if(self.cacheManager)
+                self.offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
+            else
+                self.offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
+        } else {
+            if(offlineBehavior != kRKURLRequestPromiseOfflineBehaviorFail && cacheManager == nil) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Cannot use any offline behavior besides kRKURLRequestPromiseOfflineBehaviorFail without providing a cache manager."];
+            }
+            
+            self.offlineBehavior = offlineBehavior;
+        }
         
         self.connectivityManager = [RKConnectivityManager defaultInternetConnectivityManager];
         
@@ -435,8 +443,8 @@ static BOOL gActivityLoggingEnabled = NO;
 
 #pragma mark - Deprecated
 
-RK_OVERLOADABLE RKLegacyPostProcessorBlock RKPostProcessorBlockChain(RKLegacyPostProcessorBlock source,
-                                                                     RKLegacyPostProcessorBlock refiner)
+RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
+                                                                     RKSimplePostProcessorBlock refiner)
 {
     NSCParameterAssert(source);
     NSCParameterAssert(refiner);
@@ -459,8 +467,8 @@ RK_OVERLOADABLE RKLegacyPostProcessorBlock RKPostProcessorBlockChain(RKLegacyPos
     NSParameterAssert(request);
     NSParameterAssert(requestQueue);
     
-    kRKURLRequestPromiseOfflineBehavior offlineBehavior;
-    if(useCacheWhenOffline)
+    RKURLRequestPromiseOfflineBehavior offlineBehavior;
+    if(useCacheWhenOffline && cacheManager)
         offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
     else
         offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
@@ -498,15 +506,15 @@ RK_OVERLOADABLE RKLegacyPostProcessorBlock RKPostProcessorBlockChain(RKLegacyPos
     return _legacyRequestQueue;
 }
 
-- (void)setPostProcessor:(RKLegacyPostProcessorBlock)postProcessor
+- (void)setPostProcessor:(RKSimplePostProcessorBlock)postProcessor
 {
     _legacyPostProcessor = postProcessor;
     
     [self removeAllPostProcessors];
-    [super addPostProcessors:@[ [[RKLegacyPostProcessor alloc] initWithBlock:postProcessor] ]];
+    [super addPostProcessors:@[ [[RKSimplePostProcessor alloc] initWithBlock:postProcessor] ]];
 }
 
-- (RKLegacyPostProcessorBlock)postProcessor
+- (RKSimplePostProcessorBlock)postProcessor
 {
     return _legacyPostProcessor;
 }
