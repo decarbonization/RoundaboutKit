@@ -50,7 +50,7 @@
 - (id)init
 {
     if((self = [super init])) {
-        self.imageMap = (__bridge NSMutableDictionary *)CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        self.imageMap = (__bridge_transfer NSMutableDictionary *)CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
         
         self.cacheManager = [RKFileSystemCacheManager sharedCacheManager];
         self.inMemoryCache = [NSCache new];

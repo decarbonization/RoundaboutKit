@@ -10,7 +10,7 @@
 
 ///The RKMockPromise class encapsulates a determinate asynchronous
 ///process that will yield a predetermined success or failure value.
-@interface RKMockPromise : RKPromise
+@interface RKMockPromise : RKPromise <RKLazy, RKCancelable>
 
 ///Initialize the receiver with an expected result, duration, whether or not
 ///it can cancel, and the number of times the success callback should be run.
@@ -21,5 +21,13 @@
 ///This is the designated initializer of RKMockPromise.
 - (id)initWithResult:(RKPossibility *)result
             duration:(NSTimeInterval)duration RK_REQUIRE_RESULT_USED;
+
+#pragma mark - Properties
+
+///The intended result of the mock promise.
+@property RKPossibility *result;
+
+///The amount of time that should elapse before a mock promise yields a value/error.
+@property NSTimeInterval duration;
 
 @end

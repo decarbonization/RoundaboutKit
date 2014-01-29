@@ -8,19 +8,6 @@
 
 #import "RKMockPromise.h"
 
-///The amount of time that should elapse between success callbacks.
-#define SUCCESS_CALLBACK_SLEEP_TIME 0.1
-
-@interface RKMockPromise ()
-
-///The intended result of the mock promise.
-@property RKPossibility *result;
-
-///The amount of time that should elapse before a mock promise yields a value/error.
-@property NSTimeInterval duration;
-
-@end
-
 @implementation RKMockPromise
 
 - (id)init
@@ -49,6 +36,9 @@
 {
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.duration * NSEC_PER_SEC));
     dispatch_after(popTime, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        if(_canceled)
+            return;
+        
         [self.result whenValue:^(id value) {
             [self accept:value];
         }];
@@ -56,6 +46,15 @@
             [self reject:error];
         }];
     });
+}
+
+#pragma mark - <RKCancelable>
+
+@synthesize canceled = _canceled;
+
+- (IBAction)cancel:(id)sender
+{
+    _canceled = YES;
 }
 
 @end
