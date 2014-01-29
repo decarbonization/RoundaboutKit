@@ -30,60 +30,70 @@
 
 - (void)testJSONPostProcessor
 {
-    NSData *goodJSON = [@"[1, 2, 3]" dataUsingEncoding:NSUTF8StringEncoding];
-    RKJSONPostProcessor *goodPostProcessor = [RKJSONPostProcessor new];
+    RKJSONPostProcessor *postProcessor = [RKJSONPostProcessor sharedPostProcessor];
+    NSError *error = nil;
+    id value = nil;
     
-    [goodPostProcessor processInputValue:goodJSON inputError:nil context:nil];
-    XCTAssertNil(goodPostProcessor.outputError, @"unexpected error");
-    XCTAssertNotNil(goodPostProcessor.outputValue, @"expected value");
-    XCTAssertEqualObjects((@[@1, @2, @3]), goodPostProcessor.outputValue, @"unexpected output");
+    NSData *goodInput = [@"[1, 2, 3]" dataUsingEncoding:NSUTF8StringEncoding];
+    value = [postProcessor processValue:goodInput error:&error withContext:nil];
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(value, @"expected value");
+    XCTAssertEqualObjects((@[@1, @2, @3]), value, @"unexpected output");
     
     
-    NSData *badJSON = [@"[1, 2, 3," dataUsingEncoding:NSUTF8StringEncoding];
-    RKJSONPostProcessor *badPostProcessor = [RKJSONPostProcessor new];
+    error = nil;
+    value = nil;
     
-    [badPostProcessor processInputValue:badJSON inputError:nil context:nil];
-    XCTAssertNotNil(badPostProcessor.outputError, @"expected error");
-    XCTAssertNil(badPostProcessor.outputValue, @"unexpected value");
+    NSData *badInput = [@"[1, 2, 3," dataUsingEncoding:NSUTF8StringEncoding];
+    value = [postProcessor processValue:badInput error:&error withContext:nil];
+    XCTAssertNotNil(error, @"expected error");
+    XCTAssertNil(value, @"unexpected value");
 }
 
 - (void)testPropertyListPostProcessor
 {
-    NSData *goodPropertyList = [@"(1, 2, 3)" dataUsingEncoding:NSUTF8StringEncoding];
-    RKPropertyListPostProcessor *goodPostProcessor = [RKPropertyListPostProcessor new];
+    RKPropertyListPostProcessor *postProcessor = [RKPropertyListPostProcessor sharedPostProcessor];
+    NSError *error = nil;
+    id value = nil;
     
-    [goodPostProcessor processInputValue:goodPropertyList inputError:nil context:nil];
-    XCTAssertNil(goodPostProcessor.outputError, @"unexpected error");
-    XCTAssertNotNil(goodPostProcessor.outputValue, @"expected value");
-    XCTAssertEqualObjects((@[@"1", @"2", @"3"]), goodPostProcessor.outputValue, @"unexpected output");
+    NSData *goodInput = [@"(1, 2, 3)" dataUsingEncoding:NSUTF8StringEncoding];
+    value = [postProcessor processValue:goodInput error:&error withContext:nil];
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(value, @"expected value");
+    XCTAssertEqualObjects((@[@"1", @"2", @"3"]), value, @"unexpected output");
     
     
-    NSData *badPropertyList = [@"(1, 2, 3," dataUsingEncoding:NSUTF8StringEncoding];
-    RKPropertyListPostProcessor *badPostProcessor = [RKPropertyListPostProcessor new];
+    error = nil;
+    value = nil;
     
-    [badPostProcessor processInputValue:badPropertyList inputError:nil context:nil];
-    XCTAssertNotNil(badPostProcessor.outputError, @"expected error");
-    XCTAssertNil(badPostProcessor.outputValue, @"unexpected value");
+    NSData *badInput = [@"(1, 2, 3," dataUsingEncoding:NSUTF8StringEncoding];
+    value = [postProcessor processValue:badInput error:&error withContext:nil];
+    XCTAssertNotNil(error, @"expected error");
+    XCTAssertNil(value, @"unexpected value");
 }
 
 - (void)testImagePostProcessor
 {
-    NSURL *goodImageLocation = [[NSBundle bundleForClass:[self class]] URLForImageResource:@"RKPostProcessorTestImage"];
-    NSData *goodImage = [NSData dataWithContentsOfURL:goodImageLocation];
+    NSError *error = nil;
+    id image = nil;
     
-    RKImagePostProcessor *goodPostProcessor = [RKImagePostProcessor new];
+    NSURL *goodDataLocation = [[NSBundle bundleForClass:[self class]] URLForImageResource:@"RKPostProcessorTestImage"];
+    NSData *goodData = [NSData dataWithContentsOfURL:goodDataLocation];
     
-    [goodPostProcessor processInputValue:goodImage inputError:nil context:nil];
-    XCTAssertNil(goodPostProcessor.outputError, @"unexpected error");
-    XCTAssertNotNil(goodPostProcessor.outputValue, @"expected value");
+    RKImagePostProcessor *postProcessor = [RKImagePostProcessor sharedPostProcessor];
+    
+    image = [postProcessor processValue:goodData error:&error withContext:nil];
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(image, @"expected value");
     
     
-    NSData *badPropertyList = [@"this is garbage" dataUsingEncoding:NSUTF8StringEncoding];
-    RKImagePostProcessor *badPostProcessor = [RKImagePostProcessor new];
+    error = nil;
+    image = nil;
     
-    [badPostProcessor processInputValue:badPropertyList inputError:nil context:nil];
-    XCTAssertNotNil(badPostProcessor.outputError, @"expected error");
-    XCTAssertNil(badPostProcessor.outputValue, @"unexpected value");
+    NSData *badData = [@"this is garbage" dataUsingEncoding:NSUTF8StringEncoding];
+    image = [postProcessor processValue:badData error:&error withContext:nil];
+    XCTAssertNotNil(error, @"expected error");
+    XCTAssertNil(image, @"unexpected value");
 }
 
 @end

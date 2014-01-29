@@ -19,31 +19,18 @@ NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSour
 
 @implementation RKPostProcessor
 
-#pragma mark - <NSCopying>
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    return [self.class new];
-}
-
 #pragma mark - Types
 
 - (Class)inputValueType
 {
-    return Nil; //anything
-}
-
-- (Class)outputValueType
-{
-    return Nil; //anything
+    return Nil;
 }
 
 #pragma mark - Processing
 
-- (void)processInputValue:(id)value inputError:(NSError *)error context:(id)context
+- (id)processValue:(id)value error:(NSError **)outError withContext:(id)context
 {
-    self.outputValue = value;
-    self.outputError = error;
+    return value;
 }
 
 @end
@@ -71,13 +58,6 @@ NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSour
     return nil;
 }
 
-#pragma mark - <NSCopying>
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    return [[self.class alloc] initWithBlock:self.block];
-}
-
 #pragma mark - Types
 
 - (Class)inputValueType
@@ -85,29 +65,24 @@ NSString *const RKPostProcessorSourceURLErrorUserInfoKey = @"RKPostProcessorSour
     return Nil; //anything
 }
 
-- (Class)outputValueType
-{
-    return Nil; //anything
-}
-
 #pragma mark - Processing
 
-- (void)processInputValue:(id)value inputError:(NSError *)error context:(id)context
+- (id)processValue:(id)value error:(NSError **)outError withContext:(id)context
 {
     RKPossibility *input;
     if(value)
         input = [[RKPossibility alloc] initWithValue:value];
-    else if(error)
-        input = [[RKPossibility alloc] initWithError:error];
     else
         input = [[RKPossibility alloc] initEmpty];
     
     RKPossibility *result = self.block(input, context);
     
-    if(result.state == kRKPossibilityStateError)
-        self.outputError = result.error;
-    else if(result.state == kRKPossibilityStateValue)
-        self.outputValue = result.value;
+    if(result.state == kRKPossibilityStateError) {
+        if(outError) *outError = result.error;
+        return nil;
+    } else {
+        return result.value;
+    }
 }
 
 @end

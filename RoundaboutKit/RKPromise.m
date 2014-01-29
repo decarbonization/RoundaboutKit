@@ -135,7 +135,9 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
     
     RKPromise *whenPromise = [RKPromise new];
     
-    NSOperationQueue *realizationQueue = [RKQueueManager commonQueue];
+    NSOperationQueue *realizationQueue = [NSOperationQueue new];
+    realizationQueue.name = @"com.roundabout.rk.promise.when.callbackqueue";
+    realizationQueue.maxConcurrentOperationCount = 1;
     [realizationQueue addOperationWithBlock:^{
         NSMutableArray *results = [promises mutableCopy];
         __block NSUInteger numberOfRealizedPromises = 0;
@@ -174,36 +176,21 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
 
 #pragma mark - Propagating Values
 
-///Takes an input value and error, passes them through any post-processors
-///associated with the promise, and sets the receivers `self.contents` and
-///`self.state` properties.
-///
-/// \param  value   The value that was accepted, if any.
-/// \param  error   The error occurred, if any. This value being non-nil
-///                 indicates to post-processors that an error occurred.
-///
-///The `self.contents` and `self.state` properties will be set after this
-///method finishes executing. This method should _only_ be called when the
-///`_stateGuard` is locked.
-- (void)processValue:(id)value error:(NSError *)error
+- (id)postProcessAcceptedValue:(id)value error:(NSError **)outError
 {
+    NSError *error = nil;
     for (RKPostProcessor *postProcessor in _postProcessors) {
         if([postProcessor inputValueType] && value && ![value isKindOfClass:[postProcessor inputValueType]])
             [NSException raise:NSInvalidArgumentException format:@"Post-processor %@ given value of type %@, expected %@.", postProcessor, [value class], [postProcessor inputValueType]];
         
-        [postProcessor processInputValue:value inputError:error context:self];
-        
-        value = postProcessor.outputValue;
-        error = postProcessor.outputError;
+        value = [postProcessor processValue:value error:&error withContext:self];
+        if(error)
+            break;
     }
     
-    if(error) {
-        self.contents = error;
-        self.state = kRKPromiseStateRejectedWithError;
-    } else {
-        self.contents = value;
-        self.state = kRKPromiseStateAcceptedWithValue;
-    }
+    if(outError) *outError = error;
+    
+    return value;
 }
 
 #pragma mark -
@@ -216,7 +203,17 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
                                      userInfo:nil];
     
     with_locked_state(&_stateGuard, ^{
-        [self processValue:value error:nil];
+        NSError *error = nil;
+        id processedValue = [self postProcessAcceptedValue:value error:&error];
+        if(error) {
+            self.contents = error;
+            self.state = kRKPromiseStateRejectedWithError;
+        } else {
+            self.contents = processedValue;
+            self.state = kRKPromiseStateAcceptedWithValue;
+            
+        }
+        
         [self invoke];
     });
 }
@@ -229,7 +226,9 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
                                      userInfo:nil];
     
     with_locked_state(&_stateGuard, ^{
-        [self processValue:nil error:error];
+        self.contents = error;
+        self.state = kRKPromiseStateRejectedWithError;
+        
         [self invoke];
     });
 }

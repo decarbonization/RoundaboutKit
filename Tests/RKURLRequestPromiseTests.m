@@ -249,14 +249,14 @@
 
 - (void)testPostProcessorChaining
 {
-    RKLegacyPostProcessorBlock postProcessor1 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    RKSimplePostProcessorBlock postProcessor1 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
         return [maybeData refineValue:^RKPossibility *(NSString *value) {
             NSString *newValue = [value stringByAppendingString:@" fizz"];
             return [[RKPossibility alloc] initWithValue:newValue];
         }];
     };
     
-    RKLegacyPostProcessorBlock postProcessor2 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
+    RKSimplePostProcessorBlock postProcessor2 = ^RKPossibility *(RKPossibility *maybeData, RKURLRequestPromise *request) {
         return [maybeData refineValue:^RKPossibility *(NSString *value) {
             NSString *newValue = [value stringByAppendingString:@"buzz"];
             return [[RKPossibility alloc] initWithValue:newValue];
@@ -265,7 +265,7 @@
     
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    RKLegacyPostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
+    RKSimplePostProcessorBlock postProcessor3 = RKPostProcessorBlockChain(postProcessor1, postProcessor2);
 #pragma clang diagnostic pop
     RKPossibility *result = postProcessor3([[RKPossibility alloc] initWithValue:@"it should equal"], nil);
     XCTAssertEqual(result.state, kRKPossibilityStateValue, @"Unexpected state");

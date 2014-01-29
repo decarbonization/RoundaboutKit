@@ -18,22 +18,32 @@
 
 @implementation RKJSONPostProcessor
 
++ (instancetype)sharedPostProcessor
+{
+    static RKJSONPostProcessor *sharedPostProcessor = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedPostProcessor = [self new];
+    });
+    
+    return sharedPostProcessor;
+}
+
+#pragma mark - Types
+
 - (Class)inputValueType
 {
     return [NSData class];
 }
 
-- (void)processInputValue:(NSData *)data inputError:(NSError *)error context:(id)context
+#pragma mark - Processing
+
+- (id)processValue:(NSData *)data error:(NSError **)outError withContext:(id)context
 {
-    if(error) {
-        self.outputError = error;
-        return;
-    }
-    
     NSError *parseError = nil;
     id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&parseError];
     if(result) {
-        self.outputValue = result;
+        return result;
     } else {
         NSMutableDictionary *userInfoCopy = [[parseError userInfo] mutableCopy];
         
@@ -46,9 +56,11 @@
         if([context isKindOfClass:[RKURLRequestPromise class]])
             userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = ((RKURLRequestPromise *)context).request.URL;
         
-        self.outputError = [NSError errorWithDomain:parseError.domain
-                                               code:parseError.code
-                                           userInfo:userInfoCopy];
+        if(outError) *outError = [NSError errorWithDomain:parseError.domain
+                                                     code:parseError.code
+                                                 userInfo:userInfoCopy];
+        
+        return nil;
     }
 }
 
@@ -58,22 +70,32 @@
 
 @implementation RKPropertyListPostProcessor
 
++ (instancetype)sharedPostProcessor
+{
+    static RKPropertyListPostProcessor *sharedPostProcessor = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedPostProcessor = [self new];
+    });
+    
+    return sharedPostProcessor;
+}
+
+#pragma mark - Types
+
 - (Class)inputValueType
 {
     return [NSData class];
 }
 
-- (void)processInputValue:(NSData *)data inputError:(NSError *)error context:(id)context
+#pragma mark - Processing
+
+- (id)processValue:(NSData *)data error:(NSError **)outError withContext:(id)context
 {
-    if(error) {
-        self.outputError = error;
-        return;
-    }
-    
     NSError *parseError = nil;
     id result = [NSPropertyListSerialization propertyListWithData:data options:NSPropertyListImmutable format:NULL error:&parseError];
     if(result) {
-        self.outputValue = result;
+        return result;
     } else {
         NSMutableDictionary *userInfoCopy = [[parseError userInfo] mutableCopy];
         
@@ -86,9 +108,11 @@
         if([context isKindOfClass:[RKURLRequestPromise class]])
             userInfoCopy[RKPostProcessorSourceURLErrorUserInfoKey] = ((RKURLRequestPromise *)context).request.URL;
         
-        self.outputError = [NSError errorWithDomain:parseError.domain
-                                               code:parseError.code
-                                           userInfo:userInfoCopy];
+        if(outError) *outError = [NSError errorWithDomain:parseError.domain
+                                                     code:parseError.code
+                                                 userInfo:userInfoCopy];
+        
+        return nil;
     }
 }
 
@@ -98,26 +122,28 @@
 
 @implementation RKImagePostProcessor
 
++ (instancetype)sharedPostProcessor
+{
+    static RKImagePostProcessor *sharedPostProcessor = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedPostProcessor = [self new];
+    });
+    
+    return sharedPostProcessor;
+}
+
+#pragma mark - Types
+
 - (Class)inputValueType
 {
     return [NSData class];
 }
 
-- (Class)outputValueType
-{
-#if TARGET_OS_IPHONE
-    return [UIImage class];
-#else
-    return [NSImage class];
-#endif /* TARGET_OS_IPHONE */
-}
+#pragma mark - Processing
 
-- (void)processInputValue:(NSData *)data inputError:(NSError *)error context:(id)context
+- (id)processValue:(NSData *)data error:(NSError **)outError withContext:(id)context
 {
-    if(error) {
-        self.outputError = error;
-        return;
-    }
     
 #if TARGET_OS_IPHONE
     UIImage *image = [[UIImage alloc] initWithData:data];
@@ -125,11 +151,12 @@
     NSImage *image = [[NSImage alloc] initWithData:data];
 #endif /* TARGET_OS_IPHONE */
     if(image) {
-        self.outputValue = image;
+        return image;
     } else {
-        self.outputError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                               code:'!img'
-                                           userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}];
+        if(outError) *outError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
+                                                     code:'!img'
+                                                 userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}];
+        return nil;
     }
 }
 

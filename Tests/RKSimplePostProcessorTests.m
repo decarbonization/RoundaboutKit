@@ -8,11 +8,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface RKPostProcessorTests : XCTestCase
+@interface RKSimplePostProcessorTests : XCTestCase
 
 @end
 
-@implementation RKPostProcessorTests
+@implementation RKSimplePostProcessorTests
 
 - (void)setUp
 {
@@ -30,7 +30,7 @@
 
 - (void)testValue
 {
-    RKLegacyPostProcessor *valueProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKSimplePostProcessor *valueProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         XCTAssertNotNil(context, @"context missing");
         XCTAssertEqual(maybeData.state, kRKPossibilityStateValue, @"wrong possibility state");
         
@@ -39,16 +39,17 @@
         }];
     }];
     
-    [valueProcessor processInputValue:@"test" inputError:nil context:@"context"];
+    NSError *error = nil;
+    id value = [valueProcessor processValue:@"test" error:&error withContext:@"context"];
     
-    XCTAssertNil(valueProcessor.outputError, @"unexpected error");
-    XCTAssertNotNil(valueProcessor.outputValue, @"missing value");
-    XCTAssertEqualObjects(valueProcessor.outputValue, @"testfoo", @"wrong value");
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(value, @"missing value");
+    XCTAssertEqualObjects(value, @"testfoo", @"wrong value");
 }
 
 - (void)testError
 {
-    RKLegacyPostProcessor *errorProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKSimplePostProcessor *errorProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         XCTAssertNotNil(context, @"context missing");
         XCTAssertEqual(maybeData.state, kRKPossibilityStateValue, @"wrong possibility state");
         
@@ -59,10 +60,11 @@
         }];
     }];
     
-    [errorProcessor processInputValue:@"test" inputError:nil context:@"context"];
+    NSError *error = nil;
+    id value = [errorProcessor processValue:@"test" error:&error withContext:@"context"];
     
-    XCTAssertNotNil(errorProcessor.outputError, @"missing error");
-    XCTAssertNil(errorProcessor.outputValue, @"unexpected value");
+    XCTAssertNotNil(error, @"missing error");
+    XCTAssertNil(value, @"unexpected value");
 }
 
 @end

@@ -21,48 +21,43 @@ RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
 ///and produces either an error or another object. They can be chained together
 ///to perform data conversions such as `NSData -> NSDictionary -> ModelObject`.
 ///
-///Post processors specify their input and output types, and propagate their state
-///through readwrite properties. Runtime type-checking can be performed by clients
-///of the post-processor system.
+///Post-processors may specify an input type through their `+[self inputValueType]`
+///method. Runtime type-checking will be performed by the clients of RKPostProcessor
+///contained in RoundaboutKit.
+///
+///Post-processors perform their work using their primitive method `+[self processValue:
+///error:withContext:]`. Post-processors are assumed to be stateless. Subclasses should
+///provide singletons to reduce memory usage.
 ///
 ///The RKPostProcessor root class simply passes its input value and error into its output properties.
-@interface RKPostProcessor : NSObject <NSCopying>
+@interface RKPostProcessor : NSObject
 
 #pragma mark - Types
 
 ///Returns the expected class for input values given to the post-processor.
 ///
-///Return nil to indicate `id` for any type is acceptable.
+///Return nil to indicate any type is acceptable.
 - (Class)inputValueType;
-
-///Returns the class that output values will be an instance of.
-///
-///Return nil to indicate `id` for any type is possible.
-- (Class)outputValueType;
-
-#pragma mark - Output
-
-///The end result of the post-processor.
-@property (nonatomic) id outputValue;
-
-///An error describing any issues that occurred during post-processing.
-@property (nonatomic) NSError *outputError;
 
 #pragma mark - Processing
 
-///Perform the post-processor's logic on a given input value and error,
-///setting the `self.outputValue` and `self.outputError` properties of
-///the receiver.
+///Perform the post-processor's logic on a given input value,
+///placing any processing errors into the `outError` pointer,
+///and returning the processed value.
 ///
-/// \param  value   A result value of type `-[self inputValueType]`. May be nil.
-/// \param  error   A result error. May be nil. This parameter should be used to
-///                 determine if the previous work performed failed.
-/// \param  context The object that is invoking the post-processor. When a post-
-///                 processor is being used with RKPromise, this will be the RKPromise.
+/// \param  value       A value of type `-[self inputValueType]`. May be nil.
+/// \param  outError    A pointer that should be populated with an error if
+///                     an issue arrises during post-processing.
+/// \param  context     The object that is invoking the post-processor. When a
+///                     post-processor is being used with RKPromise, this will
+///                     be the RKPromise. May be nil.
+///
+/// \result A value. nil is considered a valid value.
+///         To indicate an error, write to `outError`.
 ///
 ///This method is always invoked from a background thread. Post-processors
 ///are never shared between threads.
-- (void)processInputValue:(id)value inputError:(NSError *)error context:(id)context;
+- (id)processValue:(id)value error:(NSError **)outError withContext:(id)context;
 
 @end
 

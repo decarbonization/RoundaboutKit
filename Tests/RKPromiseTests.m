@@ -124,7 +124,7 @@
 
 - (void)testExceptionSafety
 {
-    RKLegacyPostProcessor *throwingPostProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKSimplePostProcessor *throwingPostProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         [NSException raise:NSInternalInconsistencyException format:@"Just not gonna work."];
         return nil;
     }];
@@ -170,7 +170,7 @@
 
 - (void)testSuccessPostProcessor
 {
-    RKLegacyPostProcessor *goodProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKSimplePostProcessor *goodProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         return [maybeData refineValue:^RKPossibility *(NSString *string) {
             return [[RKPossibility alloc] initWithValue:[string stringByAppendingString:@"foo"]];
         }];
@@ -189,7 +189,7 @@
 
 - (void)testFailurePostProcessor
 {
-    RKLegacyPostProcessor *badProcessor = [[RKLegacyPostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
+    RKSimplePostProcessor *badProcessor = [[RKSimplePostProcessor alloc] initWithBlock:^RKPossibility *(RKPossibility *maybeData, id context) {
         return [maybeData refineValue:^RKPossibility *(NSString *string) {
             return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:@"SillyErrorDomain"
                                                                             code:'dumb'

@@ -11,6 +11,9 @@
 ///Consumes an NSData containing JSON, yields a JSON object.
 @interface RKJSONPostProcessor : RKPostProcessor
 
+///Returns the shared post processor, creating it if it does not already exist.
++ (instancetype)sharedPostProcessor;
+
 @end
 
 #pragma mark -
@@ -18,11 +21,17 @@
 ///Consumes an NSData containing property list data, yields a property list object.
 @interface RKPropertyListPostProcessor : RKPostProcessor
 
+///Returns the shared post processor, creating it if it does not already exist.
++ (instancetype)sharedPostProcessor;
+
 @end
 
 #pragma mark -
 
 ///Consumes an NSData containing image data, yields an NSImage/UIImage.
 @interface RKImagePostProcessor : RKPostProcessor
+
+///Returns the shared post processor, creating it if it does not already exist.
++ (instancetype)sharedPostProcessor;
 
 @end
