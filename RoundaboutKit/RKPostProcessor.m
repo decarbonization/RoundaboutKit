@@ -124,7 +124,7 @@ RKSimplePostProcessorBlock const kRKImagePostProcessorBlock = ^RKPossibility *(R
             return [[RKPossibility alloc] initWithValue:image];
         } else {
             return [[RKPossibility alloc] initWithError:[NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                                                            code:'!img'
+                                                                            code:kRKErrorCodeNotAnImage
                                                                         userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}]];
         }
     }];

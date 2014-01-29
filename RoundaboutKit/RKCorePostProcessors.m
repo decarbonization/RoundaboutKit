@@ -154,7 +154,7 @@
         return image;
     } else {
         if(outError) *outError = [NSError errorWithDomain:RKURLRequestPromiseErrorDomain
-                                                     code:'!img'
+                                                     code:kRKErrorCodeNotAnImage
                                                  userInfo:@{NSLocalizedDescriptionKey: @"Could not load image"}];
         return nil;
     }

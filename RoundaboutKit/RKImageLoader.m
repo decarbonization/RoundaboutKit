@@ -152,7 +152,7 @@
                 [self.knownInvalidCacheIdentifiers addObject:imagePromise.cacheIdentifier];
             [self.imageMap removeObjectForKey:imageView];
             
-            if(error.code != '!img')
+            if(error.code != kRKErrorCodeNotAnImage)
                 RKLogError(@"Could not load image. %@", error);
             
             if(completionHandler)

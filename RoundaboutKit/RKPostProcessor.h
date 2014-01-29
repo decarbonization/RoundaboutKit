@@ -17,6 +17,12 @@ RK_EXTERN NSString *const RKPostProcessorBadValueStringRepresentationErrorUserIn
 ///The key used to embed the source URL of an error, if possible.
 RK_EXTERN NSString *const RKPostProcessorSourceURLErrorUserInfoKey;
 
+enum {
+    ///The error code used by image-loading post-processors when they
+    ///cannot convert some data into an image due to it not being an image.
+    kRKErrorCodeNotAnImage = '!img',
+};
+
 ///An RKPostProcessor takes an input value and error, performs some work on it,
 ///and produces either an error or another object. They can be chained together
 ///to perform data conversions such as `NSData -> NSDictionary -> ModelObject`.
