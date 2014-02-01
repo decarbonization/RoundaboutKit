@@ -8,6 +8,10 @@
 
 #import "RKPersister.h"
 
+#if TARGET_OS_IPHONE
+#   import <UIKit/UIKit.h>
+#endif /* TARGET_OS_IPHONE */
+
 NSString *const RKPersisterDidLoadNotification = @"RKPersisterDidLoadNotification";
 NSString *const RKPersisterDidSaveNotification = @"RKPersisterDidSaveNotification";
 NSString *const RKPersisterDidFailToSaveNotification = @"RKPersisterDidFailToSaveNotification";
