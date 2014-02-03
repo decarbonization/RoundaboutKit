@@ -137,10 +137,10 @@
     RKURLRequestPromiseOfflineBehavior offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
     if([request.HTTPMethod isEqualToString:@"GET"] && self.readCacheManager != nil) {
         cacheManager = self.readCacheManager;
-        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
+        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable;
     } else if(![request.HTTPMethod isEqualToString:@"DELETE"] && self.writeCacheManager != nil) {
         cacheManager = self.writeCacheManager;
-        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
+        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable;
     }
     
     RKURLRequestPromise *requestPromise = [[RKURLRequestPromise alloc] initWithRequest:request

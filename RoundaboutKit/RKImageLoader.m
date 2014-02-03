@@ -167,7 +167,7 @@
     
     NSURLRequest *imageURLRequest = [NSURLRequest requestWithURL:url];
     RKURLRequestPromise *imagePromise = [[RKURLRequestPromise alloc] initWithRequest:imageURLRequest
-                                                                     offlineBehavior:kRKURLRequestPromiseOfflineBehaviorUseCache
+                                                                     offlineBehavior:kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable
                                                                         cacheManager:self.cacheManager];
     [imagePromise addPostProcessor:[RKImagePostProcessor sharedPostProcessor]];
     

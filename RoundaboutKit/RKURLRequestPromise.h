@@ -116,12 +116,7 @@ typedef NS_ENUM(NSInteger, RKURLRequestPromiseOfflineBehavior) {
     
     ///The promise should attempt to use any existing
     ///persistent cache before resorting to failure.
-    kRKURLRequestPromiseOfflineBehaviorUseCache = 1,
-    
-    
-    
-    ///Chooses the best cache behavior based on if a cache manager was provided.
-    kRKURLRequestPromiseOfflineBehaviorAutomatic = -1,
+    kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable = 1,
 };
 
 #pragma mark -
@@ -168,7 +163,7 @@ typedef NS_ENUM(NSInteger, RKURLRequestPromiseOfflineBehavior) {
 ///When server headers do not contain cache identification information, there are
 ///multiple behaviors that can occur depending on the value of `self.offlineBehavior`.
 ///
-/// -   `kRKURLRequestPromiseOfflineBehaviorUseCache`: the cache is unconditionally
+/// -   `kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable`: the cache is unconditionally
 ///     saved to the disc with an arbitrary revision associated with it. This enables
 ///     the cached response to be used when there is no internet connection available.
 /// -   `kRKURLRequestPromiseOfflineBehaviorFail`: The cache is completely ignored.
@@ -211,9 +206,6 @@ typedef NS_ENUM(NSInteger, RKURLRequestPromiseOfflineBehavior) {
 /// \param  cacheManager    The manager to read and write persistent cache to and from.
 ///
 /// \result A fully initialized request-promise ready for use.
-///
-///__Important:__ Unless a cache manager is provided, `offlineBehavior` must be
-///`kRKURLRequestPromiseOfflineBehaviorFail` or an exception will be raised.
 ///
 ///It is recommended to use `RKRequestFactory` instead of creating RKURLRequestPromises directly.
 - (instancetype)initWithRequest:(NSURLRequest *)request

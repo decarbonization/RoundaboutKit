@@ -123,18 +123,17 @@ static BOOL gActivityLoggingEnabled = NO;
         
         self.cacheManager = cacheManager;
         
-        if(offlineBehavior == kRKURLRequestPromiseOfflineBehaviorAutomatic) {
-            if(self.cacheManager)
-                self.offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
-            else
+        switch (offlineBehavior) {
+            case kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable:
+                if(cacheManager)
+                    self.offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable;
+                else
+                    self.offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
+                break;
+                
+            case kRKURLRequestPromiseOfflineBehaviorFail:
                 self.offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
-        } else {
-            if(offlineBehavior != kRKURLRequestPromiseOfflineBehaviorFail && cacheManager == nil) {
-                [NSException raise:NSInvalidArgumentException
-                            format:@"Cannot use any offline behavior besides kRKURLRequestPromiseOfflineBehaviorFail without providing a cache manager."];
-            }
-            
-            self.offlineBehavior = offlineBehavior;
+                break;
         }
         
         self.connectivityManager = [RKConnectivityManager defaultInternetConnectivityManager];
@@ -400,7 +399,7 @@ static BOOL gActivityLoggingEnabled = NO;
     
     if(self.cacheManager) {
         NSString *cacheMarker = self.response.allHeaderFields[kETagHeaderKey] ?: self.response.allHeaderFields[kExpiresHeaderKey];
-        if(!cacheMarker && self.offlineBehavior == kRKURLRequestPromiseOfflineBehaviorUseCache)
+        if(!cacheMarker && self.offlineBehavior == kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable)
             cacheMarker = kDefaultRevision;
         
         if(cacheMarker) {
@@ -469,7 +468,7 @@ RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePos
     
     RKURLRequestPromiseOfflineBehavior offlineBehavior;
     if(useCacheWhenOffline && cacheManager)
-        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCache;
+        offlineBehavior = kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable;
     else
         offlineBehavior = kRKURLRequestPromiseOfflineBehaviorFail;
     

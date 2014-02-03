@@ -207,7 +207,7 @@
     
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:PLAIN_TEXT_URL_STRING]];
     RKURLRequestPromise *testPromise = [[RKURLRequestPromise alloc] initWithRequest:request
-                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorUseCache
+                                                                    offlineBehavior:kRKURLRequestPromiseOfflineBehaviorUseCacheIfAvailable
                                                                        cacheManager:cacheManager];
     testPromise.cacheIdentifier = kCacheIdentifier;
     testPromise.connectivityManager = [[RKConnectivityManager alloc] initWithHostName:PLAIN_TEXT_URL_STRING];
