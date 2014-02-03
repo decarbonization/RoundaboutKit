@@ -207,4 +207,48 @@
     XCTAssertNil(value, @"unexpected value value");
 }
 
+#pragma mark - RKBlockPromise
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+- (void)testSuccessBlockPromise
+{
+    RKBlockPromise *blockPromise = [[RKBlockPromise alloc] initWithWorker:^(RKBlockPromise *me, RKPromiseSuccessBlock onSuccess, RKPromiseFailureBlock onFailure) {
+        XCTAssertNotNil(me, @"expected me");
+        XCTAssertNotNil(onSuccess, @"expected onSuccess");
+        XCTAssertNotNil(onFailure, @"expected onFailure");
+        
+        onSuccess(@"It worked!");
+    }];
+    
+    NSError *error = nil;
+    id value = RKAwait(blockPromise, &error);
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(value, @"expected value");
+    XCTAssertEqualObjects(value, @"It worked!", @"unexpected value");
+}
+
+- (void)testFailBlockPromise
+{
+    RKBlockPromise *blockPromise = [[RKBlockPromise alloc] initWithWorker:^(RKBlockPromise *me, RKPromiseSuccessBlock onSuccess, RKPromiseFailureBlock onFailure) {
+        XCTAssertNotNil(me, @"expected me");
+        XCTAssertNotNil(onSuccess, @"expected onSuccess");
+        XCTAssertNotNil(onFailure, @"expected onFailure");
+        
+        NSError *error = [NSError errorWithDomain:@"SillyErrorDomain"
+                                             code:'dumb'
+                                         userInfo:@{NSLocalizedDescriptionKey: @"It worked!"}];
+        onFailure(error);
+    }];
+    
+    NSError *error = nil;
+    id value = RKAwait(blockPromise, &error);
+    XCTAssertNotNil(error, @"expected error");
+    XCTAssertNil(value, @"unexpected value");
+    XCTAssertEqualObjects(error.domain, @"SillyErrorDomain", @"unexpected error domain");
+}
+
+#pragma clang diagnostic pop
+
 @end
