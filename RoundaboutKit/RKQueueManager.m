@@ -54,3 +54,13 @@
 }
 
 @end
+
+#pragma mark -
+
+RK_OVERLOADABLE void RKDoAsync(dispatch_block_t actions)
+{
+    if(!actions)
+        return;
+    
+    [[RKQueueManager commonWorkQueue] addOperationWithBlock:actions];
+}

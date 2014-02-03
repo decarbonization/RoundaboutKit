@@ -383,3 +383,70 @@ RK_INLINE void with_locked_state(pthread_mutex_t *mutex, dispatch_block_t block)
 }
 
 @end
+
+#pragma mark -
+
+@implementation RKBlockPromise
+
++ (NSOperationQueue *)defaultBlockPromiseQueue
+{
+    return [RKQueueManager commonWorkQueue];
+}
+
+#pragma mark - Lifecycle
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+- (id)initWithWorker:(RKBlockPromiseWorker)worker
+{
+    return [self initWithWorker:worker operationQueue:[self.class defaultBlockPromiseQueue]];
+}
+
+- (id)initWithWorker:(RKBlockPromiseWorker)worker operationQueue:(NSOperationQueue *)operationQueue
+{
+    NSParameterAssert(worker);
+    NSParameterAssert(operationQueue);
+    
+    if((self = [super init])) {
+        _worker = worker;
+        self.operationQueue = operationQueue;
+    }
+    
+    return self;
+}
+
+#pragma clang diagnostic pop
+
+#pragma mark - <RKLazy>
+
+- (void)fire
+{
+    [self.operationQueue addOperationWithBlock:^{
+        if(self.canceled)
+            return;
+        
+        _worker(self, ^(id value) {
+            if(self.canceled)
+                return;
+            
+            [self accept:value];
+        }, ^(NSError *error) {
+            if(self.canceled)
+                return;
+            
+            [self reject:error];
+        });
+    }];
+}
+
+#pragma mark - <RKCancelable>
+
+@synthesize canceled = _canceled;
+
+- (void)cancel:(id)sender
+{
+    _canceled = YES;
+}
+
+@end

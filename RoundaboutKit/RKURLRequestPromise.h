@@ -278,7 +278,7 @@ typedef NS_ENUM(NSInteger, RKURLRequestPromiseOfflineBehavior) {
 ///The older name for blocks of type `RKSimplePostProcessorBlock`. Deprecated
 ///
 /// \seealso(RKSimplePostProcessorBlock)
-typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
+typedef RKSimplePostProcessorBlock RKPostProcessorBlock RK_DEPRECATED_SINCE_2_1;
 
 ///Returns a new block that will be given the result of an earlier block.
 ///
@@ -290,7 +290,7 @@ typedef RKSimplePostProcessorBlock RKPostProcessorBlock DEPRECATED_ATTRIBUTE;
 ///
 ///This function is deprecated. Use an array of independent post-processors instead.
 RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePostProcessorBlock source,
-                                                                            RKSimplePostProcessorBlock refiner) DEPRECATED_ATTRIBUTE;
+                                                                            RKSimplePostProcessorBlock refiner) RK_DEPRECATED_SINCE_2_1;
 
 #pragma mark -
 
@@ -318,15 +318,15 @@ RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSi
 - (id)initWithRequest:(NSURLRequest *)request
          cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
   useCacheWhenOffline:(BOOL)useCacheWhenOffline
-         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED DEPRECATED_ATTRIBUTE;
+         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED RK_DEPRECATED_SINCE_2_1;
 
 ///Deprecated. See `[self initWithRequest:offlineBehavior:cacheManager:]`.
 - (id)initWithRequest:(NSURLRequest *)request
          cacheManager:(id <RKURLRequestPromiseCacheManager>)cacheManager
-         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED DEPRECATED_ATTRIBUTE;
+         requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED RK_DEPRECATED_SINCE_2_1;
 
 ///Deprecated. See `[self initWithRequest:offlineBehavior:cacheManager:]`.
-- (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED DEPRECATED_ATTRIBUTE;
+- (id)initWithRequest:(NSURLRequest *)request requestQueue:(NSOperationQueue *)requestQueue RK_REQUIRE_RESULT_USED RK_DEPRECATED_SINCE_2_1;
 
 #pragma mark -
 
@@ -337,7 +337,7 @@ RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSi
 ///If a queue is provided through one of the legacy deprecated initializers,
 ///it will be used over the new internal queue. Clients should migrate away
 ///from relying on external queues as soon as possible.
-@property (RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue DEPRECATED_ATTRIBUTE;
+@property (RK_NONATOMIC_IOSONLY) NSOperationQueue *requestQueue RK_DEPRECATED_SINCE_2_1;
 
 ///The post processor to invoke on the URL request promise.
 ///This is the legacy interface for post-processors. Use
@@ -353,7 +353,7 @@ RK_EXTERN_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSi
 ///any post-processors attached to the promise, and attempting
 ///to add a post-processor through `-[RKPromise addPostProcessor:]`
 ///will raise if this property is not nil.
-@property (nonatomic, copy) RKSimplePostProcessorBlock postProcessor DEPRECATED_ATTRIBUTE;
+@property (nonatomic, copy) RKSimplePostProcessorBlock postProcessor RK_DEPRECATED_SINCE_2_1;
 
 @end
 

@@ -142,7 +142,7 @@ RK_EXTERN void(^kRKPossibilityDefaultErrorMatcher)(NSError *);
 /// Empty -> return emptyRefiner();
 /// NSError(value) -> return errorRefiner(error);
 ///}
-RK_EXTERN_OVERLOADABLE DEPRECATED_ATTRIBUTE RKPossibility *RKRefinePossibility(RKPossibility *possibility,
+RK_EXTERN_OVERLOADABLE RK_DEPRECATED_SINCE_2_1 RKPossibility *RKRefinePossibility(RKPossibility *possibility,
                                                                                RKPossibility *(^valueRefiner)(id value),
                                                                                RKPossibility *(^emptyRefiner)(),
                                                                                RKPossibility *(^errorRefiner)(NSError *error));
@@ -159,7 +159,7 @@ RK_EXTERN_OVERLOADABLE DEPRECATED_ATTRIBUTE RKPossibility *RKRefinePossibility(R
 /// Empty -> empty();
 /// NSError(value) -> error(error);
 ///}
-RK_EXTERN_OVERLOADABLE DEPRECATED_ATTRIBUTE void RKMatchPossibility(RKPossibility *possibility,
+RK_EXTERN_OVERLOADABLE RK_DEPRECATED_SINCE_2_1 void RKMatchPossibility(RKPossibility *possibility,
                                                                     void(^value)(id value),
                                                                     void(^empty)(),
                                                                     void(^error)(NSError *error));

@@ -17,9 +17,15 @@
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
 #define RoundaboutKit_Stable                            1
 
+#pragma mark - Compile Time Options
+
 ///Whether or not the RoundaboutKit should emit warnings
 ///for questionable but presently valid behaviour.
 #define RoundaboutKit_EmitWarnings                      1
+
+///Whether or not compiler diagnostics for
+///deprecated entities should be included.
+#define RoundaboutKit_EmitDeprecationWarnings           1
 
 ///Whether or not RoundaboutKit should include
 ///the legacy RKRealize function available.
@@ -71,8 +77,17 @@
 
 #define RK_INLINE                   static inline
 
+#pragma mark - Markers
+
 ///Causes any function or method decorated to emit a warning when its return result is not used.
 #define RK_REQUIRE_RESULT_USED      __attribute__((warn_unused_result))
+
+///Causes a decorated entity to emit a deprecated warning when used.
+#if RoundaboutKit_EmitDeprecationWarnings
+#   define RK_DEPRECATED_SINCE_2_1     DEPRECATED_ATTRIBUTE
+#else
+#   define RK_DEPRECATED_SINCE_2_1
+#endif /* RoundaboutKit_EmitDeprecationWarnings */
 
 #pragma mark - Thread-Safety Goop
 

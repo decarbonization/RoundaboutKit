@@ -288,3 +288,39 @@ RK_INLINE RK_OVERLOADABLE id RKAwait(RKPromise *promise)
 }
 
 #endif /* RoundaboutKit_EnableLegacyRealization */
+
+#pragma mark -
+
+@class RKBlockPromise;
+
+///Deprecated. Use `RKPromiseAcceptedNotificationBlock` instead.
+typedef RKPromiseAcceptedNotificationBlock RKPromiseSuccessBlock RK_DEPRECATED_SINCE_2_1;
+
+///Deprecated. Use `RKPromiseRejectedNotificationBlock` instead.
+typedef RKPromiseRejectedNotificationBlock RKPromiseFailureBlock RK_DEPRECATED_SINCE_2_1;
+
+///Deprecated without replacement.
+typedef void(^RKBlockPromiseWorker)(RKBlockPromise *me, RKPromiseSuccessBlock onSuccess, RKPromiseFailureBlock onFailure) RK_DEPRECATED_SINCE_2_1;
+
+///Deprecated. Same behavior can be accomplished with RKQueueManager and an RKPromise.
+RK_DEPRECATED_SINCE_2_1
+@interface RKBlockPromise : RKPromise <RKLazy, RKCancelable>
+{
+	RKBlockPromiseWorker mWorker;
+    BOOL mCanCancel;
+	BOOL mHasBeenRealized;
+}
+
++ (NSOperationQueue *)defaultBlockPromiseQueue RK_DEPRECATED_SINCE_2_1;
+
+#pragma mark -
+
+- (id)initWithWorker:(RKBlockPromiseWorker)worker RK_REQUIRE_RESULT_USED;
+- (id)initWithWorker:(RKBlockPromiseWorker)worker operationQueue:(NSOperationQueue *)operationQueue RK_REQUIRE_RESULT_USED;
+
+#pragma mark - Properties
+
+@property (readonly) RKBlockPromiseWorker worker;
+@property NSOperationQueue *operationQueue;
+
+@end

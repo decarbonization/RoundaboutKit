@@ -6,6 +6,9 @@
 //  Copyright (c) 2013 Roundabout Software, LLC. All rights reserved.
 //
 
+#ifndef RKQueueManager_h
+#define RKQueueManager_h 1
+
 #import <Foundation/Foundation.h>
 
 ///The RKQueueManager class manages a collection of named queues which tasks can be executed on.
@@ -41,3 +44,10 @@
 + (NSOperationQueue *)commonWorkQueue;
 
 @end
+
+#pragma mark -
+
+///Deprecated.
+RK_EXTERN_OVERLOADABLE void RKDoAsync(dispatch_block_t actions) RK_DEPRECATED_SINCE_2_1;
+
+#endif /* RKQueueManager_h */

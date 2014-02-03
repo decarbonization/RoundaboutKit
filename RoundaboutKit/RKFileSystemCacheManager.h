@@ -26,7 +26,7 @@
 #pragma mark - Properties
 
 ///The name of the bucket associated with this cache manager.
-@property (readonly, copy) NSString *bucketName DEPRECATED_ATTRIBUTE;
+@property (readonly, copy) NSString *bucketName RK_DEPRECATED_SINCE_2_1;
 
 ///The maximum size of the cache. Defaults to 30 MB.
 ///
