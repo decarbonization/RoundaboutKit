@@ -1,22 +1,17 @@
 RoundaboutKit
 =============
 
-RoundaboutKit is a collection of abstractions, utility functions, and a full networking stack to assist in the creation of modern applications.
+RoundaboutKit is a collection of asynchronous programming abstractions, utility functions, and a networking stack to assist in the creation of applications.
 
-Tests
-=====
+iOS
+===
 
-The tests for RoundaboutKit live in an Xcode project in the repo called `RoundaboutKitTests`. To run, launch Xcode and press `command+u`.
-
-Requirements
-============
-
-RoundaboutKit requires the `SystemConfiguration` framework be added to the host project in order to link.
+In order to use RoundaboutKit on iOS, link the `SystemConfiguration` framework. 
 
 License
 =======
 
-	Copyright (c) 2012-2013, Roundabout Software, LLC.
+	Copyright (c) 2012-2014, Roundabout Software, LLC.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
