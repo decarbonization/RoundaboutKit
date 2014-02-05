@@ -20,5 +20,6 @@ Pod::Spec.new do |s|
   s.prefix_header_file = "RoundaboutKit/RoundaboutKit-Prefix.pch"
   
   s.framework  = 'SystemConfiguration'
-  s.requires_arc = true
+  s.ios.requires_arc = true
+  s.osx.requires_arc = true
 end
