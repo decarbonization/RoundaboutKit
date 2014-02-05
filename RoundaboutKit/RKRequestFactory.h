@@ -71,7 +71,7 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 #pragma mark -
 
 ///The authentication handler to use for requests.
-@property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
+@property (strong, RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
 
 ///The stringifier to use when serializing dictionaries into URL parameter strings.
 ///

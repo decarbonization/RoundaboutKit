@@ -219,7 +219,7 @@ typedef NS_ENUM(NSInteger, RKURLRequestPromiseOfflineBehavior) {
 ///Defaults to `+[RKConnectivityManager defaultInternetConnectivityManager]`.
 ///This property is primarily provided for the purposes of testing.
 ///Assigning nil to this property will raise an exception.
-@property (nonatomic) RKConnectivityManager *connectivityManager;
+@property (nonatomic, strong) RKConnectivityManager *connectivityManager;
 
 ///The URL request.
 @property (readonly, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
@@ -235,7 +235,7 @@ typedef NS_ENUM(NSInteger, RKURLRequestPromiseOfflineBehavior) {
 #pragma mark -
 
 ///The authentication handler of the request promise.
-@property (RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
+@property (strong, RK_NONATOMIC_IOSONLY) id <RKURLRequestAuthenticationHandler> authenticationHandler;
 
 #pragma mark - Cache
 

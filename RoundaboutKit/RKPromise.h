@@ -321,6 +321,6 @@ RK_DEPRECATED_SINCE_2_1
 #pragma mark - Properties
 
 @property (readonly) RKBlockPromiseWorker worker;
-@property NSOperationQueue *operationQueue;
+@property (strong) NSOperationQueue *operationQueue;
 
 @end
