@@ -241,6 +241,9 @@ static BOOL gActivityLoggingEnabled = NO;
     if(data) {
         self.isCacheLoaded = YES;
         
+        if (gActivityLoggingEnabled)
+            RKLogInfo(@"!!! Loaded cached data for %@", self.cacheIdentifier);
+
         [self acceptWithData:data];
     } else {
         NSError *removeError = nil;
