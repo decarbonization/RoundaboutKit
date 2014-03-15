@@ -242,7 +242,7 @@ static BOOL gActivityLoggingEnabled = NO;
         self.isCacheLoaded = YES;
         
         if (gActivityLoggingEnabled)
-            RKLogInfo(@"!!! Loaded cached data for %@", self.cacheIdentifier);
+            RKLogInfo(@"Loaded cached data for %@", self.cacheIdentifier);
 
         [self acceptWithData:data];
     } else {
