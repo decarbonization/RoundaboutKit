@@ -277,14 +277,105 @@ NSString *RKGenerateIdentifierForStrings(NSArray *strings)
 
 id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPath)
 {
-    NSCParameterAssert(keyPath);
+    return RKTraverseJson(dictionary, keyPath);
+}
+
+///The separator token used by enhanced key paths.
+static NSString *const kEnhancedKeyPathSeparator = @".";
+
+///The operator prefix used by enhanced key path operators.
+static NSString *const kEnhancedKeyPathOperatorMarker = @"@";
+
+///The token that marks the beginning of an assertion.
+static NSString *const kEnhancedKeyPathAssertionStart = @"{";
+
+///The token that marks the end of an assertion.
+static NSString *const kEnhancedKeyPathAssertionEnd = @"}";
+
+///The prefix that marks an assertion condition.
+static NSString *const kEnhancedKeyPathAssertionConditionPrefix = @"if ";
+
+///Splits a string containing an advanced key path, taking
+///into account that dots may appear within assertions.
+static NSArray *TokenizeEnhancedKeyPath(NSString *enhancedKeyPath)
+{
+    NSMutableArray *tokens = [NSMutableArray array];
+    
+    __block NSUInteger anchorPoint = 0;
+    __block NSUInteger nestedDirectivesCount = 0;
+    [enhancedKeyPath enumerateSubstringsInRange:NSMakeRange(0, enhancedKeyPath.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
+        if([substring isEqualToString:kEnhancedKeyPathSeparator] && nestedDirectivesCount == 0) {
+            NSRange tokenRange = NSMakeRange(anchorPoint, substringRange.location - anchorPoint);
+            NSString *token = [enhancedKeyPath substringWithRange:tokenRange];
+            [tokens addObject:token];
+            anchorPoint = NSMaxRange(substringRange);
+        } else if([substring isEqualToString:kEnhancedKeyPathAssertionStart]) {
+            nestedDirectivesCount++;
+        } else if([substring isEqualToString:kEnhancedKeyPathAssertionEnd]) {
+            if(nestedDirectivesCount == 0)
+                [NSException raise:NSInternalInconsistencyException
+                            format:@"Unexpected closing assertion curly brace in enhanced key path %@ at offset %lu", enhancedKeyPath, (unsigned long)substringRange.location];
+            nestedDirectivesCount--;
+        }
+    }];
+    
+    if(nestedDirectivesCount != 0)
+        [NSException raise:NSInternalInconsistencyException
+                    format:@"Expected closing assertion curly brace, found end of string."];
+    
+    if(anchorPoint < enhancedKeyPath.length) {
+        NSString *finalToken = [enhancedKeyPath substringWithRange:NSMakeRange(anchorPoint, enhancedKeyPath.length - anchorPoint)];
+        [tokens addObject:finalToken];
+    }
+    
+    return tokens;
+}
+
+id RKTraverseJson(NSDictionary *dictionary, NSString *enhancedKeyPath)
+{
+    NSCParameterAssert(enhancedKeyPath);
+    
     if(!RKFilterOutNSNull(dictionary))
         return nil;
     
-    NSArray *keys = [keyPath componentsSeparatedByString:@"."];
+    NSArray *components = TokenizeEnhancedKeyPath(enhancedKeyPath);
     id value = dictionary;
-    for (NSString *key in keys) {
-        value = RKFilterOutNSNull([value objectForKey:key]);
+    for (NSString *part in components) {
+        if([part hasPrefix:kEnhancedKeyPathOperatorMarker]) {
+            [NSException raise:NSInternalInconsistencyException
+                        format:@"RKTraverseJson does not support @keyPath operators."];
+        } else if([part hasPrefix:kEnhancedKeyPathAssertionStart] && [part hasSuffix:kEnhancedKeyPathAssertionEnd]) {
+            if(!value || value == dictionary)
+                [NSException raise:NSInternalInconsistencyException
+                            format:@"RKTraverseJson does not support assertions at the beginning of a key path."];
+            
+            NSRange assertionRange = NSMakeRange(kEnhancedKeyPathAssertionStart.length,
+                                                 part.length - (kEnhancedKeyPathAssertionStart.length + kEnhancedKeyPathAssertionEnd.length));
+            NSString *assertion = [part substringWithRange:assertionRange];
+            if([assertion hasPrefix:kEnhancedKeyPathAssertionConditionPrefix]) {
+                NSString *condition = [assertion substringFromIndex:kEnhancedKeyPathAssertionConditionPrefix.length];
+                NSPredicate *predicate = [NSPredicate predicateWithFormat:condition argumentArray:@[]];
+                if(![predicate evaluateWithObject:value])
+                    value = nil;
+            } else {
+                if([assertion isEqualToString:@"id"])
+                    continue;
+                
+                Class class = NSClassFromString(assertion);
+                if(class == Nil) {
+                    [NSException raise:NSInternalInconsistencyException
+                                format:@"RKTraverseJson encountered class with name %@ that does not exist.", assertion];
+                }
+                
+                if(![value isKindOfClass:class])
+                    value = nil;
+            }
+        } else {
+            value = RKFilterOutNSNull([value objectForKey:part]);
+        }
+        
+        if(!value)
+            break;
     }
     
     return value;

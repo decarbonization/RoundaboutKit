@@ -195,7 +195,7 @@ RK_EXTERN id RKCollectionReduce(id input, RKReducerBlock reducer);
 ///Returns the first object in a given collection.
 ///
 ///The passed in collection must be array-like and support subscript indexing and have a count method.
-RK_EXTERN id RKCollectionGetFirstObject(id collection) RK_DEPRECATED("Deprecated since RoundaboutKit 2.1. Use -[NSArray firstObject] instead.");
+RK_EXTERN id RKCollectionGetFirstObject(id collection) RK_DEPRECATED("Deprecated since RoundaboutKit 2.2. Use -[NSArray firstObject] instead.");
 
 ///Returns YES if any value in a given collection passes a specified predicate; NO otherwise.
 RK_EXTERN BOOL RKCollectionDoesAnyValueMatch(id input, RKPredicateBlock predicate);
@@ -223,8 +223,8 @@ RK_EXTERN NSArray *RKCollectionDeepCopy(id input);
  *  These functions cause the deprecated RK_CAST and RK_TRY_CAST to emit warnings
  *  at compile-time. Both legacy macros will be removed at a future date.
  */
-RK_DEPRECATED("RK_CAST is deprecated. Use RK_CAST_OR_THROW instead.") static inline void RKCastDeprecated(void) {}
-RK_DEPRECATED("RK_TRY_CAST is deprecated. Use RK_CAST_OR_NIL instead.") static inline void RKTryCastDeprecated(void) {}
+RK_DEPRECATED("RK_CAST is deprecated. Use RK_CAST_OR_THROW instead.") RK_INLINE void RKCastDeprecated(void) {}
+RK_DEPRECATED("RK_TRY_CAST is deprecated. Use RK_CAST_OR_NIL instead.") RK_INLINE void RKTryCastDeprecated(void) {}
 
 ///Perform a cast with a runtime check.
 #define RK_CAST_OR_THROW(ClassType, ...)    ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) [NSException raise:@"RKDynamicCastTypeMismatchException" format:@"%@ is not a %s", $value, #ClassType]; (ClassType *)$value; })
@@ -239,7 +239,7 @@ RK_DEPRECATED("RK_TRY_CAST is deprecated. Use RK_CAST_OR_NIL instead.") static i
 ///Returns a BOOL indicating whether or not the current process is running under a debugger.
 ///
 ///The result of this function is cached after its initial call.
-RK_EXTERN BOOL RKProcessIsRunningInDebugger() RK_DEPRECATED("Deprecated since RoundaboutKit 2.1. RKProcessIsRunningInDebugger no longer works.");
+RK_EXTERN BOOL RKProcessIsRunningInDebugger() RK_DEPRECATED("Deprecated since RoundaboutKit 2.2. RKProcessIsRunningInDebugger no longer works.");
 
 #pragma mark -
 
@@ -273,20 +273,70 @@ RK_INLINE id RKFilterOutNSNull(id value)
 ///
 /// \param  dictionary  The dictionary to index. Optional.
 /// \param  keyPath     The key path to search for in the dictionary.
-///                     This key path may not contain collection operators. Required.
 ///
 /// \result The value for the key assoicated with the `keyPath`.
 ///
 ///This function filters out NSNull values.
+///
+///Starting in RoundaboutKit 2.2, this function is an alias for RKTraverseJson,
+///and as such supports the enhanced key path type safety and predicate syntax.
+///
+///__Important:__ This function will be deprecated in a future version.
 RK_EXTERN id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPath);
+
+///Traverses a Json dictionary using a given enhanced key path.
+///
+/// \param  dictionary      The dictionary to traverse.
+/// \param  enhancedKeyPath An enhaneced key path to traverse the dictionary with. Required.
+///
+/// \result The value for the key path if no null leafs were encountered,
+///         *and* all of the assertions were satisfied; nil otherwise.
+///
+/// \throws NSInternalInconsistencyException when the key path contains unbalanced curly
+///         brackets, an @keyPath operator is found, a non-existent class is referenced,
+///         or an assertion is found at the beginning of a key path.
+///
+///The enhanced key path this function takes is an imperfect super-set of the syntax used
+///by `-[NSObject valueForKeyPath:]`. The same basic dot-syntax is used, however any time
+///an NSNull is encountered when traversing the path, the function will immediately return
+///nil. This method also supports some basic assertions. If any one of these checks fails,
+///the function will immediately return nil in the same manner it does for NSNull.
+///
+///__Important:__ this function currently only supports traversing NSDictionaries.
+///
+///Assertions:
+///===========
+///
+///Assertions take the form of either a class name enclosed in curly braces – like {NSString} –
+///or an NSPredicate prefixed with if, also enclosed in curly braces, like {if SELF[SIZE] != 0}.
+///Assertions operate on the value of the previous component in the path. I.e. the key path
+///`name.{NSString}` would find the value for name, and then check if it was an instance of
+///NSString. Applying an assertion at the beginning of a key path will raise an exception.
+///
+///Operators:
+///==========
+///
+///The enhanced key path syntax currently does not support the @keyPath operators provided
+///by the Foundation framework. These may be added at a future date.
+///
+///Examples:
+///=========
+///
+/// - data.firstName
+/// - data.{NSDictionary}.lastName.{NSString}
+/// - data.{NSDictionary}.associates.{NSArray}.{if SELF[SIZE] > 0}
+///
+RK_EXTERN id RKTraverseJson(NSDictionary *dictionary, NSString *enhancedKeyPath);
 
 #pragma mark -
 
 ///Returns the MD5 hash of a given string.
 ///
-/// \param  string  The string to get the hash for. May be nil.
+/// \param  string  The string to calculate the hash for. May be nil.
 ///
-/// \result An MD5 of the string.
+/// \result An MD5 hash of the string.
+///
+///__Important:__ This function will be deprecated in a future version.
 RK_EXTERN NSString *RKStringGetMD5Hash(NSString *string);
 
 #pragma mark -
