@@ -88,6 +88,26 @@ NSArray *RKCollectionFilterToArray(id input, RKPredicateBlock predicate)
 	return [result copyWithZone:[input zone]];
 }
 
+#pragma mark - • Reducing
+
+id RKCollectionReduce(id input, RKReducerBlock reducer)
+{
+    NSCParameterAssert(reducer);
+    if(!input)
+        return nil;
+    
+    NSEnumerator *enumerator = [input objectEnumerator];
+    id accumulator = [enumerator nextObject];
+    if(!accumulator)
+        return nil;
+    
+    for (id value = [enumerator nextObject]; value != nil; value = [enumerator nextObject]) {
+        accumulator = reducer(accumulator, value);
+    }
+    
+    return accumulator;
+}
+
 #pragma mark - • Matching
 
 id RKCollectionGetFirstObject(id collection)

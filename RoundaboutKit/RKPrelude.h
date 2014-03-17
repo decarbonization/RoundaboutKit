@@ -151,6 +151,9 @@ typedef BOOL(^RKPredicateBlock)(id value);
 ///A Mapper is a block that takes an object and performs an operation on it, returning the result.
 typedef id(^RKMapperBlock)(id value);
 
+///A reducer is a block that takes an accumulator and a value, and returns the sum of both.
+typedef id(^RKReducerBlock)(id accumulator, id value);
+
 #pragma mark - • Generation
 
 ///Returns a newly generated array of a given length.
@@ -171,6 +174,11 @@ RK_EXTERN NSOrderedSet *RKCollectionMapToOrderedSet(id input, RKMapperBlock mapp
 
 ///Returns a given collection filtered into an array.
 RK_EXTERN NSArray *RKCollectionFilterToArray(id input, RKPredicateBlock predicate);
+
+#pragma mark - • Reducing
+
+///Returns a reduced form of a given collection.
+RK_EXTERN id RKCollectionReduce(id input, RKReducerBlock reducer);
 
 #pragma mark - • Matching
 
