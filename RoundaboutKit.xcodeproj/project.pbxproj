@@ -69,6 +69,7 @@
 		8B91A3FC1876291200C87D47 /* RKPersister.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B91A3F91876291200C87D47 /* RKPersister.m */; };
 		8B91A3FD1876291700C87D47 /* RKPersister.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B91A3F81876291200C87D47 /* RKPersister.h */; };
 		8BD8DE7F18D78CA300D360E0 /* RKPreludeCollectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD8DE7E18D78CA300D360E0 /* RKPreludeCollectionTests.m */; };
+		8BD8DE8318D791B100D360E0 /* RKPreludeJsonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD8DE8218D791B100D360E0 /* RKPreludeJsonTests.m */; };
 		8BDA554417ED11E200848C2F /* RoundaboutKitMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */; };
 		8BDA554817ED11F200848C2F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDA554717ED11F200848C2F /* Cocoa.framework */; };
 		8BE806F71792189300DFEC35 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7583EF1792100D00D45F54 /* Cocoa.framework */; };
@@ -204,6 +205,7 @@
 		8B91A3F81876291200C87D47 /* RKPersister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPersister.h; sourceTree = "<group>"; };
 		8B91A3F91876291200C87D47 /* RKPersister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPersister.m; sourceTree = "<group>"; };
 		8BD8DE7E18D78CA300D360E0 /* RKPreludeCollectionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeCollectionTests.m; sourceTree = "<group>"; };
+		8BD8DE8218D791B100D360E0 /* RKPreludeJsonTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeJsonTests.m; sourceTree = "<group>"; };
 		8BDA554517ED11ED00848C2F /* RubyCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RubyCocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/RubyCocoa.framework; sourceTree = DEVELOPER_DIR; };
 		8BDA554717ED11F200848C2F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoundaboutKitMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -402,6 +404,7 @@
 				8B7584671792115600D45F54 /* RKTesting */,
 				8B7584541792114B00D45F54 /* RKPreludeTests.m */,
 				8BD8DE7E18D78CA300D360E0 /* RKPreludeCollectionTests.m */,
+				8BD8DE8218D791B100D360E0 /* RKPreludeJsonTests.m */,
 				8B39B3511899A5D30013F0FD /* Asynchrony */,
 				8B39B3521899A5ED0013F0FD /* Networking */,
 				8B39B3571899A6120013F0FD /* Utilities */,
@@ -622,6 +625,7 @@
 				8B7584621792114B00D45F54 /* RKPossibilityTests.m in Sources */,
 				8B75845E1792114B00D45F54 /* RKFileSystemCacheManagerTests.m in Sources */,
 				8B7584661792114B00D45F54 /* RKRunLoopTestHelper.m in Sources */,
+				8BD8DE8318D791B100D360E0 /* RKPreludeJsonTests.m in Sources */,
 				8BD8DE7F18D78CA300D360E0 /* RKPreludeCollectionTests.m in Sources */,
 				8B7584631792114B00D45F54 /* RKPreludeTests.m in Sources */,
 				8B39B3501899A5BA0013F0FD /* RKRequestFactoryTests.m in Sources */,
