@@ -223,7 +223,7 @@
     }];
     
     NSError *error = nil;
-    id value = RKAwait(blockPromise, &error);
+    id value = [blockPromise waitForRealization:&error];
     XCTAssertNil(error, @"unexpected error");
     XCTAssertNotNil(value, @"expected value");
     XCTAssertEqualObjects(value, @"It worked!", @"unexpected value");
@@ -243,7 +243,7 @@
     }];
     
     NSError *error = nil;
-    id value = RKAwait(blockPromise, &error);
+    id value = [blockPromise waitForRealization:&error];
     XCTAssertNotNil(error, @"expected error");
     XCTAssertNil(value, @"unexpected value");
     XCTAssertEqualObjects(error.domain, @"SillyErrorDomain", @"unexpected error domain");

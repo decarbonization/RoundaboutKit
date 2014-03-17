@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version                           21L
+#define RoundaboutKit_Version                           22L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
 #define RoundaboutKit_Stable                            1
@@ -31,13 +31,13 @@
 ///the legacy RKRealize function available.
 ///
 ///RKRealize is deprecated and will be removed.
-#define RoundaboutKit_EnableLegacyRealization           1
+#define RoundaboutKit_EnableLegacyRealization           0
 
 ///Whether or not RoundaboutKit should include the
 ///legacy RKPossibility matching/refining functions.
 ///
 ///This functions are deprecated and will be removed.
-#define RoundaboutKit_EnableLegacyPossibilityFunctions  1
+#define RoundaboutKit_EnableLegacyPossibilityFunctions  0
 
 #pragma mark - Linkage Goop
 
@@ -82,11 +82,21 @@
 ///Causes any function or method decorated to emit a warning when its return result is not used.
 #define RK_REQUIRE_RESULT_USED      __attribute__((warn_unused_result))
 
-///Causes a decorated entity to emit a deprecated warning when used.
 #if RoundaboutKit_EmitDeprecationWarnings
-#   define RK_DEPRECATED_SINCE_2_1     DEPRECATED_ATTRIBUTE
+
+#   if __has_extension(attribute_deprecated_with_message)
+#       define RK_DEPRECATED(_Msg)  __attribute__((deprecated("" _Msg "")))
+#   else
+#       define RK_DEPRECATED(_Msg)  __attribute__((deprecated))
+#   endif /* __has_extension(attribute_deprecated_with_message) */
+
+#   define RK_DEPRECATED_SINCE_2_1     RK_DEPRECATED("Deprecated since RoundaboutKit 2.1")
+
 #else
+
+#   define RK_DEPRECATED
 #   define RK_DEPRECATED_SINCE_2_1
+
 #endif /* RoundaboutKit_EmitDeprecationWarnings */
 
 #pragma mark - Thread-Safety Goop
@@ -185,7 +195,7 @@ RK_EXTERN id RKCollectionReduce(id input, RKReducerBlock reducer);
 ///Returns the first object in a given collection.
 ///
 ///The passed in collection must be array-like and support subscript indexing and have a count method.
-RK_EXTERN id RKCollectionGetFirstObject(id collection);
+RK_EXTERN id RKCollectionGetFirstObject(id collection) RK_DEPRECATED("Deprecated since RoundaboutKit 2.1. Use -[NSArray firstObject] instead.");
 
 ///Returns YES if any value in a given collection passes a specified predicate; NO otherwise.
 RK_EXTERN BOOL RKCollectionDoesAnyValueMatch(id input, RKPredicateBlock predicate);
@@ -209,20 +219,27 @@ RK_EXTERN NSArray *RKCollectionDeepCopy(id input);
 
 #pragma mark - Safe Casting
 
+/*
+ *  These functions cause the deprecated RK_CAST and RK_TRY_CAST to emit warnings
+ *  at compile-time. Both legacy macros will be removed at a future date.
+ */
+RK_DEPRECATED("RK_CAST is deprecated. Use RK_CAST_OR_THROW instead.") static inline void RKCastDeprecated(void) {}
+RK_DEPRECATED("RK_TRY_CAST is deprecated. Use RK_CAST_OR_NIL instead.") static inline void RKTryCastDeprecated(void) {}
+
 ///Perform a cast with a runtime check.
 #define RK_CAST_OR_THROW(ClassType, ...)    ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) [NSException raise:@"RKDynamicCastTypeMismatchException" format:@"%@ is not a %s", $value, #ClassType]; (ClassType *)$value; })
-#define RK_CAST                             RK_CAST_OR_THROW /* Deprecated */
+#define RK_CAST(ClassType, ...)             ({ RKCastDeprecated(); RK_CAST_OR_THROW(ClassType, __VA_ARGS__); }) //deprecated
 
 ///Perform a cast with a runtime check, yielding nil if there is a type mismatch.
 #define RK_CAST_OR_NIL(ClassType, ...)  ({ id $value = __VA_ARGS__; if($value && ![$value isKindOfClass:[ClassType class]]) $value = nil; (ClassType *)$value; })
-#define RK_TRY_CAST                     RK_CAST_OR_NIL /* Deprecated */
+#define RK_TRY_CAST(ClassType, ...)     ({ RKTryCastDeprecated(); RK_CAST_OR_NIL(ClassType, __VA_ARGS__); }) //deprecated
 
 #pragma mark - Utilities
 
 ///Returns a BOOL indicating whether or not the current process is running under a debugger.
 ///
 ///The result of this function is cached after its initial call.
-RK_EXTERN BOOL RKProcessIsRunningInDebugger();
+RK_EXTERN BOOL RKProcessIsRunningInDebugger() RK_DEPRECATED("Deprecated since RoundaboutKit 2.1. RKProcessIsRunningInDebugger no longer works.");
 
 #pragma mark -
 
