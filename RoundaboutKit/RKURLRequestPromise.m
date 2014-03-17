@@ -195,7 +195,7 @@ static BOOL gActivityLoggingEnabled = NO;
         }
         
         if(gActivityLoggingEnabled)
-            RKLogInfo(@"Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+            RKLogInfo(@"Outgoing %@ request to <%@>, POST data <%@>", self.request.HTTPMethod, self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
     }];
 }
 
