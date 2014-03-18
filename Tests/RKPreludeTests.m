@@ -41,6 +41,14 @@
 
 #pragma mark - Utilities
 
+- (void)testFilterOutNSNull
+{
+    XCTAssertNotNil(RKFilterOutNSNull(@"test"), @"RKFilterOutNSNull returned inappropriate nil");
+    XCTAssertNil(RKFilterOutNSNull([NSNull null]), @"RKFilterOutNSNull didn't filter out NSNull");
+}
+
+#pragma mark -
+
 - (void)testSanitizeStringForSorting
 {
     XCTAssertEqualObjects(RKSanitizeStringForSorting(@"The Beatles"), @"Beatles", @"RKSanitizeStringForSorting returned incorrect value");

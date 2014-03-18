@@ -32,6 +32,7 @@
 #import "RKCorePostProcessors.h"
 #import "RKPossibility.h"
 #import "RKDefaults.h"
+#import "RKJson.h"
 #import "RKConnectivityManager.h"
 #import "RKURLRequestPromise.h"
 #import "RKFileSystemCacheManager.h"

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8B25BC5F18D8B825009BDC81 /* RKJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25BC5E18D8B825009BDC81 /* RKJson.m */; };
+		8B25BC6018D8B825009BDC81 /* RKJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B25BC5E18D8B825009BDC81 /* RKJson.m */; };
+		8B25BC6218D8B82C009BDC81 /* RKJson.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B25BC6118D8B82C009BDC81 /* RKJson.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8B25BC6318D8B8D7009BDC81 /* RKJson.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B25BC6118D8B82C009BDC81 /* RKJson.h */; };
 		8B39B34E1899A47E0013F0FD /* RKQueueManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B34D1899A47E0013F0FD /* RKQueueManagerTests.m */; };
 		8B39B3501899A5BA0013F0FD /* RKRequestFactoryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B34F1899A5BA0013F0FD /* RKRequestFactoryTests.m */; };
 		8B39B3541899A5F80013F0FD /* RKImageLoaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B39B3531899A5F80013F0FD /* RKImageLoaderTests.m */; };
@@ -18,7 +22,7 @@
 		8B4803F6189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
 		8B4803F7189861E8008ECE64 /* RKCorePostProcessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F4189861E8008ECE64 /* RKCorePostProcessors.m */; };
 		8B4803F91898632F008ECE64 /* RKCorePostProcessorsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B4803F81898632F008ECE64 /* RKCorePostProcessorsTests.m */; };
-		8B4803FA18986340008ECE64 /* RKCorePostProcessors.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */; };
+		8B4803FA18986340008ECE64 /* RKCorePostProcessors.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B4803F3189861E8008ECE64 /* RKCorePostProcessors.h */; };
 		8B75839C17920E7200D45F54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B75839B17920E7200D45F54 /* Foundation.framework */; };
 		8B7583D817920E9A00D45F54 /* RKActivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7583C217920E9A00D45F54 /* RKActivityManager.m */; };
 		8B7583D917920E9A00D45F54 /* RKConnectivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7583C417920E9A00D45F54 /* RKConnectivityManager.m */; };
@@ -51,25 +55,25 @@
 		8B7D8E4A1852977500215AE5 /* RKPostProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D8E481852977500215AE5 /* RKPostProcessor.m */; };
 		8B7D8E4B1852977500215AE5 /* RKPostProcessor.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D8E481852977500215AE5 /* RKPostProcessor.m */; };
 		8B7D8E4D1852B11700215AE5 /* RKSimplePostProcessorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B7D8E4C1852B11700215AE5 /* RKSimplePostProcessorTests.m */; };
-		8B91A3E9187628D000C87D47 /* RoundaboutKit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583D717920E9A00D45F54 /* RoundaboutKit.h */; };
-		8B91A3EA187628D000C87D47 /* RKPrelude.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583CD17920E9A00D45F54 /* RKPrelude.h */; };
-		8B91A3EB187628D000C87D47 /* RKPossibility.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583CB17920E9A00D45F54 /* RKPossibility.h */; };
-		8B91A3EC187628D000C87D47 /* RKPromise.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583CF17920E9A00D45F54 /* RKPromise.h */; };
-		8B91A3ED187628D000C87D47 /* RKQueueManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583D117920E9A00D45F54 /* RKQueueManager.h */; };
-		8B91A3EE187628D000C87D47 /* RKPostProcessor.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7D8E471852977500215AE5 /* RKPostProcessor.h */; };
-		8B91A3EF187628D000C87D47 /* RKRequestFactory.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583D317920E9A00D45F54 /* RKRequestFactory.h */; };
-		8B91A3F0187628D000C87D47 /* RKURLRequestPromise.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583D517920E9A00D45F54 /* RKURLRequestPromise.h */; };
-		8B91A3F1187628D000C87D47 /* RKFileSystemCacheManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C717920E9A00D45F54 /* RKFileSystemCacheManager.h */; };
-		8B91A3F2187628D000C87D47 /* RKImageLoader.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C917920E9A00D45F54 /* RKImageLoader.h */; };
-		8B91A3F3187628D000C87D47 /* RKConnectivityManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C317920E9A00D45F54 /* RKConnectivityManager.h */; };
-		8B91A3F4187628D000C87D47 /* RKActivityManager.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C117920E9A00D45F54 /* RKActivityManager.h */; };
-		8B91A3F5187628D000C87D47 /* RKDefaults.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B7583C517920E9A00D45F54 /* RKDefaults.h */; };
+		8B91A3E9187628D000C87D47 /* RoundaboutKit.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583D717920E9A00D45F54 /* RoundaboutKit.h */; };
+		8B91A3EA187628D000C87D47 /* RKPrelude.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583CD17920E9A00D45F54 /* RKPrelude.h */; };
+		8B91A3EB187628D000C87D47 /* RKPossibility.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583CB17920E9A00D45F54 /* RKPossibility.h */; };
+		8B91A3EC187628D000C87D47 /* RKPromise.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583CF17920E9A00D45F54 /* RKPromise.h */; };
+		8B91A3ED187628D000C87D47 /* RKQueueManager.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583D117920E9A00D45F54 /* RKQueueManager.h */; };
+		8B91A3EE187628D000C87D47 /* RKPostProcessor.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7D8E471852977500215AE5 /* RKPostProcessor.h */; };
+		8B91A3EF187628D000C87D47 /* RKRequestFactory.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583D317920E9A00D45F54 /* RKRequestFactory.h */; };
+		8B91A3F0187628D000C87D47 /* RKURLRequestPromise.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583D517920E9A00D45F54 /* RKURLRequestPromise.h */; };
+		8B91A3F1187628D000C87D47 /* RKFileSystemCacheManager.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583C717920E9A00D45F54 /* RKFileSystemCacheManager.h */; };
+		8B91A3F2187628D000C87D47 /* RKImageLoader.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583C917920E9A00D45F54 /* RKImageLoader.h */; };
+		8B91A3F3187628D000C87D47 /* RKConnectivityManager.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583C317920E9A00D45F54 /* RKConnectivityManager.h */; };
+		8B91A3F4187628D000C87D47 /* RKActivityManager.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583C117920E9A00D45F54 /* RKActivityManager.h */; };
+		8B91A3F5187628D000C87D47 /* RKDefaults.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B7583C517920E9A00D45F54 /* RKDefaults.h */; };
 		8B91A3FA1876291200C87D47 /* RKPersister.h in Headers */ = {isa = PBXBuildFile; fileRef = 8B91A3F81876291200C87D47 /* RKPersister.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8B91A3FB1876291200C87D47 /* RKPersister.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B91A3F91876291200C87D47 /* RKPersister.m */; };
 		8B91A3FC1876291200C87D47 /* RKPersister.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B91A3F91876291200C87D47 /* RKPersister.m */; };
-		8B91A3FD1876291700C87D47 /* RKPersister.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B91A3F81876291200C87D47 /* RKPersister.h */; };
+		8B91A3FD1876291700C87D47 /* RKPersister.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 8B91A3F81876291200C87D47 /* RKPersister.h */; };
 		8BD8DE7F18D78CA300D360E0 /* RKPreludeCollectionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD8DE7E18D78CA300D360E0 /* RKPreludeCollectionTests.m */; };
-		8BD8DE8318D791B100D360E0 /* RKPreludeJsonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD8DE8218D791B100D360E0 /* RKPreludeJsonTests.m */; };
+		8BD8DE8318D791B100D360E0 /* RKJsonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8BD8DE8218D791B100D360E0 /* RKJsonTests.m */; };
 		8BDA554417ED11E200848C2F /* RoundaboutKitMac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */; };
 		8BDA554817ED11F200848C2F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BDA554717ED11F200848C2F /* Cocoa.framework */; };
 		8BE806F71792189300DFEC35 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B7583EF1792100D00D45F54 /* Cocoa.framework */; };
@@ -109,33 +113,37 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		8B75839617920E7200D45F54 /* CopyFiles */ = {
+		8B75839617920E7200D45F54 /* Copy Headers */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				8B4803FA18986340008ECE64 /* RKCorePostProcessors.h in CopyFiles */,
-				8B91A3E9187628D000C87D47 /* RoundaboutKit.h in CopyFiles */,
-				8B91A3EA187628D000C87D47 /* RKPrelude.h in CopyFiles */,
-				8B91A3EB187628D000C87D47 /* RKPossibility.h in CopyFiles */,
-				8B91A3EC187628D000C87D47 /* RKPromise.h in CopyFiles */,
-				8B91A3ED187628D000C87D47 /* RKQueueManager.h in CopyFiles */,
-				8B91A3EE187628D000C87D47 /* RKPostProcessor.h in CopyFiles */,
-				8B91A3FD1876291700C87D47 /* RKPersister.h in CopyFiles */,
-				8B91A3EF187628D000C87D47 /* RKRequestFactory.h in CopyFiles */,
-				8B91A3F0187628D000C87D47 /* RKURLRequestPromise.h in CopyFiles */,
-				8B91A3F1187628D000C87D47 /* RKFileSystemCacheManager.h in CopyFiles */,
-				8B91A3F2187628D000C87D47 /* RKImageLoader.h in CopyFiles */,
-				8B91A3F3187628D000C87D47 /* RKConnectivityManager.h in CopyFiles */,
-				8B91A3F4187628D000C87D47 /* RKActivityManager.h in CopyFiles */,
-				8B91A3F5187628D000C87D47 /* RKDefaults.h in CopyFiles */,
+				8B4803FA18986340008ECE64 /* RKCorePostProcessors.h in Copy Headers */,
+				8B91A3E9187628D000C87D47 /* RoundaboutKit.h in Copy Headers */,
+				8B91A3EA187628D000C87D47 /* RKPrelude.h in Copy Headers */,
+				8B91A3EB187628D000C87D47 /* RKPossibility.h in Copy Headers */,
+				8B91A3EC187628D000C87D47 /* RKPromise.h in Copy Headers */,
+				8B91A3ED187628D000C87D47 /* RKQueueManager.h in Copy Headers */,
+				8B91A3EE187628D000C87D47 /* RKPostProcessor.h in Copy Headers */,
+				8B25BC6318D8B8D7009BDC81 /* RKJson.h in Copy Headers */,
+				8B91A3FD1876291700C87D47 /* RKPersister.h in Copy Headers */,
+				8B91A3EF187628D000C87D47 /* RKRequestFactory.h in Copy Headers */,
+				8B91A3F0187628D000C87D47 /* RKURLRequestPromise.h in Copy Headers */,
+				8B91A3F1187628D000C87D47 /* RKFileSystemCacheManager.h in Copy Headers */,
+				8B91A3F2187628D000C87D47 /* RKImageLoader.h in Copy Headers */,
+				8B91A3F3187628D000C87D47 /* RKConnectivityManager.h in Copy Headers */,
+				8B91A3F4187628D000C87D47 /* RKActivityManager.h in Copy Headers */,
+				8B91A3F5187628D000C87D47 /* RKDefaults.h in Copy Headers */,
 			);
+			name = "Copy Headers";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8B25BC5E18D8B825009BDC81 /* RKJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKJson.m; sourceTree = "<group>"; };
+		8B25BC6118D8B82C009BDC81 /* RKJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKJson.h; sourceTree = "<group>"; };
 		8B39B34D1899A47E0013F0FD /* RKQueueManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKQueueManagerTests.m; sourceTree = "<group>"; };
 		8B39B34F1899A5BA0013F0FD /* RKRequestFactoryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKRequestFactoryTests.m; sourceTree = "<group>"; };
 		8B39B3531899A5F80013F0FD /* RKImageLoaderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKImageLoaderTests.m; sourceTree = "<group>"; };
@@ -205,7 +213,7 @@
 		8B91A3F81876291200C87D47 /* RKPersister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKPersister.h; sourceTree = "<group>"; };
 		8B91A3F91876291200C87D47 /* RKPersister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPersister.m; sourceTree = "<group>"; };
 		8BD8DE7E18D78CA300D360E0 /* RKPreludeCollectionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeCollectionTests.m; sourceTree = "<group>"; };
-		8BD8DE8218D791B100D360E0 /* RKPreludeJsonTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKPreludeJsonTests.m; sourceTree = "<group>"; };
+		8BD8DE8218D791B100D360E0 /* RKJsonTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKJsonTests.m; sourceTree = "<group>"; };
 		8BDA554517ED11ED00848C2F /* RubyCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RubyCocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/RubyCocoa.framework; sourceTree = DEVELOPER_DIR; };
 		8BDA554717ED11F200848C2F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		8BE806F61792189300DFEC35 /* RoundaboutKitMac.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoundaboutKitMac.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -384,6 +392,8 @@
 				8B7583C217920E9A00D45F54 /* RKActivityManager.m */,
 				8B7583C517920E9A00D45F54 /* RKDefaults.h */,
 				8B7583C617920E9A00D45F54 /* RKDefaults.m */,
+				8B25BC6118D8B82C009BDC81 /* RKJson.h */,
+				8B25BC5E18D8B825009BDC81 /* RKJson.m */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -404,7 +414,7 @@
 				8B7584671792115600D45F54 /* RKTesting */,
 				8B7584541792114B00D45F54 /* RKPreludeTests.m */,
 				8BD8DE7E18D78CA300D360E0 /* RKPreludeCollectionTests.m */,
-				8BD8DE8218D791B100D360E0 /* RKPreludeJsonTests.m */,
+				8BD8DE8218D791B100D360E0 /* RKJsonTests.m */,
 				8B39B3511899A5D30013F0FD /* Asynchrony */,
 				8B39B3521899A5ED0013F0FD /* Networking */,
 				8B39B3571899A6120013F0FD /* Utilities */,
@@ -476,6 +486,7 @@
 				8BE8071F179218D000DFEC35 /* RKQueueManager.h in Headers */,
 				8BE80720179218D000DFEC35 /* RKRequestFactory.h in Headers */,
 				8B91A3FA1876291200C87D47 /* RKPersister.h in Headers */,
+				8B25BC6218D8B82C009BDC81 /* RKJson.h in Headers */,
 				8BE80721179218D000DFEC35 /* RKURLRequestPromise.h in Headers */,
 				8BE80722179218D000DFEC35 /* RKFileSystemCacheManager.h in Headers */,
 				8BE80723179218D000DFEC35 /* RKConnectivityManager.h in Headers */,
@@ -493,7 +504,7 @@
 			buildPhases = (
 				8B75839417920E7200D45F54 /* Sources */,
 				8B75839517920E7200D45F54 /* Frameworks */,
-				8B75839617920E7200D45F54 /* CopyFiles */,
+				8B75839617920E7200D45F54 /* Copy Headers */,
 			);
 			buildRules = (
 			);
@@ -610,6 +621,7 @@
 				8B7583DE17920E9A00D45F54 /* RKPrelude.m in Sources */,
 				8B7D8E4A1852977500215AE5 /* RKPostProcessor.m in Sources */,
 				8B91A3FB1876291200C87D47 /* RKPersister.m in Sources */,
+				8B25BC5F18D8B825009BDC81 /* RKJson.m in Sources */,
 				8B7583E017920E9A00D45F54 /* RKQueueManager.m in Sources */,
 				8B7583DC17920E9A00D45F54 /* RKImageLoader.m in Sources */,
 			);
@@ -625,7 +637,7 @@
 				8B7584621792114B00D45F54 /* RKPossibilityTests.m in Sources */,
 				8B75845E1792114B00D45F54 /* RKFileSystemCacheManagerTests.m in Sources */,
 				8B7584661792114B00D45F54 /* RKRunLoopTestHelper.m in Sources */,
-				8BD8DE8318D791B100D360E0 /* RKPreludeJsonTests.m in Sources */,
+				8BD8DE8318D791B100D360E0 /* RKJsonTests.m in Sources */,
 				8BD8DE7F18D78CA300D360E0 /* RKPreludeCollectionTests.m in Sources */,
 				8B7584631792114B00D45F54 /* RKPreludeTests.m in Sources */,
 				8B39B3501899A5BA0013F0FD /* RKRequestFactoryTests.m in Sources */,
@@ -658,6 +670,7 @@
 				8B4803F7189861E8008ECE64 /* RKCorePostProcessors.m in Sources */,
 				8BE8072D179218DA00DFEC35 /* RKConnectivityManager.m in Sources */,
 				8BE8072E179218DA00DFEC35 /* RKActivityManager.m in Sources */,
+				8B25BC6018D8B825009BDC81 /* RKJson.m in Sources */,
 				8BE8072F179218DA00DFEC35 /* RKDefaults.m in Sources */,
 				8B7D8E4B1852977500215AE5 /* RKPostProcessor.m in Sources */,
 			);

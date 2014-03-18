@@ -8,11 +8,11 @@
 
 #import <XCTest/XCTest.h>
 
-@interface RKPreludeJsonTests : XCTestCase
+@interface RKJsonTests : XCTestCase
 
 @end
 
-@implementation RKPreludeJsonTests {
+@implementation RKJsonTests {
     NSDictionary *_pregeneratedDictionary;
 }
 
@@ -32,16 +32,11 @@
 
 #pragma mark -
 
-- (void)testFilterOutNSNull
-{
-    XCTAssertNotNil(RKFilterOutNSNull(@"test"), @"RKFilterOutNSNull returned inappropriate nil");
-    XCTAssertNil(RKFilterOutNSNull([NSNull null]), @"RKFilterOutNSNull didn't filter out NSNull");
-}
-
 - (void)testTraversalExceptions
 {
     XCTAssertThrows(RKTraverseJson(_pregeneratedDictionary, @"(NSDictionarydictionaryLeaf", NULL), @"Should throw for open parenthesis");
     XCTAssertThrows(RKTraverseJson(_pregeneratedDictionary, @"NSDictionary)dictionaryLeaf", NULL), @"Should throw for unexpected closing parenthesis");
+    XCTAssertThrows(RKTraverseJson(_pregeneratedDictionary, @"dictionaryLeaf.{NSDictionary}", NULL), @"Should throw for malformed assertion");
     XCTAssertThrows(RKTraverseJson(_pregeneratedDictionary, @"dictionaryLeaf.{if SELF[SIZE] == 3", NULL), @"Should throw for open curly bracket");
     XCTAssertThrows(RKTraverseJson(_pregeneratedDictionary, @"dictionaryLeaf.if SELF[SIZE] == 3}", NULL), @"Should throw for unexpected closing curly bracket");
     XCTAssertThrows(RKTraverseJson(_pregeneratedDictionary, @"{if SELF[SIZE] == 3}", NULL), @"Should throw for conditional assertion at beginning");
