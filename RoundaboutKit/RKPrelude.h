@@ -284,34 +284,59 @@ RK_INLINE id RKFilterOutNSNull(id value)
 ///__Important:__ This function will be deprecated in a future version.
 RK_EXTERN id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSString *keyPath);
 
+///The error domain used by the RKTraverseJson class.
+RK_EXTERN NSString *const RKJsonTraversingErrorDomain;
+
+///The error codes used by the RKJsonTraversingErrorDomain domain.
+NS_ENUM(NSInteger, RKJsonTraversingErrorCode) {
+    ///Indicates that a type assertion was not satisfied.
+    kRKJsonTraversingErrorCodeTypeUnsatisfied = 'type',
+    
+    ///Indicates that a null leaf was encountered.
+    kRKJsonTraversingErrorCodeNullEncountered = 'null',
+    
+    ///Indicates that a condition predicate was unsatisfied.
+    kRKJsonTraversingErrorCodeConditionUnsatisifed = '!tru',
+};
+
 ///Traverses a Json dictionary using a given enhanced key path.
 ///
 /// \param  dictionary      The dictionary to traverse.
 /// \param  enhancedKeyPath An enhaneced key path to traverse the dictionary with. Required.
+/// \param  error           On return, contains an error that describes any short circuit that occurred.
 ///
 /// \result The value for the key path if no null leafs were encountered,
 ///         *and* all of the assertions were satisfied; nil otherwise.
 ///
 /// \throws NSInternalInconsistencyException when the key path contains unbalanced curly
 ///         brackets, an @keyPath operator is found, a non-existent class is referenced,
-///         or an assertion is found at the beginning of a key path.
+///         or a condition assertion is found at the beginning of a key path.
 ///
 ///The enhanced key path this function takes is an imperfect super-set of the syntax used
-///by `-[NSObject valueForKeyPath:]`. The same basic dot-syntax is used, however any time
-///an NSNull is encountered when traversing the path, the function will immediately return
-///nil. This method also supports some basic assertions. If any one of these checks fails,
-///the function will immediately return nil in the same manner it does for NSNull.
+///by `-[NSObject valueForKeyPath:]`, described in the sections below.
 ///
-///__Important:__ this function currently only supports traversing NSDictionaries.
+///Null Handling:
+///==============
+///
+///Any time either nil or NSNull is encountered while traversing a path, the traversal is
+///immediately terminated, and the function will return nil with an out error. This makes
+///it safe to traverse deep Json structures without worrying about a null exception.
 ///
 ///Assertions:
 ///===========
 ///
-///Assertions take the form of either a class name enclosed in curly braces – like {NSString} –
-///or an NSPredicate prefixed with if, also enclosed in curly braces, like {if SELF[SIZE] != 0}.
-///Assertions operate on the value of the previous component in the path. I.e. the key path
-///`name.{NSString}` would find the value for name, and then check if it was an instance of
-///NSString. Applying an assertion at the beginning of a key path will raise an exception.
+///There are two types of assertions: Type assertions, and condition assertions.
+///
+///Type assertions are placed before a path component, like `(NSString)firstName`.
+///If the path component is not of the type specified, traversing is aborted and
+///nil is returned with an out error.
+///
+///Condition assertions are always placed immediately after the path component they
+///are applied to, and are evaluated by NSPredicate. E.g. `associates.{if SELF[SIZE] > 0}`.
+///When a predicate is applied to an array, it is evaluated against each object in the array.
+///As such, the predicate must be true for every item in order for the condition to pass.
+///If the predicate passes, the object from the path to the left of the predicate is used.
+///Otherwise, the function will return nil and an out error.
 ///
 ///Operators:
 ///==========
@@ -323,10 +348,11 @@ RK_EXTERN id RKJSONDictionaryGetObjectAtKeyPath(NSDictionary *dictionary, NSStri
 ///=========
 ///
 /// - data.firstName
-/// - data.{NSDictionary}.lastName.{NSString}
-/// - data.{NSDictionary}.associates.{NSArray}.{if SELF[SIZE] > 0}
+/// - (NSDictionary)data.(NSString)lastName
+/// - (NSDictionary)data.(NSArray)associates.{if SELF[SIZE] > 0}
 ///
-RK_EXTERN id RKTraverseJson(NSDictionary *dictionary, NSString *enhancedKeyPath);
+///__Important:__ this function currently only supports traversing NSDictionaries.
+RK_EXTERN id RKTraverseJson(NSDictionary *dictionary, NSString *enhancedKeyPath, NSError **outError);
 
 #pragma mark -
 
