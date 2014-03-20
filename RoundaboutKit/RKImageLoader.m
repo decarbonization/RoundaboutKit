@@ -136,7 +136,7 @@
             imageView.image = image;
             
 #if TARGET_OS_IPHONE
-            UITableViewCell *superCell = RK_TRY_CAST(UITableViewCell, imageView.superview.superview);
+            UITableViewCell *superCell = RK_CAST_OR_NIL(UITableViewCell, imageView.superview.superview);
             [superCell setNeedsLayout];
 #endif /* TARGET_OS_IPHONE */
             

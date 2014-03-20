@@ -7,6 +7,7 @@
 //
 
 #import "RKPrelude.h"
+#import "RKJson.h"
 
 #import <sys/types.h>
 #import <unistd.h>
