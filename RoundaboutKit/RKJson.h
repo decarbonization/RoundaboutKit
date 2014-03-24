@@ -65,7 +65,10 @@ NS_ENUM(NSInteger, RKJsonTraversingErrorCode) {
 ///
 ///Any time either nil or NSNull is encountered while traversing a path, the traversal is
 ///immediately terminated, and the function will return nil with an out error. This makes
-///it safe to traverse deep Json structures without worrying about a null exception.
+///it safe to traverse deep Json structures without worrying about a null exception. If a
+///value may safely be null/nil, the key path component may be suffixed with a question mark.
+///E.g. `data.(NSString)firstName?` will return nil if first name is null/nil, but will not
+///set the error parameter.
 ///
 ///Assertions:
 ///===========
@@ -93,7 +96,8 @@ NS_ENUM(NSInteger, RKJsonTraversingErrorCode) {
 ///=========
 ///
 /// - data.firstName
-/// - (NSDictionary)data.(NSString)lastName
+/// - (NSDictionary)data.(NSString)firstName
+/// - (NSDictionary)data.(NSString)lastName?
 /// - (NSDictionary)data.(NSArray)associates.{if SELF[SIZE] > 0}
 ///
 ///__Important:__ this function currently only supports traversing NSDictionaries.

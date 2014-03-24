@@ -18,6 +18,9 @@ static NSString *const kSeparator = @".";
 ///The operator prefix used by enhanced key path operators.
 static NSString *const kOperatorPrefix = @"@";
 
+///The suffix used by enhanced key paths to mark a path component as optional.
+static NSString *const kOptionalSuffix = @"?";
+
 
 ///The token that marks the beginning of a type cast.
 static NSString *const kTypeStart = @"(";
@@ -213,12 +216,19 @@ id RKTraverseJson(NSDictionary *dictionary, NSString *enhancedKeyPath, NSError *
                 break;
             }
         } else {
-            value = RKFilterOutNSNull([value objectForKey:component]);
+            NSString *key = component;
+            
+            BOOL wantsError = YES;
+            if([key hasSuffix:kOptionalSuffix]) {
+                key = [key substringFromIndex:kOptionalSuffix.length];
+                wantsError = NO;
+            }
+            value = RKFilterOutNSNull([value objectForKey:key]);
             
             if(!value) {
-                error = [NSError errorWithDomain:RKJsonTraversingErrorDomain
-                                            code:kRKJsonTraversingErrorCodeNullEncountered
-                                        userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Object for %@ was nil", component]}];
+                if(wantsError) error = [NSError errorWithDomain:RKJsonTraversingErrorDomain
+                                                           code:kRKJsonTraversingErrorCodeNullEncountered
+                                                       userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithFormat:@"Object for %@ was nil", component]}];
                 break;
             }
         }

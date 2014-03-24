@@ -68,6 +68,20 @@
     XCTAssertEqual(error.code, kRKJsonTraversingErrorCodeNullEncountered, @"Wrong error code");
 }
 
+- (void)testIntentionalNullBehavior
+{
+    NSError *error = nil;
+    id value = nil;
+    
+    value = RKTraverseJson(_pregeneratedDictionary, @"nullLeaf?.nonExistentLeaf1", &error);
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNil(value, @"unexpected value");
+    
+    value = RKTraverseJson(_pregeneratedDictionary, @"dictionaryLeaf.nonExistentLeaf1?", &error);
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNil(value, @"unexpected value");
+}
+
 - (void)testSingleLevelTypeSafety
 {
     NSError *error = nil;
