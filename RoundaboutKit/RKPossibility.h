@@ -26,10 +26,43 @@ typedef enum RKPossibilityState : NSUInteger {
     
 } RKPossibilityState;
 
-///The RKPossibility class represents the possible outcomes of a given promise.
+///The RKPossibility class is an object-oriented representation of a tagged enum of the psuedo type:
 ///
-///The `.state` property should always be used to determine the contents of a possibility.
+/// type Possibility = Empty
+///                  | Value(id)
+///                  | Error(NSError)
+///
+///That is to say, a possibility may be empty, contain an untyped value, or contain an error. What
+///a possibility contains is tracked through the `self.state` property. A nil error or value is
+///potentially a valid state, depending on the API returning the possibility object. As such, code
+///should always use the `self.state` property to determine what a possibility contains.
+///
+///Several utility methods are provided that allow a possibilities contents to be refined or matched
+///against. All refinement methods return a new possibility, all possibilities are immutable.
 @interface RKPossibility : NSObject
+
+#pragma mark - Convenience
+
+///Returns a new possibility containing a value.
++ (instancetype)possibilityWithValue:(id)value;
+
+///Returns a new possibility containing an error.
++ (instancetype)possibilityWithError:(NSError *)error;
+
+///Returns the shared empty possibility.
++ (instancetype)emptyPossibility;
+
+#pragma mark -
+
+///Enumerates an array of RKPossibility objects and collects
+///all value-possibility values into a new array.
++ (NSArray *)valuesFromPossibilities:(NSArray *)possibilities;
+
+///Enumerates an array of RKPossibility objects and collects
+///all error-possibility errors into a new array.
++ (NSArray *)errorsFromPossibilities:(NSArray *)possibilities;
+
+#pragma mark - Lifecycle
 
 ///Initialize the receiver with a specified value.
 - (id)initWithValue:(id)value;
@@ -57,6 +90,7 @@ typedef enum RKPossibilityState : NSUInteger {
 #pragma mark - Refining
 
 ///Returns a new version of receiver by passing its value through a `value` refiner block.
+///Immediately returns the receiver if it does not contain a value.
 ///
 /// \param  refiner The refiner block. Required.
 ///
@@ -64,6 +98,7 @@ typedef enum RKPossibilityState : NSUInteger {
 - (RKPossibility *)refineValue:(RKPossibility *(^)(id value))refiner;
 
 ///Returns a new version of receiver by passing its error through a `error` refiner block.
+///Immediately returns the receiver if it does not contain an error.
 ///
 /// \param  refiner The refiner block. Required.
 ///
@@ -71,6 +106,7 @@ typedef enum RKPossibilityState : NSUInteger {
 - (RKPossibility *)refineError:(RKPossibility *(^)(NSError *error))refiner;
 
 ///Returns a new version of receiver by passing it through a `empty` refiner block.
+///Immediately returns the receiver if it is not empty.
 ///
 /// \param  refiner The refiner block. Required.
 ///
@@ -143,9 +179,9 @@ RK_EXTERN void(^kRKPossibilityDefaultErrorMatcher)(NSError *);
 /// NSError(value) -> return errorRefiner(error);
 ///}
 RK_EXTERN_OVERLOADABLE RK_DEPRECATED_SINCE_2_1 RKPossibility *RKRefinePossibility(RKPossibility *possibility,
-                                                                               RKPossibility *(^valueRefiner)(id value),
-                                                                               RKPossibility *(^emptyRefiner)(),
-                                                                               RKPossibility *(^errorRefiner)(NSError *error));
+                                                                                  RKPossibility *(^valueRefiner)(id value),
+                                                                                  RKPossibility *(^emptyRefiner)(),
+                                                                                  RKPossibility *(^errorRefiner)(NSError *error));
 
 ///Match a possibility's contents against `value` and `error` blocks.
 ///
@@ -160,9 +196,9 @@ RK_EXTERN_OVERLOADABLE RK_DEPRECATED_SINCE_2_1 RKPossibility *RKRefinePossibilit
 /// NSError(value) -> error(error);
 ///}
 RK_EXTERN_OVERLOADABLE RK_DEPRECATED_SINCE_2_1 void RKMatchPossibility(RKPossibility *possibility,
-                                                                    void(^value)(id value),
-                                                                    void(^empty)(),
-                                                                    void(^error)(NSError *error));
+                                                                       void(^value)(id value),
+                                                                       void(^empty)(),
+                                                                       void(^error)(NSError *error));
 
 #endif /* RoundaboutKit_EnableLegacyPossibilityFunctions */
 

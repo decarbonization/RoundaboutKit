@@ -14,6 +14,53 @@
     RKPossibilityState _state;
 }
 
+#pragma mark - Convenience
+
++ (instancetype)possibilityWithValue:(id)value;
+{
+    return [[self alloc] initWithValue:value];
+}
+
++ (instancetype)possibilityWithError:(NSError *)error
+{
+    return [[self alloc] initWithError:error];
+}
+
++ (instancetype)emptyPossibility
+{
+    static RKPossibility *emptyPossibility = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        emptyPossibility = [[RKPossibility alloc] initEmpty];
+    });
+    
+    return emptyPossibility;
+}
+
+#pragma mark -
+
++ (NSArray *)valuesFromPossibilities:(NSArray *)possibilities
+{
+    return RKCollectionMapToArray(possibilities, ^id(RKPossibility *maybeValue) {
+        if(maybeValue.state == kRKPossibilityStateValue)
+            return maybeValue.value;
+        else
+            return nil;
+    });
+}
+
++ (NSArray *)errorsFromPossibilities:(NSArray *)possibilities
+{
+    return RKCollectionMapToArray(possibilities, ^id(RKPossibility *maybeError) {
+        if(maybeError.state == kRKPossibilityStateError)
+            return maybeError.error;
+        else
+            return nil;
+    });
+}
+
+#pragma mark - Lifecycle
+
 - (id)initWithValue:(id)value
 {
 	if((self = [super init])) {
