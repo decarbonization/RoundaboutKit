@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "RoundaboutKit"
-  s.version      = "2.2.0"
+  s.version      = "2.2.1"
   s.summary      = "A collection of asynchronous programming abstractions, utility functions, and a networking stack to assist in the creation of applications."
   s.description  = <<-DESC
                    A collection of asynchronous programming abstractions, utility functions, and a networking stack to assist in the creation of applications.
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '6.0'
   s.osx.deployment_target = '10.8'
 
-  s.source       = { :git => "https://github.com/decarbonization/RoundaboutKit.git", :tag => "2.2.0" }
+  s.source       = { :git => "https://github.com/decarbonization/RoundaboutKit.git", :tag => "2.2.1" }
 
   s.source_files  = 'Classes', 'RoundaboutKit/*.{h,m}'
   s.prefix_header_file = "RoundaboutKit/RoundaboutKit-Prefix.pch"
