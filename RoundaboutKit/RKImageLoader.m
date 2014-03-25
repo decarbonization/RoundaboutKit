@@ -140,7 +140,7 @@
             [superCell setNeedsLayout];
 #endif /* TARGET_OS_IPHONE */
             
-            if(xCGSizeGetArea(image.size) < xCGSizeGetArea(_maximumCacheableSize))
+            if(image && xCGSizeGetArea(image.size) < xCGSizeGetArea(_maximumCacheableSize))
                 [self.inMemoryCache setObject:image forKey:imagePromise.cacheIdentifier cost:image.size.width + image.size.height];
             
             [self.imageMap removeObjectForKey:imageView];
