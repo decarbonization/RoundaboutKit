@@ -195,7 +195,7 @@ static BOOL gActivityLoggingEnabled = NO;
         }
         
         if(gActivityLoggingEnabled)
-            RKLogInfo(@"Outgoing request to <%@>, POST data <%@>", self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+            RKLogInfo(@"Outgoing %@ request to <%@>, POST data <%@>", self.request.HTTPMethod, self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
     }];
 }
 
@@ -241,6 +241,9 @@ static BOOL gActivityLoggingEnabled = NO;
     if(data) {
         self.isCacheLoaded = YES;
         
+        if (gActivityLoggingEnabled)
+            RKLogInfo(@"Loaded cached data for %@", self.cacheIdentifier);
+
         [self acceptWithData:data];
     } else {
         NSError *removeError = nil;
