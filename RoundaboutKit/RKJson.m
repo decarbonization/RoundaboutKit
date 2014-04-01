@@ -220,7 +220,7 @@ id RKTraverseJson(NSDictionary *dictionary, NSString *enhancedKeyPath, NSError *
             
             BOOL wantsError = YES;
             if([key hasSuffix:kOptionalSuffix]) {
-                key = [key substringFromIndex:kOptionalSuffix.length];
+                key = [key substringToIndex:key.length - kOptionalSuffix.length];
                 wantsError = NO;
             }
             value = RKFilterOutNSNull([value objectForKey:key]);

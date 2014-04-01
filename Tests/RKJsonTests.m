@@ -73,6 +73,11 @@
     NSError *error = nil;
     id value = nil;
     
+    value = RKTraverseJson(_pregeneratedDictionary, @"dictionaryLeaf?", &error);
+    XCTAssertNil(error, @"unexpected error");
+    XCTAssertNotNil(value, @"expected value");
+    
+    
     value = RKTraverseJson(_pregeneratedDictionary, @"nullLeaf?.nonExistentLeaf1", &error);
     XCTAssertNil(error, @"unexpected error");
     XCTAssertNil(value, @"unexpected value");
