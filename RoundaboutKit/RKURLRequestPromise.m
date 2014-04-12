@@ -194,8 +194,12 @@ static BOOL gActivityLoggingEnabled = NO;
             [self.connection start];
         }
         
-        if(gActivityLoggingEnabled)
-            RKLogInfo(@"Outgoing %@ request to <%@>, POST data <%@>", self.request.HTTPMethod, self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+        if(gActivityLoggingEnabled) {
+            NSString *message = [NSString stringWithFormat:@"%@ <%@>", self.request.HTTPMethod, self.request.URL];
+            NSString *postData = (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"");
+            NSDictionary *properties = @{@"request":self.request, @"URL":self.request.URL, @"post data":postData};
+            RKLogNetworkWithProperties(message, properties);
+        }
     }];
 }
 
@@ -212,7 +216,7 @@ static BOOL gActivityLoggingEnabled = NO;
         [_loadedDataLock unlock];
         
         if(gActivityLoggingEnabled)
-            RKLogInfo(@"Outgoing request to <%@> canceled", self.request.URL);
+            RKLogNetwork(@"Canceled request <%@>", self.request.URL);
         
         [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
@@ -241,8 +245,12 @@ static BOOL gActivityLoggingEnabled = NO;
     if(data) {
         self.isCacheLoaded = YES;
         
-        if (gActivityLoggingEnabled)
-            RKLogInfo(@"Loaded cached data for %@", self.cacheIdentifier);
+        if (gActivityLoggingEnabled) {
+            NSString *message = [NSString stringWithFormat:@"Loaded cached data for %@", self.cacheIdentifier];
+            NSString *cachedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] ?: @"";
+            NSDictionary *properties = @{@"request":self.request, @"URL":self.request.URL, @"cached data":cachedData};
+            RKLogNetworkWithProperties(message, properties);
+        }
 
         [self acceptWithData:data];
     } else {
@@ -314,8 +322,11 @@ static BOOL gActivityLoggingEnabled = NO;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
-    if(gActivityLoggingEnabled)
-        RKLogInfo(@"%@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    if(gActivityLoggingEnabled) {
+        NSString *message = [NSString stringWithFormat:@"%@Response %@ %@",  (_isInOfflineMode? @"(offline) " : @""), self.request.HTTPMethod, self.request.URL];
+        NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] ?: @"";
+        RKLogNetworkWithProperties(message, @{@"responseData": dataString});
+    }
     
     [self accept:data];
 }

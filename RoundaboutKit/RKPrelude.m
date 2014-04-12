@@ -379,28 +379,35 @@ static NSString *RKLogTypeGetLogString(RKLogType type)
         case kRKLogTypeInfo:
             return @"Info";
             
+        case kRKLogTypeNetwork:
+            return @"Network";
+            
         default:
             [NSException raise:NSInternalInconsistencyException format:@"Invalid log type"];
             return nil;
     }
 }
 
-void RKLog_Internal(const char *prettyFunction, int line, RKLogType type, NSString *format, ...)
+void RKLog_InternalWithProperties(const char *prettyFunction, int line, RKLogType type, NSString *message, NSDictionary *properties)
 {
     NSCParameterAssert(prettyFunction);
     NSCAssert((type != kNilOptions && type != kRKLogTypeAll), @"Contextually invalid log type.");
     
-    va_list formatArgs;
-    va_start(formatArgs, format);
-    NSString *message = [[NSString alloc] initWithFormat:format arguments:formatArgs];
-    va_end(formatArgs);
-    
     for (RKLogHookBlock hook in RKGetLogHooks())
-        hook(type, prettyFunction, line, message);
+        hook(type, prettyFunction, line, message, properties);
     
     if(RK_FLAG_IS_SET(RKGlobalLoggingTypesEnabled, type)) {
         NSLog(@"[%@ from '%s' line %d] %@", RKLogTypeGetLogString(type), prettyFunction, line, message);
     }
+}
+
+void RKLog_Internal(const char *prettyFunction, int line, RKLogType type, NSString *format, ...)
+{
+    va_list formatArgs;
+    va_start(formatArgs, format);
+    NSString *message = [[NSString alloc] initWithFormat:format arguments:formatArgs];
+    va_end(formatArgs);
+    RKLog_InternalWithProperties(prettyFunction, line, type, message, nil);
 }
 
 void RKLogAddHook(RKLogHookBlock hookBlock)
