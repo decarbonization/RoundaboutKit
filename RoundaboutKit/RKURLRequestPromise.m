@@ -71,6 +71,8 @@ static NSString *const kDefaultRevision = @"-1";
 
 #pragma mark - Logging
 
+@dynamic requestIdentifier;
+
 ///Whether or not activity logging is enabled.
 static BOOL gActivityLoggingEnabled = NO;
 
