@@ -378,6 +378,12 @@ RK_EXTERN void RKLog_InternalWithProperties(const char *prettyFunction, int line
 ///It is not safe to invoke this function from anything but the main thread.
 RK_EXTERN void RKLogAddHook(RKLogHookBlock hookBlock);
 
+///Clears out all of the previously added RKLog hooks. Used for testing.
+///
+///##Important:
+///It is not safe to invoke this function from anything but the main thread.
+RK_EXTERN void RKLogResetHooks();
+
 #if RKLogEnabled
 
 ///Logs a given error message.

@@ -25,6 +25,30 @@
     XCTAssertEqualObjects(RKMakeStringFromTimeInterval(-150.0), @"-:--", @"RKMakeStringFromTimeInterval w/negative value returned wrong value");
 }
 
+#pragma mark - Logging
+
+- (void)testLogFormatting
+{
+    RKLogResetHooks();
+    
+    RKLogAddHook(^(RKLogType type, const char *prettyFunction, int line, NSString *message, NSDictionary *properties) {
+        XCTAssertEqualObjects(message, @"testing 1 2 3", @"improperly formatted");
+    });
+    
+    RKLogInfo(@"testing %@ %ld %.0f", @1, (long)2, 3.0);
+}
+
+- (void)testLogProperties
+{
+    RKLogResetHooks();
+    
+    RKLogAddHook(^(RKLogType type, const char *prettyFunction, int line, NSString *message, NSDictionary *properties) {
+        XCTAssertEqualObjects(properties, @{@"testing": @"1 2 3"}, @"wrong properties dictionary");
+    });
+    
+    RKLogNetworkWithProperties(@{@"testing": @"1 2 3"}, @"test log");
+}
+
 #pragma mark - Safe Casting
 
 - (void)testCast

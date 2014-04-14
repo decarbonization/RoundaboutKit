@@ -393,11 +393,16 @@ void RKLog_InternalWithProperties(const char *prettyFunction, int line, RKLogTyp
     NSCParameterAssert(prettyFunction);
     NSCAssert((type != kNilOptions && type != kRKLogTypeAll), @"Contextually invalid log type.");
     
+    va_list args;
+    va_start(args, message);
+    NSString *formattedMessage = [[NSString alloc] initWithFormat:message arguments:args];
+    va_end(args);
+    
     for (RKLogHookBlock hook in RKGetLogHooks())
-        hook(type, prettyFunction, line, message, properties);
+        hook(type, prettyFunction, line, formattedMessage, properties);
     
     if(RK_FLAG_IS_SET(RKGlobalLoggingTypesEnabled, type)) {
-        NSLog(@"[%@ from '%s' line %d] %@", RKLogTypeGetLogString(type), prettyFunction, line, message);
+        NSLog(@"[%@ from '%s' line %d] %@", RKLogTypeGetLogString(type), prettyFunction, line, formattedMessage);
     }
 }
 
@@ -406,6 +411,11 @@ void RKLogAddHook(RKLogHookBlock hookBlock)
     NSCParameterAssert(hookBlock);
     
     [RKGetLogHooks() addObject:[hookBlock copy]];
+}
+
+void RKLogResetHooks()
+{
+    [RKGetLogHooks() removeAllObjects];
 }
 
 #pragma mark - Mac Image Tools
