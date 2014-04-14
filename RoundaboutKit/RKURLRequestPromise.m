@@ -33,13 +33,14 @@ static NSString *const kDefaultRevision = @"-1";
 ///Whether or not the cache has been successfully loaded.
 @property BOOL isCacheLoaded;
 
+@property (readonly) NSString *requestIdentifier;
+
 #pragma mark - Readwrite Properties
 
 @property (readwrite, RK_NONATOMIC_IOSONLY) NSURLRequest *request;
 @property (copy, readwrite) NSHTTPURLResponse *response;
 @property (readwrite, RK_NONATOMIC_IOSONLY) id <RKURLRequestPromiseCacheManager> cacheManager;
 @property (readwrite, RK_NONATOMIC_IOSONLY) RKURLRequestPromiseOfflineBehavior offlineBehavior;
-
 @end
 
 #pragma mark -
@@ -69,6 +70,8 @@ static NSString *const kDefaultRevision = @"-1";
 }
 
 #pragma mark - Logging
+
+@dynamic requestIdentifier;
 
 ///Whether or not activity logging is enabled.
 static BOOL gActivityLoggingEnabled = NO;
@@ -185,17 +188,16 @@ static BOOL gActivityLoggingEnabled = NO;
                 [self loadCacheAndReportError:YES];
             }];
         } else {
-            
-            self.connection = [[NSURLConnection alloc] initWithRequest:self.request
-                                                              delegate:self
-                                                      startImmediately:NO];
-            
+            self.connection = [[NSURLConnection alloc] initWithRequest:self.request delegate:self startImmediately:NO];
             [self.connection setDelegateQueue:workQueue];
             [self.connection start];
         }
         
-        if(gActivityLoggingEnabled)
-            RKLogInfo(@"Outgoing %@ request to <%@>, POST data <%@>", self.request.HTTPMethod, self.request.URL, (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+        if(gActivityLoggingEnabled) {
+            NSString *postData = (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"");
+            NSDictionary *properties = @{@"request":self.requestIdentifier, @"URL":self.request.URL, @"post data":postData, @"headers": (self.request.allHTTPHeaderFields ?: @{})};
+            RKLogNetworkWithProperties(properties, @"%@ <%@>", self.request.HTTPMethod, self.request.URL);
+        }
     }];
 }
 
@@ -211,8 +213,10 @@ static BOOL gActivityLoggingEnabled = NO;
         _loadedData = nil;
         [_loadedDataLock unlock];
         
-        if(gActivityLoggingEnabled)
-            RKLogInfo(@"Outgoing request to <%@> canceled", self.request.URL);
+        if(gActivityLoggingEnabled) {
+            NSDictionary *properties = @{@"request":self.requestIdentifier, @"URL":self.request.URL};
+            RKLogNetworkWithProperties(properties, @"Canceled request");
+        }
         
         [[RKActivityManager sharedActivityManager] decrementActivityCount];
         
@@ -241,8 +245,11 @@ static BOOL gActivityLoggingEnabled = NO;
     if(data) {
         self.isCacheLoaded = YES;
         
-        if (gActivityLoggingEnabled)
-            RKLogInfo(@"Loaded cached data for %@", self.cacheIdentifier);
+        if (gActivityLoggingEnabled) {
+            NSString *cachedData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] ?: @"";
+            NSDictionary *properties = @{@"request":self.requestIdentifier, @"URL":self.request.URL, @"cached data":cachedData};
+            RKLogNetworkWithProperties(properties, @"Loaded cached data for %@", self.cacheIdentifier);
+        }
 
         [self acceptWithData:data];
     } else {
@@ -314,8 +321,10 @@ static BOOL gActivityLoggingEnabled = NO;
     
     [[RKActivityManager sharedActivityManager] decrementActivityCount];
     
-    if(gActivityLoggingEnabled)
-        RKLogInfo(@"%@Response for request to <%@>: %@", (_isInOfflineMode? @"(offline) " : @""), self.request.URL, [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+    if(gActivityLoggingEnabled) {
+        NSDictionary *properties = @{@"request": self.requestIdentifier, @"URL":self.request.URL, @"responseData": ([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] ?: @"")};
+        RKLogNetworkWithProperties(properties, @"Response Data %@", self.request.URL);
+    }
     
     [self accept:data];
 }
@@ -363,6 +372,11 @@ static BOOL gActivityLoggingEnabled = NO;
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response
 {
     self.response = response;
+    
+    if(gActivityLoggingEnabled) {
+        NSDictionary *properties = @{@"request": self.requestIdentifier, @"URL":self.request.URL, @"headers": (response.allHeaderFields ?: @{})};
+        RKLogNetworkWithProperties(properties, @"%@Response %@ %@",  (_isInOfflineMode? @"(offline) " : @""), self.request.HTTPMethod, self.request.URL);
+    }
     
     if(!self.cacheManager || self.canceled || self.cacheIdentifier == nil)
         return;
@@ -527,6 +541,11 @@ RK_OVERLOADABLE RKSimplePostProcessorBlock RKPostProcessorBlockChain(RKSimplePos
                     format:@"Cannot use %s when an old-style post processor is set.", __PRETTY_FUNCTION__];
     
     [super addPostProcessors:processors];
+}
+
+- (NSString *) requestIdentifier
+{
+    return [NSString stringWithFormat:@"%p", self.request];
 }
 
 @end

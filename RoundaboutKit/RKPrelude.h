@@ -323,9 +323,12 @@ typedef NS_OPTIONS(NSUInteger, RKLogType) {
     ///Info messages.
     kRKLogTypeInfo = (1 << 3),
     
+    ///Info messages.
+    kRKLogTypeNetwork = (1 << 4),
+    
     
     ///All of the different types of log messages.
-    kRKLogTypeAll = (kRKLogTypeErrors | kRKLogTypeWarnings | kRKLogTypeInfo)
+    kRKLogTypeAll = (kRKLogTypeErrors | kRKLogTypeWarnings | kRKLogTypeInfo | kRKLogTypeNetwork)
 };
 
 ///A bit-or'd value describing which types of log messages that should
@@ -339,8 +342,11 @@ RK_EXTERN RKLogType RKGlobalLoggingTypesEnabled;
 ///The block type used to implement logging hooks in the RKLog mechanism.
 ///
 /// \param  type    The type of message being logged.
+/// \param  prettyFunction
+/// \param  line
 /// \param  message The message being logged. This string is the result
 ///                 of evaluating format+varargs on the RKLog functions.
+/// \param  properties The properties being logged.
 ///
 ///Thread hook blocks may be invoked from any thread.
 ///Hooks do not filter based on what types are enabled. If a hook
@@ -348,7 +354,7 @@ RK_EXTERN RKLogType RKGlobalLoggingTypesEnabled;
 ///output, it should compare `type` against `RKGlobalLoggingTypesEnabled`.
 ///
 /// \seealso(RKLogAddHook)
-typedef void(^RKLogHookBlock)(RKLogType type, const char *prettyFunction, int line, NSString *message);
+typedef void(^RKLogHookBlock)(RKLogType type, const char *prettyFunction, int line, NSString *message, NSDictionary *properties);
 
 ///The primitive logging function used by all RK logging macros. Conditionally
 ///prints a given format-string and its arguments to `stderr` if the given
@@ -356,11 +362,12 @@ typedef void(^RKLogHookBlock)(RKLogType type, const char *prettyFunction, int li
 ///
 /// \param  prettyFunction  The function which the log function is being invoked from. Required.
 /// \param  type            The type of message being logged. Must not be `kNilOptions` or `kRKLogTypeAll`.
+/// \param  properties      An optional dictionary of properties.
 /// \param  format          A format string. Required.
 /// \param  ...             A comma-separated list of arguments to substitute into format.
 ///
 ///This function should never be invoked directly, but always through one the `RKLog` macros.
-RK_EXTERN void RKLog_Internal(const char *prettyFunction, int line, RKLogType type, NSString *format, ...) NS_FORMAT_FUNCTION(4, 5);
+RK_EXTERN void RKLog_InternalWithProperties(const char *prettyFunction, int line, RKLogType type, NSDictionary *properties, NSString *message, ...);
 
 ///Adds a block to be executed every time one of the RKLog function-like is invoked.
 ///Log hook blocks are invoked before the logging information is passed along to NSLog.
@@ -381,7 +388,7 @@ RK_EXTERN void RKLogAddHook(RKLogHookBlock hookBlock);
 ///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeErrors`.
 ///
 ///Expands to nothing if `RKLogEnabled` is zero or undefined.
-#   define RKLogError(format, ...)     RKLog_Internal(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeErrors, format, ##__VA_ARGS__)
+#   define RKLogError(format, ...)     RKLog_InternalWithProperties(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeErrors, nil, format, ##__VA_ARGS__)
 
 ///Logs a given warning message.
 ///
@@ -391,7 +398,7 @@ RK_EXTERN void RKLogAddHook(RKLogHookBlock hookBlock);
 ///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeWarnings`.
 ///
 ///Expands to nothing if `RKLogEnabled` is zero or undefined.
-#   define RKLogWarning(format, ...)   RKLog_Internal(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeWarnings, format, ##__VA_ARGS__)
+#   define RKLogWarning(format, ...)   RKLog_InternalWithProperties(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeWarnings, nil, format, ##__VA_ARGS__)
 
 ///Logs a given informative message.
 ///
@@ -401,7 +408,27 @@ RK_EXTERN void RKLogAddHook(RKLogHookBlock hookBlock);
 ///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeInfo`.
 ///
 ///Expands to nothing if `RKLogEnabled` is zero or undefined.
-#   define RKLogInfo(format, ...)      RKLog_Internal(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeInfo, format, ##__VA_ARGS__)
+#   define RKLogInfo(format, ...)      RKLog_InternalWithProperties(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeInfo, nil, format, ##__VA_ARGS__)
+
+///Logs a given network message.
+///
+/// \param  format          A format string. Required.
+/// \param  ...             A comma-separated list of arguments to substitute into format.
+///
+///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeNetwork`.
+///
+///Expands to nothing if `RKLogEnabled` is zero or undefined.
+#   define RKLogNetwork(format, ...)   RKLog_InternalWithProperties(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeNetwork, nil, format, ##__VA_ARGS__)
+
+///Logs a given network message and includes.
+///
+/// \param  string          A string. Required.
+/// \param  properties      A dictionary. Can be nil.
+///
+///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeNetwork`.
+///
+///Expands to nothing if `RKLogEnabled` is zero or undefined.
+#   define RKLogNetworkWithProperties(properties, string, ...)      RKLog_InternalWithProperties(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeNetwork, properties, string, ##__VA_ARGS__)
 
 ///Logs a trace indicating a certain line in the containing function has been passed.
 ///
@@ -411,7 +438,7 @@ RK_EXTERN void RKLogAddHook(RKLogHookBlock hookBlock);
 ///No-op if `RKGlobalLoggingTypesEnabled` doesn't contain `kRKLogTypeInfo`.
 ///
 ///Expands to nothing if `RKLogEnabled` is zero or undefined.
-#   define RKLogTrace()                RKLog_Internal(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeInfo, @"trace")
+#   define RKLogTrace()                RKLog_InternalWithProperties(__PRETTY_FUNCTION__, __LINE__, kRKLogTypeInfo, nil, @"trace")
 
 #else
 #   define RKLogError(format, ...)
