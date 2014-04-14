@@ -12,7 +12,7 @@
 #import <Foundation/Foundation.h>
 
 ///The version of the RoundaboutKit being embedded.
-#define RoundaboutKit_Version                           22L
+#define RoundaboutKit_Version                           23L
 
 ///Whether or not the embedded version of RoundaboutKit is considered stable.
 #define RoundaboutKit_Stable                            1
