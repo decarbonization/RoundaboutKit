@@ -194,9 +194,10 @@ static BOOL gActivityLoggingEnabled = NO;
         }
         
         if(gActivityLoggingEnabled) {
-            NSString *postData = (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"");
-            NSDictionary *properties = @{@"request":self.requestIdentifier, @"URL":self.request.URL, @"post data":postData, @"headers": (self.request.allHTTPHeaderFields ?: @{})};
-            RKLogNetworkWithProperties(properties, @"%@ <%@>", self.request.HTTPMethod, self.request.URL);
+            RKLogInfo(@"Outgoing %@ request to <%@>, POST data <%@>",
+                      self.request.HTTPMethod,
+                      self.request.URL,
+                      (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
         }
     }];
 }
