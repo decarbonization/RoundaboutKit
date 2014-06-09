@@ -142,6 +142,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		57B8FE12194620A400F1866B /* RoundaboutKit.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = RoundaboutKit.podspec; sourceTree = "<group>"; };
 		8B25BC5E18D8B825009BDC81 /* RKJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKJson.m; sourceTree = "<group>"; };
 		8B25BC6118D8B82C009BDC81 /* RKJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKJson.h; sourceTree = "<group>"; };
 		8B39B34D1899A47E0013F0FD /* RKQueueManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKQueueManagerTests.m; sourceTree = "<group>"; };
@@ -344,6 +345,7 @@
 		8B75839E17920E7200D45F54 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				57B8FE12194620A400F1866B /* RoundaboutKit.podspec */,
 				8B75839F17920E7200D45F54 /* RoundaboutKit-Prefix.pch */,
 			);
 			name = "Supporting Files";

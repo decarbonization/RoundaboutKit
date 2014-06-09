@@ -194,10 +194,12 @@ static BOOL gActivityLoggingEnabled = NO;
         }
         
         if(gActivityLoggingEnabled) {
-            RKLogInfo(@"Outgoing %@ request to <%@>, POST data <%@>",
-                      self.request.HTTPMethod,
-                      self.request.URL,
-                      (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"(none)"));
+            NSString *postData = (self.request.HTTPBody? [[NSString alloc] initWithData:self.request.HTTPBody encoding:NSUTF8StringEncoding] : @"");
+            if (!postData) {
+                postData = @"Non-UTF8 Data";
+            }
+            NSDictionary *properties = @{@"request":self.requestIdentifier, @"URL":self.request.URL, @"post data":postData, @"headers": (self.request.allHTTPHeaderFields ?: @{})};
+            RKLogNetworkWithProperties(properties, @"%@ <%@>", self.request.HTTPMethod, self.request.URL);
         }
     }];
 }
