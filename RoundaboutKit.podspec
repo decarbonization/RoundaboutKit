@@ -1,4 +1,4 @@
-version = '2.3.2'
+version = '2.3.3'
 
 Pod::Spec.new do |s|
   s.name         = "RoundaboutKit"
