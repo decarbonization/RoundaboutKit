@@ -67,16 +67,25 @@
 
 #pragma mark - Dispensing NSURLRequests
 
-- (NSURLRequest *)GETRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters
+- (NSMutableURLRequest *)baseRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self URLWithPath:path parameters:parameters]];
+    for (id key in [self.additionalHeaders allKeys]) {
+        [request addValue:[self.additionalHeaders objectForKey:key]  forHTTPHeaderField:key];
+    }
+    return request;
+}
+
+- (NSURLRequest *)GETRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters
+{
+    NSMutableURLRequest *request = [self baseRequestWithPath:path parameters:parameters];
     [request setHTTPMethod:@"GET"];
     return request;
 }
 
 - (NSURLRequest *)DELETERequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters
 {
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self URLWithPath:path parameters:parameters]];
+    NSMutableURLRequest *request = [self baseRequestWithPath:path parameters:parameters];
     [request setHTTPMethod:@"DELETE"];
     return request;
 }
@@ -115,7 +124,7 @@
 
 - (NSURLRequest *)POSTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters body:(id)body bodyType:(RKRequestFactoryBodyType)bodyType
 {
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self URLWithPath:path parameters:parameters]];
+    NSMutableURLRequest *request = [self baseRequestWithPath:path parameters:parameters];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[self bodyForPayload:body bodyType:bodyType]];
     return request;
@@ -123,7 +132,7 @@
 
 - (NSURLRequest *)PUTRequestWithPath:(NSString *)path parameters:(NSDictionary *)parameters body:(id)body bodyType:(RKRequestFactoryBodyType)bodyType
 {
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self URLWithPath:path parameters:parameters]];
+    NSMutableURLRequest *request = [self baseRequestWithPath:path parameters:parameters];
     [request setHTTPMethod:@"PUT"];
     [request setHTTPBody:[self bodyForPayload:body bodyType:bodyType]];
     return request;

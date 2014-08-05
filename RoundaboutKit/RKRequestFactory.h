@@ -68,6 +68,9 @@ typedef NS_ENUM(NSUInteger, RKRequestFactoryBodyType) {
 ///The post processors to use for vended requests.
 @property (readonly, copy, RK_NONATOMIC_IOSONLY) NSArray *postProcessors;
 
+///Headers to include in each request.
+@property (copy, RK_NONATOMIC_IOSONLY) NSDictionary *additionalHeaders;
+
 #pragma mark -
 
 ///The authentication handler to use for requests.
