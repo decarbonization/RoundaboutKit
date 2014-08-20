@@ -1,4 +1,4 @@
-version = '2.3.3'
+version = '2.3.4'
 
 Pod::Spec.new do |s|
   s.name         = "RoundaboutKit"
@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '6.0'
   s.osx.deployment_target = '10.8'
 
-  s.source       = { :git => "https://github.com/decarbonization/RoundaboutKit.git", :tag => version }
+  s.source       = { :git => "git@github.com:TeamSidewinder/RoundaboutKit.git", :tag => version }
 
   s.source_files  = 'Classes', 'RoundaboutKit/*.{h,m}'
   s.prefix_header_file = "RoundaboutKit/RoundaboutKit-Prefix.pch"
